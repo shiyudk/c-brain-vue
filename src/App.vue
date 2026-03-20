@@ -1023,7 +1023,10 @@ html {
     display: none !important;
   }
   .search-bar {
-    width: 150px; /* 모바일에서 검색창 크기 조절 */
+    width: 100px; /* 기존 150px에서 2/3 사이즈로 축소 */
+  }
+  .mobile-menu-btn {
+    margin-right: 10px; /* 검색창이 줄어듦에 따라 아이콘도 자연스럽게 왼쪽으로 이동 */
   }
 }
 </style>
