@@ -47,12 +47,11 @@ onMounted(() => {
           <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
         </a>
         <nav class="nav-links">
-          <a href="#science">회사소개</a>
-          <a href="#science">과학교구</a>
+          <a href="#company">회사소개</a>
           <a href="#ai">AI로봇 컨설팅</a>
-          <a href="#personal">개인컨설팅</a>
-          <a href="#lifestyle">리빙/굿즈</a>
-          <a href="#ai-club">AI 구독클럽</a>
+          <a href="#personal">퍼스널 컨설팅</a>
+          <a href="#science">키즈 컨설팅</a>
+          <a href="#lifestyle">굿즈</a>
         </nav>
         <div class="nav-actions">
           <!-- 둥근 검색창 -->
@@ -150,18 +149,7 @@ onMounted(() => {
         <section id="products" class="products-section">
           <div class="section-container animate-hidden">
             <div class="grid-container">
-              <!-- Product 1 -->
-              <div class="tech-card" @click="goToCheckout('2-5세 과학교구')">
-                <div class="card-img-placeholder c-science">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>고등과학 2-5세 과학교구</h3>
-                  <button>구매하기</button>
-                </div>
-              </div>
-
-              <!-- Product 2 -->
+              <!-- Product 1: AI (reordered) -->
               <div class="tech-card" @click="goToCheckout('AI로봇 컨설팅')">
                 <div class="card-img-placeholder c-ai">
                   <span class="glow"></span>
@@ -172,19 +160,30 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Product 3 -->
-              <div class="tech-card" @click="goToCheckout('개인 컨설팅')">
+              <!-- Product 2: Personal (reordered) -->
+              <div class="tech-card" @click="goToCheckout('퍼스널 컨설팅')">
                 <div class="card-img-placeholder c-personal">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>1:1 하이엔드 멘토링</h3>
+                  <h3>하이엔드 퍼스널 컨설팅</h3>
+                  <button>구매하기</button>
+                </div>
+              </div>
+
+              <!-- Product 3: Kids (reordered) -->
+              <div class="tech-card" @click="goToCheckout('키즈 컨설팅')">
+                <div class="card-img-placeholder c-science">
+                  <span class="glow"></span>
+                </div>
+                <div class="tech-card-info">
+                  <h3>프리미엄 키즈 컨설팅</h3>
                   <button>구매하기</button>
                 </div>
               </div>
 
               <!-- Product 4 -->
-              <div class="tech-card" @click="goToCheckout('라이프스타일 굿즈')">
+              <div class="tech-card" @click="goToCheckout('디자인 굿즈')">
                 <div class="card-img-placeholder c-goods">
                   <span class="glow"></span>
                 </div>
