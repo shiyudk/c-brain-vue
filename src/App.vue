@@ -4,6 +4,12 @@ import CheckoutPage from './components/CheckoutPage.vue'
 
 const currentView = ref('home')
 const selectedProduct = ref(null)
+const isMobileMenuOpen = ref(false)
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : ''
+}
 
 const goToCheckout = (productName) => {
   selectedProduct.value = productName
@@ -33,10 +39,8 @@ onMounted(() => {
     <div class="top-utility-bar" v-if="currentView === 'home'">
       <div class="utility-content">
         <a href="#">고객지원</a>
-        <a href="#">비즈니스 ↗</a>
-        <a href="#">사업자몰 ↗</a>
-        <a href="#">브레인스토어</a>
-        <a href="#">지속가능경영</a>
+        <a href="#">채용정보</a>
+        <a href="#">회원가입</a>
       </div>
     </div>
 
@@ -57,13 +61,35 @@ onMounted(() => {
           <!-- 둥근 검색창 -->
           <div class="search-bar">
             <span class="search-icon">🔍</span>
-            <input type="text" placeholder="AI 컨설팅 검색" />
+            <input type="text" placeholder="검색" />
           </div>
-          <a href="#cart" class="icon-btn">🛒</a>
-          <a href="#login" class="icon-btn">👤</a>
+          <a href="#cart" class="icon-btn hide-mobile">🛒</a>
+          <a href="#login" class="icon-btn hide-mobile">👤</a>
+          <!-- 햄버거 메뉴 버튼 -->
+          <button class="mobile-menu-btn" @click="toggleMobileMenu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
         </div>
       </div>
     </header>
+
+    <!-- Mobile Slide-out Menu -->
+    <div class="mobile-overlay" :class="{ 'is-open': isMobileMenuOpen }" @click="toggleMobileMenu"></div>
+    <div class="mobile-slide-menu" :class="{ 'is-open': isMobileMenuOpen }">
+      <div class="mobile-menu-header">
+        <span class="mobile-menu-title">MENU</span>
+        <button class="close-menu-btn" @click="toggleMobileMenu">✕</button>
+      </div>
+      <nav class="mobile-nav-links">
+        <a href="#company" @click="toggleMobileMenu">회사소개</a>
+        <a href="#ai" @click="toggleMobileMenu">AI로봇 컨설팅</a>
+        <a href="#personal" @click="toggleMobileMenu">퍼스널 컨설팅</a>
+        <a href="#science" @click="toggleMobileMenu">키즈 컨설팅</a>
+        <a href="#lifestyle" @click="toggleMobileMenu">굿즈</a>
+      </nav>
+    </div>
 
     <main class="main-content">
       <!-- HOME VIEW (Tech Landing Page) -->
@@ -885,6 +911,119 @@ html {
   }
   .quote-text {
     font-size: 1.2rem;
+  }
+}
+
+/* Mobile Slide Menu Styles */
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1002;
+  padding: 5px 10px;
+}
+
+.hamburger-line {
+  width: 22px;
+  height: 2px;
+  background-color: var(--tech-text);
+  transition: all 0.3s ease;
+}
+
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+}
+
+.mobile-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-slide-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 260px;
+  height: 100vh;
+  background: var(--tech-bg);
+  box-shadow: -5px 0 30px rgba(0,0,0,0.5);
+  z-index: 2001;
+  transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-slide-menu.is-open {
+  right: 0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid var(--tech-border);
+}
+
+.mobile-menu-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--tech-text);
+}
+
+.close-menu-btn {
+  background: none;
+  border: none;
+  color: var(--tech-text);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.mobile-nav-links a {
+  color: var(--tech-text);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.mobile-nav-links a:hover {
+  color: var(--tech-muted);
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  .search-bar {
+    width: 150px; /* 모바일에서 검색창 크기 조절 */
   }
 }
 </style>
