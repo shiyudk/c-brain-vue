@@ -865,5 +865,26 @@ html {
   .grid-container {
     grid-template-columns: 1fr;
   }
+  /* 모바일 네비게이션 최적화 */
+  .navbar {
+    height: 65px;
+    top: 0 !important;
+    background: var(--tech-bg) !important;
+  }
+  .nav-content {
+    padding: 0 1.2rem;
+  }
+  .nav-logo-img {
+    height: 40px; /* 모바일에 맞게 로고 축소 */
+  }
+  .top-utility-bar {
+    display: none; /* 공간 확보를 위해 유틸바 숨김 */
+  }
+  .quote-content {
+    padding: 0 2rem;
+  }
+  .quote-text {
+    font-size: 1.2rem;
+  }
 }
 </style>
