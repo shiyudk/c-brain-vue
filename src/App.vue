@@ -229,7 +229,13 @@ onMounted(() => {
                   <button>견적문의</button>
                 </div>
               </div>
+            </div>
 
+            <div class="section-divider">
+              <h2>Brain Design 기타 제품</h2>
+            </div>
+
+            <div class="grid-container">
               <!-- Product 4: Cake Knife -->
               <div class="tech-card" @click="goToCheckout('케익칼')">
                 <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
