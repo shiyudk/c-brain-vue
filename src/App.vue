@@ -233,6 +233,16 @@ onMounted(() => {
         <CheckoutPage />
       </template>
     </main>
+
+    <!-- Footer Section -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>상호명: 컨티뉴엄 브레인 디자인 (츙) | 대표자명: 윤신희</p>
+        <p>사업자등록번호: 746-36-01588 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6</p>
+        <p>대표문의: contact@c-braindesign.com</p>
+        <p class="copyright">&copy; 2026 Continuum Brain Design. All rights reserved.</p>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -263,6 +273,29 @@ html {
 </style>
 
 <style scoped>
+.app-footer {
+  background: var(--tech-bg);
+  padding: 3rem 0;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+}
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  color: var(--tech-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.footer-content p {
+  margin: 0.3rem 0;
+}
+.copyright {
+  margin-top: 1rem !important;
+  opacity: 0.6;
+  font-size: 0.75rem;
+}
+
 .app-container {
   min-height: 100vh;
   display: flex;
