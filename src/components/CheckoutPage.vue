@@ -1,11 +1,23 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { loadPaymentWidget } from '@tosspayments/payment-widget-sdk';
-// Note: We use the widget SDK from NPM. The package name is usually @tosspayments/payment-widget-sdk
+
+const props = defineProps({
+  productName: {
+    type: String,
+    default: '상품'
+  }
+});
 
 const widgetClientKey = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
 const customerKey = 'test_customer_key_' + Math.random().toString(36).substring(2, 10);
-const amount = 50000; // 가격 (예: 50,000원)
+
+const amount = computed(() => {
+  if (props.productName === '케익칼') return 2000;
+  if (props.productName === '딥소스') return 8000;
+  if (props.productName === '동화책') return 39000;
+  return 50000;
+});
 
 // ----------------------------------------------------
 // UI State
@@ -16,23 +28,19 @@ const paymentMethodWidget = ref(null);
 
 onMounted(async () => {
   try {
-    // 1. 위젯 렌더링을 위한 결제 위젯 객체 초기화
     paymentWidget.value = await loadPaymentWidget(widgetClientKey, customerKey);
 
-    // 2. 결제위젯 렌더링
     paymentMethodWidget.value = paymentWidget.value.renderPaymentMethods(
       '#payment-method', 
-      { value: amount },
+      { value: amount.value },
       { variantKey: 'DEFAULT' }
     );
 
-    // 3. 이용약관 위젯 렌더링
     paymentWidget.value.renderAgreement(
       '#agreement',
       { variantKey: 'AGREEMENT' }
     );
 
-    // 위젯 및 약관 로드 대기
     await paymentMethodWidget.value.on('ready', () => {
       isWidgetLoaded.value = true;
     });
@@ -48,11 +56,11 @@ const requestPayment = async () => {
 
     await paymentWidget.value.requestPayment({
       orderId: 'ORDER_' + new Date().getTime(),
-      orderName: '한국소스세트 및 교육콘텐츠',
+      orderName: props.productName,
       successUrl: window.location.origin + '/success',
       failUrl: window.location.origin + '/fail',
-      customerEmail: 'customer@example.com',
-      customerName: '홍길동',
+      customerEmail: 'contact@c-braindesign.com',
+      customerName: '고객',
     });
   } catch (err) {
     console.error('결제 요청 중 실패 (사용자 취소 등):', err);
@@ -64,18 +72,18 @@ const requestPayment = async () => {
   <div class="checkout-container">
     <div class="header">
       <h2>결제하기</h2>
-      <p class="subtitle">한국소스세트 / 교육콘텐츠 구매</p>
+      <p class="subtitle">{{ props.productName }} 구매</p>
     </div>
 
     <div class="product-info box">
       <h3>주문 정보</h3>
       <div class="item">
-        <span>한국소스세트 & 교육콘텐츠 패키지</span>
-        <span class="price">50,000 원</span>
+        <span>{{ props.productName }}</span>
+        <span class="price">{{ amount.toLocaleString() }} 원</span>
       </div>
       <div class="total-row">
         <span>총 결제금액</span>
-        <span class="total-price">50,000 원</span>
+        <span class="total-price">{{ amount.toLocaleString() }} 원</span>
       </div>
     </div>
 
@@ -90,7 +98,7 @@ const requestPayment = async () => {
       :disabled="!isWidgetLoaded" 
       @click="requestPayment"
     >
-      {{ isWidgetLoaded ? '50,000원 결제하기' : '결제 모듈 불러오는 중...' }}
+      {{ isWidgetLoaded ? `${amount.toLocaleString()}원 결제하기` : '결제 모듈 불러오는 중...' }}
     </button>
   </div>
 </template>

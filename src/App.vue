@@ -17,6 +17,10 @@ const goToCheckout = (productName) => {
   window.scrollTo(0, 0)
 }
 
+const sendMail = () => {
+  window.location.href = 'mailto:contact@c-braindesign.com'
+}
+
 // 스크롤 시 부드럽게 나타나는 애니메이션 설정
 onMounted(() => {
   const observer = new IntersectionObserver((entries) => {
@@ -176,35 +180,35 @@ onMounted(() => {
           <div class="section-container animate-hidden">
             <div class="grid-container">
               <!-- Product 1: AI (reordered) -->
-              <div class="tech-card" @click="goToCheckout('AI로봇 컨설팅')">
+              <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
                   <h3>AI로봇 기반 컨설팅</h3>
-                  <button>구매하기</button>
+                  <button>구매문의</button>
                 </div>
               </div>
 
               <!-- Product 2: Personal (reordered) -->
-              <div class="tech-card" @click="goToCheckout('퍼스널 컨설팅')">
+              <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/personal.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
                   <h3>하이엔드 퍼스널 컨설팅</h3>
-                  <button>구매하기</button>
+                  <button>구매문의</button>
                 </div>
               </div>
 
               <!-- Product 3: Kids (reordered) -->
-              <div class="tech-card" @click="goToCheckout('키즈 컨설팅')">
+              <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/kids.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
                   <h3>프리미엄 키즈 컨설팅</h3>
-                  <button>구매하기</button>
+                  <button>구매문의</button>
                 </div>
               </div>
 
@@ -252,7 +256,7 @@ onMounted(() => {
           <button @click="currentView = 'home'" class="back-btn">← 뒤로가기</button>
           <h2>{{ selectedProduct }} 결제/상담예약</h2>
         </div>
-        <CheckoutPage />
+        <CheckoutPage :productName="selectedProduct" />
       </template>
     </main>
 
