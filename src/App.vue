@@ -863,6 +863,19 @@ html {
   padding: 0 4rem;
 }
 
+.section-divider {
+  text-align: center;
+  margin: 4rem 0 2rem;
+  padding-top: 4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.section-divider h2 {
+  font-size: 1.8rem;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
