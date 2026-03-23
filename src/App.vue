@@ -79,7 +79,6 @@ onMounted(() => {
           <a href="#products">AI로봇 컨설팅</a>
           <a href="#products">퍼스널 컨설팅</a>
           <a href="#products">키즈 컨설팅</a>
-          <a href="#products">굿즈</a>
         </nav>
         <div class="nav-actions">
           <!-- 둥근 검색창 -->
@@ -111,7 +110,6 @@ onMounted(() => {
         <a href="#products" @click="toggleMobileMenu">AI로봇 컨설팅</a>
         <a href="#products" @click="toggleMobileMenu">퍼스널 컨설팅</a>
         <a href="#products" @click="toggleMobileMenu">키즈 컨설팅</a>
-        <a href="#products" @click="toggleMobileMenu">굿즈</a>
       </nav>
     </div>
 
