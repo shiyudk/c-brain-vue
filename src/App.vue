@@ -76,10 +76,10 @@ onMounted(() => {
         </a>
         <nav class="nav-links">
           <a href="#company">회사소개</a>
-          <a href="#ai">AI로봇 컨설팅</a>
-          <a href="#personal">퍼스널 컨설팅</a>
-          <a href="#science">키즈 컨설팅</a>
-          <a href="#lifestyle">굿즈</a>
+          <a href="#products">AI로봇 컨설팅</a>
+          <a href="#products">퍼스널 컨설팅</a>
+          <a href="#products">키즈 컨설팅</a>
+          <a href="#products">굿즈</a>
         </nav>
         <div class="nav-actions">
           <!-- 둥근 검색창 -->
@@ -108,10 +108,10 @@ onMounted(() => {
       </div>
       <nav class="mobile-nav-links">
         <a href="#company" @click="toggleMobileMenu">회사소개</a>
-        <a href="#ai" @click="toggleMobileMenu">AI로봇 컨설팅</a>
-        <a href="#personal" @click="toggleMobileMenu">퍼스널 컨설팅</a>
-        <a href="#science" @click="toggleMobileMenu">키즈 컨설팅</a>
-        <a href="#lifestyle" @click="toggleMobileMenu">굿즈</a>
+        <a href="#products" @click="toggleMobileMenu">AI로봇 컨설팅</a>
+        <a href="#products" @click="toggleMobileMenu">퍼스널 컨설팅</a>
+        <a href="#products" @click="toggleMobileMenu">키즈 컨설팅</a>
+        <a href="#products" @click="toggleMobileMenu">굿즈</a>
       </nav>
     </div>
 
@@ -872,6 +872,20 @@ html {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .tech-card {
