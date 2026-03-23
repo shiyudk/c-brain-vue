@@ -24,6 +24,16 @@ const goHome = () => {
   setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
 }
 
+const scrollToConsulting = (isMobile = false) => {
+  if (isMobile && isMobileMenuOpen.value) {
+    toggleMobileMenu()
+  }
+  const el = document.getElementById('consulting-boxes')
+  if (el) {
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }
+}
+
 const showContactModal = ref(false)
 
 const sendMail = () => {
@@ -76,9 +86,9 @@ onMounted(() => {
         </a>
         <nav class="nav-links">
           <a href="#company">회사소개</a>
-          <a href="#products">AI로봇 컨설팅</a>
-          <a href="#products">퍼스널 컨설팅</a>
-          <a href="#products">키즈 컨설팅</a>
+          <a href="#" @click.prevent="scrollToConsulting(false)">AI로봇 컨설팅</a>
+          <a href="#" @click.prevent="scrollToConsulting(false)">퍼스널 컨설팅</a>
+          <a href="#" @click.prevent="scrollToConsulting(false)">키즈 컨설팅</a>
         </nav>
         <div class="nav-actions">
           <!-- 둥근 검색창 -->
@@ -107,9 +117,9 @@ onMounted(() => {
       </div>
       <nav class="mobile-nav-links">
         <a href="#company" @click="toggleMobileMenu">회사소개</a>
-        <a href="#products" @click="toggleMobileMenu">AI로봇 컨설팅</a>
-        <a href="#products" @click="toggleMobileMenu">퍼스널 컨설팅</a>
-        <a href="#products" @click="toggleMobileMenu">키즈 컨설팅</a>
+        <a href="#" @click.prevent="scrollToConsulting(true)">AI로봇 컨설팅</a>
+        <a href="#" @click.prevent="scrollToConsulting(true)">퍼스널 컨설팅</a>
+        <a href="#" @click.prevent="scrollToConsulting(true)">키즈 컨설팅</a>
       </nav>
     </div>
 
@@ -196,7 +206,7 @@ onMounted(() => {
         <!-- 디테일 상품 라인업 섹션 -->
         <section id="products" class="products-section">
           <div class="section-container animate-hidden">
-            <div class="grid-container">
+            <div id="consulting-boxes" class="grid-container">
               <!-- Product 1: AI (reordered) -->
               <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;">
