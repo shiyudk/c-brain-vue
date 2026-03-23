@@ -208,13 +208,35 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Product 4 -->
-              <div class="tech-card" @click="goToCheckout('디자인 굿즈')">
+              <!-- Product 4: Cake Knife -->
+              <div class="tech-card" @click="goToCheckout('케익칼')">
                 <div class="card-img-placeholder c-goods">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>케익칼 · 딥소스 · 동화책</h3>
+                  <h3>케익칼</h3>
+                  <button>구매하기</button>
+                </div>
+              </div>
+
+              <!-- Product 5: Deep Sauce -->
+              <div class="tech-card" @click="goToCheckout('딥소스')">
+                <div class="card-img-placeholder c-goods">
+                  <span class="glow"></span>
+                </div>
+                <div class="tech-card-info">
+                  <h3>딥소스</h3>
+                  <button>구매하기</button>
+                </div>
+              </div>
+
+              <!-- Product 6: Storybook -->
+              <div class="tech-card" @click="goToCheckout('동화책')">
+                <div class="card-img-placeholder c-goods">
+                  <span class="glow"></span>
+                </div>
+                <div class="tech-card-info">
+                  <h3>동화책</h3>
                   <button>구매하기</button>
                 </div>
               </div>
@@ -808,7 +830,7 @@ html {
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
 }
 
