@@ -177,7 +177,7 @@ onMounted(() => {
             <div class="grid-container">
               <!-- Product 1: AI (reordered) -->
               <div class="tech-card" @click="goToCheckout('AI로봇 컨설팅')">
-                <div class="card-img-placeholder c-ai">
+                <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
@@ -188,7 +188,7 @@ onMounted(() => {
 
               <!-- Product 2: Personal (reordered) -->
               <div class="tech-card" @click="goToCheckout('퍼스널 컨설팅')">
-                <div class="card-img-placeholder c-personal">
+                <div class="card-img-placeholder" style="background-image: url('/images/personal.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
@@ -199,7 +199,7 @@ onMounted(() => {
 
               <!-- Product 3: Kids (reordered) -->
               <div class="tech-card" @click="goToCheckout('키즈 컨설팅')">
-                <div class="card-img-placeholder c-science">
+                <div class="card-img-placeholder" style="background-image: url('/images/kids.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
@@ -210,7 +210,7 @@ onMounted(() => {
 
               <!-- Product 4: Cake Knife -->
               <div class="tech-card" @click="goToCheckout('케익칼')">
-                <div class="card-img-placeholder c-goods">
+                <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
@@ -221,7 +221,7 @@ onMounted(() => {
 
               <!-- Product 5: Deep Sauce -->
               <div class="tech-card" @click="goToCheckout('딥소스')">
-                <div class="card-img-placeholder c-goods">
+                <div class="card-img-placeholder" style="background-image: url('/images/dip_sauce.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
@@ -232,7 +232,7 @@ onMounted(() => {
 
               <!-- Product 6: Storybook -->
               <div class="tech-card" @click="goToCheckout('동화책')">
-                <div class="card-img-placeholder c-goods">
+                <div class="card-img-placeholder" style="background-image: url('/images/story_book.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
