@@ -5,6 +5,7 @@ import CheckoutPage from './components/CheckoutPage.vue'
 const currentView = ref('home')
 const selectedProduct = ref(null)
 const isMobileMenuOpen = ref(false)
+const savedScrollY = ref(0)
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -12,13 +13,21 @@ const toggleMobileMenu = () => {
 }
 
 const goToCheckout = (productName) => {
+  savedScrollY.value = window.scrollY
   selectedProduct.value = productName
   currentView.value = 'checkout'
   window.scrollTo(0, 0)
 }
 
+const goHome = () => {
+  currentView.value = 'home'
+  setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
+}
+
 const sendMail = () => {
-  window.location.href = 'mailto:contact@c-braindesign.com'
+  const mailToLink = document.createElement('a')
+  mailToLink.href = 'mailto:contact@c-braindesign.com'
+  mailToLink.click()
 }
 
 // 스크롤 시 부드럽게 나타나는 애니메이션 설정
@@ -40,7 +49,7 @@ onMounted(() => {
   <div class="app-container">
     
     <!-- 최상단 유틸리티 바 (고객지원, 비즈니스 등) -->
-    <div class="top-utility-bar" v-if="currentView === 'home'">
+    <div class="top-utility-bar" v-show="currentView === 'home'">
       <div class="utility-content">
         <a href="#">고객지원</a>
         <a href="#">채용정보</a>
@@ -49,7 +58,7 @@ onMounted(() => {
     </div>
 
     <!-- 메인 네비게이션 바 -->
-    <header class="navbar" v-if="currentView === 'home'">
+    <header class="navbar" v-show="currentView === 'home'">
       <div class="nav-content">
         <a href="#" class="logo">
           <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
@@ -97,7 +106,7 @@ onMounted(() => {
 
     <main class="main-content">
       <!-- HOME VIEW (Tech Landing Page) -->
-      <template v-if="currentView === 'home'">
+      <div v-show="currentView === 'home'">
         
 
 
@@ -248,12 +257,12 @@ onMounted(() => {
           </div>
         </section>
 
-      </template>
+      </div>
       
       <!-- CHECKOUT VIEW (결제 페이지) -->
       <template v-if="currentView === 'checkout'">
         <div class="checkout-header">
-          <button @click="currentView = 'home'" class="back-btn">← 뒤로가기</button>
+          <button @click="goHome" class="back-btn">← 뒤로가기</button>
           <h2>{{ selectedProduct }} 결제/상담예약</h2>
         </div>
         <CheckoutPage :productName="selectedProduct" />
