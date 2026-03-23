@@ -206,7 +206,7 @@ onMounted(() => {
                 </div>
                 <div class="tech-card-info">
                   <h3>AI로봇 기반 컨설팅</h3>
-                  <button>구매문의</button>
+                  <button>견적문의</button>
                 </div>
               </div>
 
@@ -217,7 +217,7 @@ onMounted(() => {
                 </div>
                 <div class="tech-card-info">
                   <h3>하이엔드 퍼스널 컨설팅</h3>
-                  <button>구매문의</button>
+                  <button>견적문의</button>
                 </div>
               </div>
 
@@ -228,7 +228,7 @@ onMounted(() => {
                 </div>
                 <div class="tech-card-info">
                   <h3>프리미엄 키즈 컨설팅</h3>
-                  <button>구매문의</button>
+                  <button>견적문의</button>
                 </div>
               </div>
 
@@ -271,10 +271,10 @@ onMounted(() => {
       </template>
     </main>
 
-    <!-- 구매문의 모달 팝업 -->
+    <!-- 견적문의 모달 팝업 -->
     <div class="modal-overlay" v-show="showContactModal" @click="showContactModal = false">
       <div class="modal-content" @click.stop>
-        <h3>구매 및 상담 문의</h3>
+        <h3>견적 및 상담 문의</h3>
         <p class="modal-desc">아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.</p>
         <div class="email-box">
           <strong>contact@c-braindesign.com</strong>
