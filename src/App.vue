@@ -877,32 +877,44 @@ html {
 }
 
 .grid-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 2rem;
 }
 
 @media (max-width: 1024px) {
   .grid-container {
-    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
   .grid-container {
-    grid-template-columns: 1fr;
     gap: 1rem;
   }
 }
 
 .tech-card {
+  width: calc(33.333% - 1.34rem);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s, background 0.3s;
+}
+
+@media (max-width: 1024px) {
+  .tech-card {
+    width: calc(50% - 0.75rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .tech-card {
+    width: 100%;
+  }
 }
 
 .tech-card:hover {
