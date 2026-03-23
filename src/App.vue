@@ -254,16 +254,7 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Product 6: Storybook -->
-              <div class="tech-card" @click="goToCheckout('동화책')">
-                <div class="card-img-placeholder" style="background-image: url('/images/story_book.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>동화책</h3>
-                  <button>구매하기</button>
-                </div>
-              </div>
+
             </div>
           </div>
         </section>
