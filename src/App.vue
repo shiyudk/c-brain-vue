@@ -237,7 +237,7 @@ onMounted(() => {
     <!-- Footer Section -->
     <footer class="app-footer">
       <div class="footer-content">
-        <p>상호명: 컨티뉴엄 브레인 디자인 (츙) | 대표자명: 윤신희</p>
+        <p>상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희</p>
         <p>사업자등록번호: 746-36-01588 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6</p>
         <p>대표문의: contact@c-braindesign.com</p>
         <p class="copyright">&copy; 2026 Continuum Brain Design. All rights reserved.</p>
