@@ -24,7 +24,18 @@ const goHome = () => {
   setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
 }
 
+const showContactModal = ref(false)
+
 const sendMail = () => {
+  showContactModal.value = true
+}
+
+const copyEmail = () => {
+  navigator.clipboard.writeText('contact@c-braindesign.com')
+  alert('이메일 주소가 복사되었습니다!')
+}
+
+const triggerMailApp = () => {
   const mailToLink = document.createElement('a')
   mailToLink.href = 'mailto:contact@c-braindesign.com'
   mailToLink.click()
@@ -268,6 +279,22 @@ onMounted(() => {
         <CheckoutPage :productName="selectedProduct" />
       </template>
     </main>
+
+    <!-- 구매문의 모달 팝업 -->
+    <div class="modal-overlay" v-show="showContactModal" @click="showContactModal = false">
+      <div class="modal-content" @click.stop>
+        <h3>구매 및 상담 문의</h3>
+        <p class="modal-desc">아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.</p>
+        <div class="email-box">
+          <strong>contact@c-braindesign.com</strong>
+        </div>
+        <div class="modal-actions">
+          <button class="outline-btn" @click="copyEmail">주소 복사하기</button>
+          <button class="primary-btn" @click="triggerMailApp">메일 앱 열기</button>
+        </div>
+        <button class="close-btn" @click="showContactModal = false">✕</button>
+      </div>
+    </div>
 
     <!-- Footer Section -->
     <footer class="app-footer">
@@ -1096,5 +1123,83 @@ html {
   .mobile-menu-btn {
     margin-right: 10px; /* 검색창이 줄어듦에 따라 아이콘도 자연스럽게 왼쪽으로 이동 */
   }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: var(--tech-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.5rem;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+.modal-content h3 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+.modal-desc {
+  color: var(--tech-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+.email-box {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  color: #59B3D9;
+  user-select: all;
+}
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+.modal-actions button {
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  border: none;
+  font-size: 0.9rem;
+  transition: opacity 0.2s;
+}
+.modal-actions button:hover {
+  opacity: 0.8;
+}
+.modal-actions .outline-btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.modal-actions .primary-btn {
+  background: #59B3D9;
+  color: #111;
+}
+.close-btn {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
 </style>
