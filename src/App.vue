@@ -8,8 +8,13 @@ const selectedDetailProduct = ref(null)
 const isMobileMenuOpen = ref(false)
 const savedScrollY = ref(0)
 
+const previousView = ref('home')
+
 const goToDetail = (productName) => {
-  savedScrollY.value = window.scrollY
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
   selectedDetailProduct.value = productName
   currentView.value = 'detail'
   window.scrollTo(0, 0)
@@ -21,14 +26,28 @@ const toggleMobileMenu = () => {
 }
 
 const goToCheckout = (productName) => {
-  savedScrollY.value = window.scrollY
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
   selectedProduct.value = productName
   currentView.value = 'checkout'
   window.scrollTo(0, 0)
 }
 
+const goBackFromCheckout = () => {
+  if (previousView.value === 'detail') {
+    currentView.value = 'detail'
+    previousView.value = 'home'
+    window.scrollTo(0, 0)
+  } else {
+    goHome()
+  }
+}
+
 const goHome = () => {
   currentView.value = 'home'
+  previousView.value = 'home'
   setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
 }
 
@@ -310,7 +329,7 @@ onMounted(() => {
       <!-- CHECKOUT VIEW (결제 페이지) -->
       <template v-if="currentView === 'checkout'">
         <div class="checkout-header">
-          <button @click="goHome" class="back-btn">← 뒤로가기</button>
+          <button @click="goBackFromCheckout" class="back-btn">← 뒤로가기</button>
           <h2>{{ selectedProduct }} 결제/상담예약</h2>
         </div>
         <CheckoutPage :productName="selectedProduct" />
