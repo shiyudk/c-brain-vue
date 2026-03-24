@@ -1,13 +1,37 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import CheckoutPage from './components/CheckoutPage.vue'
+
+const currentLang = ref('ko')
+
+const translations = {
+  ko: {
+    nav: { support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
+    hero: { quote1: '"시스템은 자유를 제한하는 것이 아니라,<br>더 큰 자유로 가는 길을 여는 것입니다."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: '현대인의 의사결정 위기', crisisDesc1: '우리는 매 순간 수많은 정보와 감정의 파도 속에서 결정을 내립니다. 하지만 그 결정이 정말 당신의 의지에 의한 것입니까?', crisisDesc2: '<strong>파편화된 선택과 순간의 충동</strong>은 우리의 삶을 불안정한 궤도로 몰아넣고 있습니다.', waverTitle: '왜 우리는 항상 흔들리는가', waverSub: '신경계 구조의 관점', waverDesc: '우리의 뇌는 <strong>불확실성</strong>을 생존의 위협으로 간주합니다. 기준이 없는 선택은 뇌의 \'편도체\'를 자극하여 불안을 증폭시킵니다.', waverBox: '🧠 <strong>감정 vs 시스템:</strong> 감정은 위험을 알리는 \'신호\'일 뿐이며, 의사결정의 \'기준\'이 되어서는 안 됩니다.', signalTitle: '감정은 신호지, 기준이 아니다', signalList1: '<strong>생각이 많을수록 인생이 느려지는 이유:</strong> 기준 없이 감정에 매몰되어 \'생각의 루프\'에 갇히기 때문입니다.', signalList2: '<strong>불안한 사람일수록 기준이 필요하다:</strong> 외부 환경이 흔들릴 때 나를 잡아줄 수 있는 것은 오직 명확한 \'판단 기준\'뿐입니다.', signalList3: '<strong>치유가 아닌 설계:</strong> 불안을 달래는 힐링보다, 불안 속에서도 작동하는 사고 구조를 만드는 것이 핵심입니다.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: '시스템이 감정을 앞섭니다', systemDesc1: '인간의 의지력은 고갈되는 자원입니다. 우리는 감정에 의존하지 않아도 일관된 성과를 낼 수 있는 실행 프로세스를 구축합니다.', systemDesc2: '기분이 좋지 않아도, 의지가 약해져도 작동하는 견고한 시스템이 당신의 일상을 보호합니다.' },
+    products: { ai: 'AI로봇 기반 컨설팅', personal: '하이엔드 퍼스널 컨설팅', kids: '프리미엄 키즈 컨설팅', cakeKnife: '케익칼', dipSauce: '딥소스', otherProducts: 'Brain Design 기타 제품', inquireBtn: '견적문의', purchaseBtn: '구매하기' },
+    detail: { backBtn: '← 뒤로가기', detailInfo: '상세 정보', shipping: '🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.', payCake: '결제하기 (2,000원)', payDip: '결제하기 (8,000원)' },
+    checkout: { title: '결제/상담예약' },
+    modal: { title: '견적 및 상담 문의', desc: '아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.', copy: '주소 복사하기', app: '메일 앱 열기' },
+    footer: { company: '상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희', bizNo: '사업자등록번호: 746-36-01588 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6', contact: '대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' }
+  },
+  en: {
+    nav: { support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
+    hero: { quote1: '"A system does not restrict freedom,<br>but opens the path to greater freedom."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: 'The Crisis of Decision Making', crisisDesc1: 'We make decisions amidst a sea of information and emotions. But are those decisions truly yours?', crisisDesc2: '<strong>Fragmented choices and momentary impulses</strong> are driving our lives into an unstable orbit.', waverTitle: 'Why We Always Waver', waverSub: 'A Nervous System Perspective', waverDesc: 'Our brains interpret <strong>uncertainty</strong> as a threat. Choices without standards stimulate the amygdala, amplifying anxiety.', waverBox: '🧠 <strong>Emotion vs System:</strong> Emotion is a \'signal\' for danger, not a \'standard\' for decision making.', signalTitle: 'Emotion is a Signal, Not a Standard', signalList1: '<strong>Why overthinking slows down life:</strong> Being trapped in a \'thought loop\' without clear standards.', signalList2: '<strong>Anxiety begs standardizations:</strong> Only clear \'judgments\' can ground you when the environment shakes.', signalList3: '<strong>Design, not healing:</strong> The key is building a thought process that works even in anxiety.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: 'The System Precedes Emotion', systemDesc1: 'Human willpower is a depleting resource. We build execution processes that yield consistent results without relying on emotions.', systemDesc2: 'A solid system protects your daily life, even when you\'re feeling down or weak.' },
+    products: { ai: 'AI Algorithm Check', personal: 'High-End Personal Core', kids: 'Premium Kids Builder', cakeKnife: 'Cake Knife', dipSauce: 'Dipping Sauce', otherProducts: 'Brain Design Other Products', inquireBtn: 'Inquire', purchaseBtn: 'Purchase' },
+    detail: { backBtn: '← Back', detailInfo: 'Details', shipping: '🚚 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
+    checkout: { title: 'Checkout / Booking' },
+    modal: { title: 'Quote & Inquiry', desc: 'Please leave inquiries via email below for a rapid response.', copy: 'Copy Address', app: 'Open Mail App' },
+    footer: { company: 'Company: Continuum Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' }
+  }
+}
+
+const t = computed(() => translations[currentLang.value])
 
 const currentView = ref('home')
 const selectedProduct = ref(null)
 const selectedDetailProduct = ref(null)
 const isMobileMenuOpen = ref(false)
 const savedScrollY = ref(0)
-
 const previousView = ref('home')
 
 const goToDetail = (productName) => {
@@ -69,7 +93,7 @@ const sendMail = () => {
 
 const copyEmail = () => {
   navigator.clipboard.writeText('contact@c-braindesign.com')
-  alert('이메일 주소가 복사되었습니다!')
+  alert(currentLang.value === 'ko' ? '이메일 주소가 복사되었습니다!' : 'Email address copied!')
 }
 
 const triggerMailApp = () => {
@@ -78,7 +102,6 @@ const triggerMailApp = () => {
   mailToLink.click()
 }
 
-// 스크롤 시 부드럽게 나타나는 애니메이션 설정
 onMounted(() => {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -87,7 +110,6 @@ onMounted(() => {
       }
     })
   }, { threshold: 0.1 })
-
   const hiddenElements = document.querySelectorAll('.animate-hidden')
   hiddenElements.forEach((el) => observer.observe(el))
 })
@@ -95,37 +117,37 @@ onMounted(() => {
 
 <template>
   <div class="app-container">
-    
-    <!-- 최상단 유틸리티 바 (고객지원, 비즈니스 등) -->
     <div class="top-utility-bar" v-show="currentView === 'home'">
       <div class="utility-content">
-        <a href="#">고객지원</a>
-        <a href="#">채용정보</a>
-        <a href="#">회원가입</a>
+        <a href="#">{{ t.nav.support }}</a>
+        <a href="#">{{ t.nav.jobs }}</a>
+        <a href="#">{{ t.nav.signup }}</a>
       </div>
     </div>
 
-    <!-- 메인 네비게이션 바 -->
     <header class="navbar" v-show="currentView === 'home'">
       <div class="nav-content">
         <a href="#" class="logo">
           <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
         </a>
         <nav class="nav-links">
-          <a href="#company">회사소개</a>
-          <a href="#" @click.prevent="scrollToConsulting(false)">AI로봇 컨설팅</a>
-          <a href="#" @click.prevent="scrollToConsulting(false)">퍼스널 컨설팅</a>
-          <a href="#" @click.prevent="scrollToConsulting(false)">키즈 컨설팅</a>
+          <a href="#company">{{ t.nav.company }}</a>
+          <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.ai }}</a>
+          <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.personal }}</a>
+          <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.kids }}</a>
         </nav>
         <div class="nav-actions">
-          <!-- 둥근 검색창 -->
+          <div class="lang-toggle">
+            <button @click="currentLang = 'ko'" :class="{ active: currentLang === 'ko' }" class="lang-btn">KR</button>
+            <span style="color:rgba(255,255,255,0.2)">|</span>
+            <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
+          </div>
           <div class="search-bar">
             <span class="search-icon">🔍</span>
-            <input type="text" placeholder="검색" />
+            <input type="text" :placeholder="t.nav.search" />
           </div>
           <a href="#cart" class="icon-btn hide-mobile">🛒</a>
           <a href="#login" class="icon-btn hide-mobile">👤</a>
-          <!-- 햄버거 메뉴 버튼 -->
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -135,7 +157,6 @@ onMounted(() => {
       </div>
     </header>
 
-    <!-- Mobile Slide-out Menu -->
     <div class="mobile-overlay" :class="{ 'is-open': isMobileMenuOpen }" @click="toggleMobileMenu"></div>
     <div class="mobile-slide-menu" :class="{ 'is-open': isMobileMenuOpen }">
       <div class="mobile-menu-header">
@@ -143,170 +164,153 @@ onMounted(() => {
         <button class="close-menu-btn" @click="toggleMobileMenu">✕</button>
       </div>
       <nav class="mobile-nav-links">
-        <a href="#company" @click="toggleMobileMenu">회사소개</a>
-        <a href="#" @click.prevent="scrollToConsulting(true)">AI로봇 컨설팅</a>
-        <a href="#" @click.prevent="scrollToConsulting(true)">퍼스널 컨설팅</a>
-        <a href="#" @click.prevent="scrollToConsulting(true)">키즈 컨설팅</a>
+        <a href="#company" @click="toggleMobileMenu">{{ t.nav.company }}</a>
+        <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
+        <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
+        <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
+        <div class="lang-toggle" style="margin-top:20px;justify-content:center;">
+          <button @click="currentLang = 'ko'" :class="{ active: currentLang === 'ko' }" class="lang-btn">KR</button>
+          <span style="color:rgba(255,255,255,0.2)">|</span>
+          <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
+        </div>
       </nav>
     </div>
 
     <main class="main-content">
-      <!-- HOME VIEW (Tech Landing Page) -->
       <div v-show="currentView === 'home'">
-        
-
-
-        <!-- Philosophy Introduction (Clarity over Impulse) -->
         <section id="philosophy" class="philosophy-section">
-
-            <!-- Part 1: Dynamic Full-Screen Quote -->
             <div class="full-screen-quote intro-fade-in">
               <div class="quote-content">
                 <span class="quote-mark">“</span>
-                <h2 class="quote-text">"시스템은 자유를 제한하는 것이 아니라,<br>더 큰 자유로 가는 길을 여는 것입니다."</h2>
-                <p class="quote-eyebrow align-right">— Clarity over Impulse Philosophy</p>
+                <h2 class="quote-text" v-html="t.hero.quote1"></h2>
+                <p class="quote-eyebrow align-right">{{ t.hero.quote2 }}</p>
               </div>
             </div>
         
-            <!-- Part 2: 현대인의 의사결정 위기 -->
             <div class="full-screen-section">
               <div class="crop-bg slide2-crop"></div>
               <div class="dark-overlay"></div>
               <div class="phil-text-content animate-hidden">
-                <h3>현대인의 의사결정 위기</h3>
-                <p>우리는 매 순간 수많은 정보와 감정의 파도 속에서 결정을 내립니다. 하지만 그 결정이 정말 당신의 의지에 의한 것입니까?</p>
-                <p><strong>파편화된 선택과 순간의 충동</strong>은 우리의 삶을 불안정한 궤도로 몰아넣고 있습니다.</p>
+                <h3>{{ t.hero.crisisTitle }}</h3>
+                <p>{{ t.hero.crisisDesc1 }}</p>
+                <p v-html="t.hero.crisisDesc2"></p>
               </div>
             </div>
         
-            <!-- Part 3: 왜 우리는 항상 흔들리는가 -->
             <div class="full-screen-section">
               <div class="crop-bg slide3-crop"></div>
               <div class="dark-overlay"></div>
               <div class="phil-text-content animate-hidden">
-                <h3>왜 우리는 항상 흔들리는가</h3>
-                <h4 class="sub-heading">신경계 구조의 관점</h4>
-                <p>우리의 뇌는 <strong>불확실성</strong>을 생존의 위협으로 간주합니다. 기준이 없는 선택은 뇌의 '편도체'를 자극하여 불안을 증폭시킵니다.</p>
+                <h3>{{ t.hero.waverTitle }}</h3>
+                <h4 class="sub-heading">{{ t.hero.waverSub }}</h4>
+                <p v-html="t.hero.waverDesc"></p>
                 <div class="phil-box">
-                  <p>🧠 <strong>감정 vs 시스템:</strong> 감정은 위험을 알리는 '신호'일 뿐이며, 의사결정의 '기준'이 되어서는 안 됩니다.</p>
+                  <p v-html="t.hero.waverBox"></p>
                 </div>
               </div>
             </div>
         
-            <!-- Part 4: 감정은 신호지, 기준이 아니다 -->
             <div class="full-screen-section">
               <div class="crop-bg slide4-crop"></div>
               <div class="dark-overlay"></div>
               <div class="phil-text-content animate-hidden">
-                <h3>감정은 신호지, 기준이 아니다</h3>
+                <h3>{{ t.hero.signalTitle }}</h3>
                 <ul class="phil-list">
                   <li>
                     <span class="icon">⚠️</span>
-                    <p><strong>생각이 많을수록 인생이 느려지는 이유:</strong> 기준 없이 감정에 매몰되어 '생각의 루프'에 갇히기 때문입니다.</p>
+                    <p v-html="t.hero.signalList1"></p>
                   </li>
                   <li>
                     <span class="icon">⚖️</span>
-                    <p><strong>불안한 사람일수록 기준이 필요하다:</strong> 외부 환경이 흔들릴 때 나를 잡아줄 수 있는 것은 오직 명확한 '판단 기준'뿐입니다.</p>
+                    <p v-html="t.hero.signalList2"></p>
                   </li>
                   <li>
                     <span class="icon">🛡️</span>
-                    <p><strong>치유가 아닌 설계:</strong> 불안을 달래는 힐링보다, 불안 속에서도 작동하는 사고 구조를 만드는 것이 핵심입니다.</p>
+                     <p v-html="t.hero.signalList3"></p>
                   </li>
                 </ul>
               </div>
             </div>
         
-            <!-- Part 5: SYSTEM BEFORE EMOTIONS -->
             <div class="full-screen-section">
               <div class="crop-bg slide5-crop"></div>
               <div class="dark-overlay"></div>
               <div class="phil-text-content animate-hidden">
-                <h3 class="giant-title">SYSTEM BEFORE<br>EMOTIONS</h3>
-                <h4 class="sub-heading">시스템이 감정을 앞섭니다</h4>
-                <p>인간의 의지력은 고갈되는 자원입니다. 우리는 감정에 의존하지 않아도 일관된 성과를 낼 수 있는 실행 프로세스를 구축합니다.</p>
-                <p>기분이 좋지 않아도, 의지가 약해져도 작동하는 견고한 시스템이 당신의 일상을 보호합니다.</p>
+                <h3 class="giant-title" v-html="t.hero.systemTitle"></h3>
+                <h4 class="sub-heading">{{ t.hero.systemSub }}</h4>
+                <p>{{ t.hero.systemDesc1 }}</p>
+                <p>{{ t.hero.systemDesc2 }}</p>
               </div>
             </div>
-        
         </section>
 
-        <!-- 디테일 상품 라인업 섹션 -->
         <section id="products" class="products-section">
           <div class="section-container animate-hidden">
             <div id="consulting-boxes" class="grid-container">
-              <!-- Product 1: AI (reordered) -->
               <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>AI로봇 기반 컨설팅</h3>
-                  <button>견적문의</button>
+                  <h3>{{ t.products.ai }}</h3>
+                  <button>{{ t.products.inquireBtn }}</button>
                 </div>
               </div>
 
-              <!-- Product 2: Personal (reordered) -->
               <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/personal.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>하이엔드 퍼스널 컨설팅</h3>
-                  <button>견적문의</button>
+                  <h3>{{ t.products.personal }}</h3>
+                  <button>{{ t.products.inquireBtn }}</button>
                 </div>
               </div>
 
-              <!-- Product 3: Kids (reordered) -->
               <div class="tech-card" @click="sendMail">
                 <div class="card-img-placeholder" style="background-image: url('/images/kids.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>프리미엄 키즈 컨설팅</h3>
-                  <button>견적문의</button>
+                  <h3>{{ t.products.kids }}</h3>
+                  <button>{{ t.products.inquireBtn }}</button>
                 </div>
               </div>
             </div>
 
             <div class="section-divider">
-              <h2>Brain Design 기타 제품</h2>
+              <h2>{{ t.products.otherProducts }}</h2>
             </div>
 
             <div class="grid-container flex-center">
-              <!-- Product 4: Cake Knife -->
               <div class="tech-card" @click="goToDetail('케익칼')">
                 <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>케익칼</h3>
-                  <button>구매하기</button>
+                  <h3>{{ t.products.cakeKnife }}</h3>
+                  <button>{{ t.products.purchaseBtn }}</button>
                 </div>
               </div>
 
-              <!-- Product 5: Deep Sauce -->
               <div class="tech-card" @click="goToDetail('딥소스')">
                 <div class="card-img-placeholder" style="background-image: url('/images/dip_sauce.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
                 <div class="tech-card-info">
-                  <h3>딥소스</h3>
-                  <button>구매하기</button>
+                  <h3>{{ t.products.dipSauce }}</h3>
+                  <button>{{ t.products.purchaseBtn }}</button>
                 </div>
               </div>
-
-
             </div>
           </div>
         </section>
-
       </div>
       
-      <!-- PRODUCT DETAIL VIEW (상품 상세 페이지) -->
       <template v-if="currentView === 'detail'">
         <div class="detail-header">
-          <button @click="goHome" class="back-btn">← 뒤로가기</button>
-          <h2>{{ selectedDetailProduct }} 상세 정보</h2>
+          <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
+          <h2>{{ selectedDetailProduct === '케익칼' ? t.products.cakeKnife : selectedDetailProduct === '딥소스' ? t.products.dipSauce : selectedDetailProduct }} {{ t.detail.detailInfo }}</h2>
         </div>
         
         <div class="product-detail-container" v-if="selectedDetailProduct === '케익칼' || selectedDetailProduct === '딥소스'">
@@ -320,53 +324,50 @@ onMounted(() => {
           </div>
           
           <div class="shipping-info">
-            <p>🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.</p>
+            <p v-html="t.detail.shipping"></p>
           </div>
           
           <div class="detail-action-bottom">
             <button class="primary-btn huge-btn" @click="goToCheckout('케익칼')" v-if="selectedDetailProduct === '케익칼'">
-              결제하기 (2,000원)
+              {{ t.detail.payCake }}
             </button>
             <button class="primary-btn huge-btn" @click="goToCheckout('딥소스')" v-else-if="selectedDetailProduct === '딥소스'">
-              결제하기 (8,000원)
+              {{ t.detail.payDip }}
             </button>
           </div>
         </div>
       </template>
 
-      <!-- CHECKOUT VIEW (결제 페이지) -->
       <template v-if="currentView === 'checkout'">
         <div class="checkout-header">
-          <button @click="goBackFromCheckout" class="back-btn">← 뒤로가기</button>
-          <h2>{{ selectedProduct }} 결제/상담예약</h2>
+          <button @click="goBackFromCheckout" class="back-btn">{{ t.detail.backBtn }}</button>
+          <h2>{{ selectedProduct === '케익칼' ? t.products.cakeKnife : selectedProduct === '딥소스' ? t.products.dipSauce : selectedProduct }} {{ t.checkout.title }}</h2>
         </div>
         <CheckoutPage :productName="selectedProduct" />
       </template>
     </main>
 
-    <!-- 견적문의 모달 팝업 -->
     <div class="modal-overlay" v-show="showContactModal" @click="showContactModal = false">
       <div class="modal-content" @click.stop>
-        <h3>견적 및 상담 문의</h3>
-        <p class="modal-desc">아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.</p>
+        <h3>{{ t.modal.title }}</h3>
+        <p class="modal-desc">{{ t.modal.desc }}</p>
         <div class="email-box">
           <strong>contact@c-braindesign.com</strong>
         </div>
         <div class="modal-actions">
-          <button class="outline-btn" @click="copyEmail">주소 복사하기</button>
-          <button class="primary-btn" @click="triggerMailApp">메일 앱 열기</button>
+          <button class="outline-btn" @click="copyEmail">{{ t.modal.copy }}</button>
+          <button class="primary-btn" @click="triggerMailApp">{{ t.modal.app }}</button>
         </div>
         <button class="close-btn" @click="showContactModal = false">✕</button>
       </div>
     </div>
 
-    <!-- Footer Section -->
     <footer class="app-footer">
       <div class="footer-content">
-        <p>상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희</p>
-        <p>사업자등록번호: 746-36-01588 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6</p>
-        <p>대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189</p>
-        <p class="copyright">&copy; 2026 Continuum Brain Design. All rights reserved.</p>
+        <p>{{ t.footer.company }}</p>
+        <p>{{ t.footer.bizNo }}</p>
+        <p>{{ t.footer.contact }}</p>
+        <p class="copyright">{{ t.footer.copyright }}</p>
       </div>
     </footer>
   </div>
@@ -1374,5 +1375,27 @@ html {
   border: none;
   cursor: pointer;
   font-weight: bold;
+}
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  font-size: 14px;
+}
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.lang-btn.active {
+  color: #fff;
+}
+.lang-btn:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
 </style>
