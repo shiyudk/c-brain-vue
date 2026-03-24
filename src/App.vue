@@ -4,8 +4,16 @@ import CheckoutPage from './components/CheckoutPage.vue'
 
 const currentView = ref('home')
 const selectedProduct = ref(null)
+const selectedDetailProduct = ref(null)
 const isMobileMenuOpen = ref(false)
 const savedScrollY = ref(0)
+
+const goToDetail = (productName) => {
+  savedScrollY.value = window.scrollY
+  selectedDetailProduct.value = productName
+  currentView.value = 'detail'
+  window.scrollTo(0, 0)
+}
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -247,7 +255,7 @@ onMounted(() => {
 
             <div class="grid-container flex-center">
               <!-- Product 4: Cake Knife -->
-              <div class="tech-card" @click="goToCheckout('케익칼')">
+              <div class="tech-card" @click="goToDetail('케익칼')">
                 <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
@@ -275,6 +283,34 @@ onMounted(() => {
 
       </div>
       
+      <!-- PRODUCT DETAIL VIEW (상품 상세 페이지) -->
+      <template v-if="currentView === 'detail'">
+        <div class="detail-header">
+          <button @click="goHome" class="back-btn">← 뒤로가기</button>
+          <h2>{{ selectedDetailProduct }} 상세 정보</h2>
+        </div>
+        
+        <div class="product-detail-container" v-if="selectedDetailProduct === '케익칼'">
+          <div class="detail-images">
+            <img src="/images/cake_knife_detail_1.png" alt="Cake Knife Detail 1" />
+            <img src="/images/cake_knife_detail_2.png" alt="Cake Knife Detail 2" />
+            <img src="/images/cake_knife_detail_3.png" alt="Cake Knife Detail 3" />
+            <img src="/images/cake_knife_detail_4.png" alt="Cake Knife Detail 4" />
+            <img src="/images/cake_knife_detail_5.png" alt="Cake Knife Detail 5" />
+          </div>
+          
+          <div class="shipping-info">
+            <p>🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.</p>
+          </div>
+          
+          <div class="detail-action-bottom">
+            <button class="primary-btn huge-btn" @click="goToCheckout('케익칼')">
+              결제하기 (2,000원)
+            </button>
+          </div>
+        </div>
+      </template>
+
       <!-- CHECKOUT VIEW (결제 페이지) -->
       <template v-if="currentView === 'checkout'">
         <div class="checkout-header">
@@ -1249,5 +1285,71 @@ html {
   color: #fff;
   font-size: 1.2rem;
   cursor: pointer;
+}
+.detail-header {
+  max-width: 800px;
+  margin: 40px auto 20px;
+  padding: 0 20px;
+  text-align: center;
+  position: relative;
+}
+.detail-header h2 {
+  font-size: 24px;
+  color: #fff;
+  margin: 0;
+}
+.detail-header .back-btn {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: #59B3D9;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+.product-detail-container {
+  max-width: 800px;
+  margin: 0 auto 60px;
+  padding: 20px;
+  background: var(--tech-bg);
+  border-radius: 12px;
+}
+.detail-images {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.detail-images img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  display: block;
+}
+.shipping-info {
+  background: rgba(89, 179, 217, 0.1);
+  border-left: 4px solid #59B3D9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+  font-size: 1.1rem;
+  color: #fff;
+  text-align: center;
+}
+.detail-action-bottom {
+  text-align: center;
+}
+.huge-btn {
+  width: 100%;
+  padding: 20px;
+  font-size: 1.3rem;
+  border-radius: 12px;
+  color: #111;
+  background: #59B3D9;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>
