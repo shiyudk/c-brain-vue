@@ -292,11 +292,7 @@ onMounted(() => {
         
         <div class="product-detail-container" v-if="selectedDetailProduct === '케익칼'">
           <div class="detail-images">
-            <img src="/images/cake_knife_detail_1.png" alt="Cake Knife Detail 1" />
-            <img src="/images/cake_knife_detail_2.png" alt="Cake Knife Detail 2" />
-            <img src="/images/cake_knife_detail_3.png" alt="Cake Knife Detail 3" />
-            <img src="/images/cake_knife_detail_4.png" alt="Cake Knife Detail 4" />
-            <img src="/images/cake_knife_detail_5.png" alt="Cake Knife Detail 5" />
+            <img src="/images/eco_paper_cake_knife.jpg" alt="Eco Paper Cake Knife" />
           </div>
           
           <div class="shipping-info">
