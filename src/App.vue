@@ -1090,6 +1090,9 @@ html {
   .grid-container {
     grid-template-columns: 1fr;
   }
+  .section-divider h2 {
+    font-size: 1.2rem;
+  }
   /* 모바일 네비게이션 최적화 */
   .navbar {
     height: 65px;
