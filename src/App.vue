@@ -1226,10 +1226,18 @@ html {
     display: none !important;
   }
   .search-bar {
-    width: 100px; /* 기존 150px에서 2/3 사이즈로 축소 */
+    width: auto;
+    padding: 4px 10px;
+  }
+  .search-bar .search-icon {
+    font-size: 0.75rem;
+  }
+  .search-bar input {
+    width: 80px;
+    font-size: 0.75rem;
   }
   .mobile-menu-btn {
-    margin-right: 10px; /* 검색창이 줄어듦에 따라 아이콘도 자연스럽게 왼쪽으로 이동 */
+    margin-right: 5px;
   }
 }
 
