@@ -1101,7 +1101,7 @@ html {
     background: var(--tech-bg) !important;
   }
   .nav-content {
-    padding: 0 1.2rem;
+    padding: 0 0.5rem;
   }
   .nav-logo-img {
     height: 40px; /* 모바일에 맞게 로고 축소 */
@@ -1225,19 +1225,35 @@ html {
   .hide-mobile {
     display: none !important;
   }
+  .nav-actions {
+    gap: 0.3rem !important;
+  }
+  .lang-toggle {
+    margin-right: 0 !important;
+    gap: 2px !important;
+    font-size: 11px;
+  }
+  .lang-btn {
+    padding: 2px !important;
+  }
   .search-bar {
     width: auto;
-    padding: 4px 10px;
+    padding: 3px 6px;
+    margin-right: 0 !important;
   }
   .search-bar .search-icon {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   .search-bar input {
-    width: 80px;
-    font-size: 0.75rem;
+    width: 40px;
+    font-size: 0.7rem;
   }
   .mobile-menu-btn {
-    margin-right: 5px;
+    margin-right: 0;
+    padding: 2px;
+  }
+  .hamburger-line {
+    width: 18px;
   }
 }
 
