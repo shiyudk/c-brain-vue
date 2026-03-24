@@ -285,7 +285,7 @@ onMounted(() => {
               </div>
 
               <!-- Product 5: Deep Sauce -->
-              <div class="tech-card" @click="goToCheckout('딥소스')">
+              <div class="tech-card" @click="goToDetail('딥소스')">
                 <div class="card-img-placeholder" style="background-image: url('/images/dip_sauce.png'); background-size: cover; background-position: center;">
                   <span class="glow"></span>
                 </div>
@@ -309,9 +309,14 @@ onMounted(() => {
           <h2>{{ selectedDetailProduct }} 상세 정보</h2>
         </div>
         
-        <div class="product-detail-container" v-if="selectedDetailProduct === '케익칼'">
+        <div class="product-detail-container" v-if="selectedDetailProduct === '케익칼' || selectedDetailProduct === '딥소스'">
           <div class="detail-images">
-            <img src="/images/eco_paper_cake_knife.jpg" alt="Eco Paper Cake Knife" />
+            <template v-if="selectedDetailProduct === '케익칼'">
+              <img src="/images/eco_paper_cake_knife.jpg" alt="Eco Paper Cake Knife" />
+            </template>
+            <template v-else-if="selectedDetailProduct === '딥소스'">
+              <img src="/images/dip_sauce_detail.jpg" alt="Korean Dipping Sauce" />
+            </template>
           </div>
           
           <div class="shipping-info">
@@ -319,8 +324,11 @@ onMounted(() => {
           </div>
           
           <div class="detail-action-bottom">
-            <button class="primary-btn huge-btn" @click="goToCheckout('케익칼')">
+            <button class="primary-btn huge-btn" @click="goToCheckout('케익칼')" v-if="selectedDetailProduct === '케익칼'">
               결제하기 (2,000원)
+            </button>
+            <button class="primary-btn huge-btn" @click="goToCheckout('딥소스')" v-else-if="selectedDetailProduct === '딥소스'">
+              결제하기 (8,000원)
             </button>
           </div>
         </div>
