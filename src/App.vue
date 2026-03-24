@@ -168,11 +168,7 @@ onMounted(() => {
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
-        <div class="lang-toggle" style="margin-top:20px;justify-content:center;">
-          <button @click="currentLang = 'ko'" :class="{ active: currentLang === 'ko' }" class="lang-btn">KR</button>
-          <span style="color:rgba(255,255,255,0.2)">|</span>
-          <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
-        </div>
+
       </nav>
     </div>
 
@@ -1226,7 +1222,7 @@ html {
     display: none !important;
   }
   .nav-actions {
-    gap: 0.3rem !important;
+    gap: 0.8rem !important;
   }
   .lang-toggle {
     margin-right: 0 !important;
