@@ -1087,15 +1087,18 @@ html {
   .hero-buttons {
     justify-content: center;
   }
-  .section-container {
-    padding: 0 1.5rem;
-  }
   .grid-container {
     grid-template-columns: 1fr;
   }
+  .section-divider {
+    margin-left: -3rem;
+    margin-right: -3rem;
+  }
   .section-divider h2 {
-    font-size: 1.15rem;
+    font-size: clamp(1.4rem, 6.5vw, 2.5rem);
     white-space: nowrap;
+    letter-spacing: -1px;
+    transform: scale(1.1);
   }
   /* 모바일 네비게이션 최적화 */
   .navbar {
