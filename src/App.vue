@@ -407,7 +407,7 @@ html {
   max-width: 1400px;
   margin: 0 auto;
   color: var(--tech-muted);
-  font-size: 0.85rem;
+  font-size: 1.27rem;
   line-height: 1.6;
 }
 .footer-content p {
@@ -416,7 +416,7 @@ html {
 .copyright {
   margin-top: 1rem !important;
   opacity: 0.6;
-  font-size: 0.75rem;
+  font-size: 1.13rem;
 }
 
 .app-container {
@@ -447,7 +447,7 @@ html {
 .utility-content a {
   color: var(--tech-text);
   text-decoration: none;
-  font-size: 0.75rem;
+  font-size: 1.13rem;
   font-weight: 500;
   opacity: 0.8;
   letter-spacing: -0.2px;
@@ -505,7 +505,7 @@ html {
 .nav-links a {
   color: var(--tech-text);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 1.42rem;
   font-weight: 600;
   letter-spacing: -0.5px;
   transition: opacity 0.2s;
@@ -539,7 +539,7 @@ html {
 }
 
 .search-icon {
-  font-size: 0.9rem;
+  font-size: 1.35rem;
   opacity: 0.8;
 }
 
@@ -547,7 +547,7 @@ html {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 1.27rem;
   width: 120px;
   outline: none;
 }
@@ -559,7 +559,7 @@ html {
 .icon-btn {
   color: #fff;
   text-decoration: none;
-  font-size: 1.2rem;
+  font-size: 1.80rem;
   opacity: 0.9;
 }
 
@@ -622,7 +622,7 @@ html {
 }
 
 .main-title {
-  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-size: clamp(4.50rem, 9vw, 6.75rem);
   font-weight: 800;
   margin: 0;
   color: #fff;
@@ -631,7 +631,7 @@ html {
 }
 
 .sub-title {
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(3rem, 6vw, 4.50rem);
   font-weight: 400;
   margin: 0.5rem 0 1.5rem 0;
   color: #fff;
@@ -639,7 +639,7 @@ html {
 }
 
 .hero-desc {
-  font-size: 1.3rem;
+  font-size: 1.95rem;
   color: #E2E4EC;
   margin-bottom: 2.5rem;
   font-weight: 400;
@@ -657,7 +657,7 @@ html {
   text-decoration: underline;
   text-underline-offset: 6px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.50rem;
   transition: opacity 0.2s;
 }
 
@@ -671,7 +671,7 @@ html {
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   padding: 12px 28px;
   border-radius: 30px;
-  font-size: 0.95rem;
+  font-size: 1.42rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -727,7 +727,7 @@ html {
 }
 
 .quote-mark {
-  font-size: 4.8rem;
+  font-size: 7.20rem;
   color: rgba(255, 255, 255, 0.08); /* Very faint watermark quote */
   position: absolute;
   top: -2.5rem;
@@ -738,7 +738,7 @@ html {
 }
 
 .quote-text {
-  font-size: clamp(1.44rem, 2.8vw, 2.0rem); /* 100% -> 80% 사이즈 축소 */
+  font-size: clamp(2.16rem, 4.20vw, 3rem); /* 100% -> 80% 사이즈 축소 */
   font-weight: 300;
   line-height: 1.7;
   font-style: italic;
@@ -749,7 +749,7 @@ html {
 
 .quote-eyebrow {
   color: var(--tech-muted);
-  font-size: 0.95rem;
+  font-size: 1.42rem;
   letter-spacing: 1px;
   font-style: italic;
 }
@@ -842,7 +842,7 @@ html {
 }
 
 .phil-text-content h3 {
-  font-size: clamp(1.4rem, 2vw, 1.8rem); /* 글씨 크기 크게 축소 */
+  font-size: clamp(2.10rem, 3vw, 2.70rem); /* 글씨 크기 크게 축소 */
   font-weight: 800;
   margin-bottom: 1.5rem;
   color: #fff;
@@ -850,13 +850,13 @@ html {
 }
 
 .phil-text-content h3.giant-title {
-  font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+  font-size: clamp(2.70rem, 3.75vw, 3.90rem);
   line-height: 1.1;
   color: #59B3D9; /* 채도를 30% 낮춘 부드러운 스카이블루 */
 }
 
 .phil-text-content p {
-  font-size: 0.95rem; /* 약 70% 폰트 사이즈 */
+  font-size: 1.42rem; /* 약 70% 폰트 사이즈 */
   line-height: 1.8;
   color: #D3D5DF;
   margin-bottom: 1rem;
@@ -869,7 +869,7 @@ html {
 }
 
 .sub-heading {
-  font-size: 1.1rem;
+  font-size: 1.65rem;
   color: #59B3D9; /* 채도를 30% 낮춘 부드러운 스카이블루 */
   margin-bottom: 1.5rem;
   font-weight: 600;
@@ -886,7 +886,7 @@ html {
 
 .phil-box p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1.35rem;
 }
 
 .phil-list {
@@ -904,10 +904,10 @@ html {
   padding: 1.2rem;
   border-radius: 10px;
 }
-.phil-list li p { margin: 0; font-size: 0.9rem; }
+.phil-list li p { margin: 0; font-size: 1.35rem; }
 
 .phil-list .icon {
-  font-size: 1.4rem;
+  font-size: 2.10rem;
   flex-shrink: 0;
 }
 
@@ -936,7 +936,7 @@ html {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .section-divider h2 {
-  font-size: 1.8rem;
+  font-size: 2.70rem;
   color: #fff;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -1016,7 +1016,7 @@ html {
 }
 
 .tech-card-info h3 {
-  font-size: 1.1rem;
+  font-size: 1.65rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
   color: #fff;
@@ -1028,7 +1028,7 @@ html {
   border: none;
   padding: 8px 20px;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 1.27rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
@@ -1056,7 +1056,7 @@ html {
   color: var(--tech-text);
   cursor: pointer;
   margin-bottom: 2rem;
-  font-size: 0.9rem;
+  font-size: 1.35rem;
   font-weight: bold;
   transition: all 0.3s;
 }
@@ -1095,7 +1095,7 @@ html {
     margin-right: -3rem;
   }
   .section-divider h2 {
-    font-size: clamp(1.4rem, 6.5vw, 2.5rem);
+    font-size: clamp(2.10rem, 9.75vw, 3.75rem);
     white-space: nowrap;
     letter-spacing: -1px;
     transform: scale(1.1);
@@ -1119,7 +1119,7 @@ html {
     padding: 0 2rem;
   }
   .quote-text {
-    font-size: 1.2rem;
+    font-size: 1.80rem;
   }
 }
 
@@ -1188,7 +1188,7 @@ html {
 }
 
 .mobile-menu-title {
-  font-size: 1.1rem;
+  font-size: 1.65rem;
   font-weight: 800;
   letter-spacing: 2px;
   color: var(--tech-text);
@@ -1198,7 +1198,7 @@ html {
   background: none;
   border: none;
   color: var(--tech-text);
-  font-size: 1.5rem;
+  font-size: 2.25rem;
   cursor: pointer;
 }
 
@@ -1212,7 +1212,7 @@ html {
 .mobile-nav-links a {
   color: var(--tech-text);
   text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 1.65rem;
   font-weight: 600;
   transition: color 0.2s;
 }
@@ -1237,7 +1237,7 @@ html {
   .lang-toggle {
     margin-right: 0 !important;
     gap: 2px !important;
-    font-size: 11px;
+    font-size: 16.50px;
   }
   .lang-btn {
     padding: 2px !important;
@@ -1248,11 +1248,11 @@ html {
     margin-right: 0 !important;
   }
   .search-bar .search-icon {
-    font-size: 0.7rem;
+    font-size: 1.05rem;
   }
   .search-bar input {
     width: 40px;
-    font-size: 0.7rem;
+    font-size: 1.05rem;
   }
   .mobile-menu-btn {
     margin-right: 0;
@@ -1286,13 +1286,13 @@ html {
 }
 .modal-content h3 {
   margin-top: 0;
-  font-size: 1.4rem;
+  font-size: 2.10rem;
   color: #fff;
   margin-bottom: 1rem;
 }
 .modal-desc {
   color: var(--tech-muted);
-  font-size: 0.95rem;
+  font-size: 1.42rem;
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
@@ -1301,7 +1301,7 @@ html {
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 2rem;
-  font-size: 1.1rem;
+  font-size: 1.65rem;
   color: #59B3D9;
   user-select: all;
 }
@@ -1316,7 +1316,7 @@ html {
   cursor: pointer;
   font-weight: bold;
   border: none;
-  font-size: 0.9rem;
+  font-size: 1.35rem;
   transition: opacity 0.2s;
 }
 .modal-actions button:hover {
@@ -1337,7 +1337,7 @@ html {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.80rem;
   cursor: pointer;
 }
 .detail-header {
@@ -1348,7 +1348,7 @@ html {
   position: relative;
 }
 .detail-header h2 {
-  font-size: 24px;
+  font-size: 36px;
   color: #fff;
   margin: 0;
 }
@@ -1360,7 +1360,7 @@ html {
   background: transparent;
   color: #59B3D9;
   border: none;
-  font-size: 16px;
+  font-size: 24px;
   cursor: pointer;
 }
 .product-detail-container {
@@ -1388,7 +1388,7 @@ html {
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 40px;
-  font-size: 1.1rem;
+  font-size: 1.65rem;
   color: #fff;
   text-align: center;
 }
@@ -1398,7 +1398,7 @@ html {
 .huge-btn {
   width: 100%;
   padding: 20px;
-  font-size: 1.3rem;
+  font-size: 1.95rem;
   border-radius: 12px;
   color: #111;
   background: #59B3D9;
@@ -1411,7 +1411,7 @@ html {
   align-items: center;
   gap: 8px;
   margin-right: 16px;
-  font-size: 14px;
+  font-size: 21px;
 }
 .lang-btn {
   background: transparent;
