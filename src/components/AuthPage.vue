@@ -110,7 +110,12 @@ const handleSubmit = async () => {
 
 const loginWithProvider = async (providerName) => {
   if (!supabase) { alert(t.value.errKey); return; }
-  const { error } = await supabase.auth.signInWithOAuth({ provider: providerName })
+  const { error } = await supabase.auth.signInWithOAuth({ 
+    provider: providerName,
+    options: {
+      redirectTo: `${window.location.origin}/`
+    }
+  })
   if (error) alert(error.message)
 }
 </script>
