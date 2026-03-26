@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import CheckoutPage from './components/CheckoutPage.vue'
+import AuthPage from './components/AuthPage.vue'
 
 const currentLang = ref('ko')
 
@@ -41,6 +42,19 @@ const goToDetail = (productName) => {
   previousView.value = currentView.value
   selectedDetailProduct.value = productName
   currentView.value = 'detail'
+  window.scrollTo(0, 0)
+}
+
+
+const goToAuth = (isMobile = false) => {
+  if (isMobile && isMobileMenuOpen.value) {
+    toggleMobileMenu()
+  }
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'auth'
   window.scrollTo(0, 0)
 }
 
@@ -135,7 +149,12 @@ onMounted(() => {
           <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.ai }}</a>
           <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.personal }}</a>
           <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.kids }}</a>
-        </nav>
+        
+        <a href="#" @click.prevent="goToAuth(true)" style="margin-top: 15px; font-weight: 700; color: #59B3D9;">
+          {{ currentLang === 'ko' ? '로그인 / 회원가입' : 'Login / Sign Up' }}
+        </a>
+      </nav>
+
         <div class="nav-actions">
           <div class="lang-toggle">
             <button @click="currentLang = 'ko'" :class="{ active: currentLang === 'ko' }" class="lang-btn">KR</button>
@@ -147,7 +166,7 @@ onMounted(() => {
             <input type="text" :placeholder="t.nav.search" />
           </div>
           <a href="#cart" class="icon-btn hide-mobile">🛒</a>
-          <a href="#login" class="icon-btn hide-mobile">👤</a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToAuth(false)">👤</a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -341,7 +360,12 @@ onMounted(() => {
         </div>
         <CheckoutPage :productName="selectedProduct" />
       </template>
+    
+      <template v-if="currentView === 'auth'">
+        <AuthPage :currentLang="currentLang" @back="goHome" />
+      </template>
     </main>
+
 
     <div class="modal-overlay" v-show="showContactModal" @click="showContactModal = false">
       <div class="modal-content" @click.stop>
