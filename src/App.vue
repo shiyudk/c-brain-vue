@@ -158,9 +158,6 @@ onMounted(() => {
         <a href="#">{{ t.nav.support }}</a>
         <a href="#">{{ t.nav.jobs }}</a>
         <template v-if="currentUser">
-          <span class="user-greeting hide-mobile" style="color: rgba(255,255,255,0.8); font-size:12px; margin-right: 15px;">
-            {{ currentUser.user_metadata?.full_name || currentUser.email }}님 환영합니다
-          </span>
           <a href="#" @click.prevent="handleLogout">로그아웃</a>
         </template>
         <template v-else>
@@ -210,10 +207,7 @@ onMounted(() => {
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
         <template v-if="currentUser">
-          <span style="margin-top:24px; font-size: 15px; color: rgba(255,255,255,0.8);">
-            {{ currentUser.user_metadata?.full_name || currentUser.email }}님 환영합니다
-          </span>
-          <a href="#" @click.prevent="handleLogout" style="margin-top: 10px; font-weight: 700; color: #ff6b6b;">
+          <a href="#" @click.prevent="handleLogout" style="margin-top: 24px; font-weight: 700; color: #ff6b6b;">
             {{ currentLang === 'ko' ? '로그아웃' : 'Logout' }}
           </a>
         </template>
