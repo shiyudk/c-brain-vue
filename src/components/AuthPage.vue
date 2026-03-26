@@ -135,8 +135,11 @@ const loginWithProvider = async (providerName) => {
       <div class="auth-box glass-panel" style="text-align: center;">
         <h2 style="font-size:32px; margin-bottom:1rem;">🎉</h2>
         <h2 style="margin-bottom:1rem;">{{ currentLang === 'ko' ? '회원가입되셨습니다!' : 'Signup Successful!' }}</h2>
-        <p style="color:rgba(255,255,255,0.7); margin-bottom:2rem;">
+        <p style="color:rgba(255,255,255,0.7); margin-bottom:1rem;">
           {{ currentLang === 'ko' ? `${registeredUserName}님, 환영합니다.` : `Welcome, ${registeredUserName}.` }}
+        </p>
+        <p style="color:#ff6b6b; font-size:14px; margin-bottom:2rem; background:rgba(255,107,107,0.1); padding:12px; border-radius:8px; line-height:1.5;">
+          {{ currentLang === 'ko' ? '메일함(또는 스팸함)으로 발송된 인증 링크(Confirm)를 클릭하셔야 로그인이 가능합니다.' : 'Please click the confirmation link sent to your email (or spam folder) to log in.' }}
         </p>
         <button class="submit-btn neon-border-btn" style="width:100%" @click="$emit('back')">
           {{ currentLang === 'ko' ? '홈페이지로 가기' : 'Go to Homepage' }}
