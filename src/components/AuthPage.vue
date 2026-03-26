@@ -133,12 +133,12 @@ const loginWithProvider = async (providerName) => {
 
     <div class="auth-container animate-fade" v-if="signupComplete">
       <div class="auth-box glass-panel" style="text-align: center;">
-        <h2 style="font-size:32px; margin-bottom:1rem;">🎉</h2>
+        <h2 style="font-size: 22.4px; margin-bottom:1rem;">🎉</h2>
         <h2 style="margin-bottom:1rem;">{{ currentLang === 'ko' ? '회원가입되셨습니다!' : 'Signup Successful!' }}</h2>
         <p style="color:rgba(255,255,255,0.7); margin-bottom:1rem;">
           {{ currentLang === 'ko' ? `${registeredUserName}님, 환영합니다.` : `Welcome, ${registeredUserName}.` }}
         </p>
-        <p style="color:#ff6b6b; font-size:14px; margin-bottom:2rem; background:rgba(255,107,107,0.1); padding:12px; border-radius:8px; line-height:1.5;">
+        <p style="color:#ff6b6b; font-size: 10px; margin-bottom:2rem; background:rgba(255,107,107,0.1); padding:12px; border-radius:8px; line-height:1.5;">
           {{ currentLang === 'ko' ? '메일함(또는 스팸함)으로 발송된 인증 링크(Confirm)를 클릭하셔야 로그인이 가능합니다.' : 'Please click the confirmation link sent to your email (or spam folder) to log in.' }}
         </p>
         <button class="submit-btn neon-border-btn" style="width:100%" @click="$emit('back')">
@@ -233,7 +233,7 @@ const loginWithProvider = async (providerName) => {
   border-radius: 30px;
   color: #D3D5DF;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 600;
   transition: all 0.3s;
 }
@@ -264,7 +264,7 @@ const loginWithProvider = async (providerName) => {
 }
 
 .auth-header h2 {
-  font-size: 28px;
+  font-size: 19.6px;
   color: #fff;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -285,7 +285,7 @@ const loginWithProvider = async (providerName) => {
 }
 
 .input-group label {
-  font-size: 13px;
+  font-size: 10px;
   color: rgba(255,255,255,0.7);
   font-weight: 600;
   margin-left: 4px;
@@ -297,7 +297,7 @@ const loginWithProvider = async (providerName) => {
   border-radius: 12px;
   padding: 14px 16px;
   color: #fff;
-  font-size: 15px;
+  font-size: 10.5px;
   transition: all 0.2s ease;
   outline: none;
 }
@@ -314,12 +314,12 @@ const loginWithProvider = async (providerName) => {
 }
 
 .text-small {
-  font-size: 13px;
+  font-size: 10px;
   color: rgba(255,255,255,0.6);
 }
 
 .text-tiny {
-  font-size: 12px;
+  font-size: 10px;
   color: rgba(255,255,255,0.4);
   margin-top: 1rem;
   line-height: 1.5;
@@ -341,7 +341,7 @@ const loginWithProvider = async (providerName) => {
   margin-top: 1rem;
   padding: 16px;
   border-radius: 14px;
-  font-size: 16px;
+  font-size: 11.2px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -369,7 +369,7 @@ const loginWithProvider = async (providerName) => {
   text-align: center;
   margin: 2rem 0;
   color: rgba(255,255,255,0.3);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
 }
 
@@ -396,7 +396,7 @@ const loginWithProvider = async (providerName) => {
   color: #fff;
   padding: 14px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -436,7 +436,7 @@ const loginWithProvider = async (providerName) => {
   background: none;
   border: none;
   color: #59B3D9;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 700;
   cursor: pointer;
   padding: 0;
