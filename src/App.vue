@@ -58,6 +58,20 @@ const goToAuth = (isMobile = false) => {
   window.scrollTo(0, 0)
 }
 
+const currentAuthMode = ref('login')
+const goToAuth = (mode = 'login', isMobile = false) => {
+  currentAuthMode.value = mode
+  if (isMobile && isMobileMenuOpen.value) {
+    toggleMobileMenu()
+  }
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'auth'
+  window.scrollTo(0, 0)
+}
+
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
   document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : ''
@@ -135,7 +149,7 @@ onMounted(() => {
       <div class="utility-content">
         <a href="#">{{ t.nav.support }}</a>
         <a href="#">{{ t.nav.jobs }}</a>
-        <a href="#">{{ t.nav.signup }}</a>
+        <a href="#" @click.prevent="goToAuth('signup', false)">{{ t.nav.signup }}</a>
       </div>
     </div>
 
@@ -149,10 +163,6 @@ onMounted(() => {
           <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.ai }}</a>
           <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.personal }}</a>
           <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.kids }}</a>
-        
-        <a href="#" @click.prevent="goToAuth(true)" style="margin-top: 15px; font-weight: 700; color: #59B3D9;">
-          {{ currentLang === 'ko' ? '로그인 / 회원가입' : 'Login / Sign Up' }}
-        </a>
       </nav>
 
         <div class="nav-actions">
@@ -166,7 +176,7 @@ onMounted(() => {
             <input type="text" :placeholder="t.nav.search" />
           </div>
           <a href="#cart" class="icon-btn hide-mobile">🛒</a>
-          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToAuth(false)">👤</a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToAuth('login', false)">👤</a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -187,7 +197,9 @@ onMounted(() => {
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
-
+        <a href="#" @click.prevent="goToAuth('signup', true)" style="margin-top: 24px; font-weight: 700; color: #59B3D9;">
+          {{ currentLang === 'ko' ? '회원가입' : 'Sign Up' }}
+        </a>
       </nav>
     </div>
 
@@ -381,6 +393,10 @@ onMounted(() => {
         <button class="close-btn" @click="showContactModal = false">✕</button>
       </div>
     </div>
+
+    <template v-if="currentView === 'auth'">
+      <AuthPage :currentLang="currentLang" :initialMode="currentAuthMode" @back="goHome" />
+    </template>
 
     <footer class="app-footer">
       <div class="footer-content">

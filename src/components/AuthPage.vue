@@ -1,16 +1,24 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   currentLang: {
     type: String,
     default: 'ko'
+  },
+  initialMode: {
+    type: String,
+    default: 'login'
   }
 })
 
 const emit = defineEmits(['back'])
 
-const isLogin = ref(true)
+const isLogin = ref(props.initialMode === 'login')
+
+watch(() => props.initialMode, (newVal) => {
+  isLogin.value = newVal === 'login'
+})
 const email = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
