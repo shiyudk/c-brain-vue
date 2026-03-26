@@ -2,6 +2,16 @@
 import { ref, onMounted, computed } from 'vue'
 import CheckoutPage from './components/CheckoutPage.vue'
 import AuthPage from './components/AuthPage.vue'
+import { supabase } from './supabase.js'
+
+const currentUser = ref(null)
+const handleLogout = async () => {
+  if (supabase) {
+    await supabase.auth.signOut()
+    currentUser.value = null
+    goHome()
+  }
+}
 
 const currentLang = ref('ko')
 
@@ -120,6 +130,15 @@ const triggerMailApp = () => {
 }
 
 onMounted(() => {
+  if (supabase) {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      currentUser.value = session?.user || null
+    })
+    supabase.auth.onAuthStateChange((_event, session) => {
+      currentUser.value = session?.user || null
+    })
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -138,7 +157,15 @@ onMounted(() => {
       <div class="utility-content">
         <a href="#">{{ t.nav.support }}</a>
         <a href="#">{{ t.nav.jobs }}</a>
-        <a href="#" @click.prevent="goToAuth('signup', false)">{{ t.nav.signup }}</a>
+        <template v-if="currentUser">
+          <span class="user-greeting hide-mobile" style="color: rgba(255,255,255,0.8); font-size:12px; margin-right: 15px;">
+            {{ currentUser.user_metadata?.full_name || currentUser.email }}님 환영합니다
+          </span>
+          <a href="#" @click.prevent="handleLogout">로그아웃</a>
+        </template>
+        <template v-else>
+          <a href="#" @click.prevent="goToAuth('signup', false)">{{ t.nav.signup }}</a>
+        </template>
       </div>
     </div>
 
@@ -161,7 +188,7 @@ onMounted(() => {
             <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
           </div>
           <a href="#cart" class="icon-btn hide-mobile">🛒</a>
-          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToAuth('login', false)">👤</a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="currentUser ? goHome() : goToAuth('login', false)">👤</a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -182,9 +209,19 @@ onMounted(() => {
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
-        <a href="#" @click.prevent="goToAuth('signup', true)" style="margin-top: 24px; font-weight: 700; color: #59B3D9;">
-          {{ currentLang === 'ko' ? '회원가입' : 'Sign Up' }}
-        </a>
+        <template v-if="currentUser">
+          <span style="margin-top:24px; font-size: 15px; color: rgba(255,255,255,0.8);">
+            {{ currentUser.user_metadata?.full_name || currentUser.email }}님 환영합니다
+          </span>
+          <a href="#" @click.prevent="handleLogout" style="margin-top: 10px; font-weight: 700; color: #ff6b6b;">
+            {{ currentLang === 'ko' ? '로그아웃' : 'Logout' }}
+          </a>
+        </template>
+        <template v-else>
+          <a href="#" @click.prevent="goToAuth('signup', true)" style="margin-top: 24px; font-weight: 700; color: #59B3D9;">
+            {{ currentLang === 'ko' ? '회원가입' : 'Sign Up' }}
+          </a>
+        </template>
       </nav>
     </div>
 

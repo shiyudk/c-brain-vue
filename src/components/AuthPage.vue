@@ -16,6 +16,8 @@ const props = defineProps({
 const emit = defineEmits(['back'])
 
 const isLogin = ref(props.initialMode === 'login')
+const signupComplete = ref(false)
+const registeredUserName = ref('')
 
 watch(() => props.initialMode, (newVal) => {
   isLogin.value = newVal === 'login'
@@ -104,7 +106,10 @@ const handleSubmit = async () => {
       options: { data: { full_name: name.value } }
     })
     if (error) alert(error.message)
-    else { alert(t.value.signupSuccess); isLogin.value = true; }
+    else { 
+      registeredUserName.value = name.value || email.value.split('@')[0]
+      signupComplete.value = true 
+    }
   }
 }
 
@@ -126,7 +131,20 @@ const loginWithProvider = async (providerName) => {
       <button @click="$emit('back')" class="back-btn">{{ t.backBtn }}</button>
     </div>
 
-    <div class="auth-container animate-fade">
+    <div class="auth-container animate-fade" v-if="signupComplete">
+      <div class="auth-box glass-panel" style="text-align: center;">
+        <h2 style="font-size:32px; margin-bottom:1rem;">🎉</h2>
+        <h2 style="margin-bottom:1rem;">{{ currentLang === 'ko' ? '회원가입되셨습니다!' : 'Signup Successful!' }}</h2>
+        <p style="color:rgba(255,255,255,0.7); margin-bottom:2rem;">
+          {{ currentLang === 'ko' ? `${registeredUserName}님, 환영합니다.` : `Welcome, ${registeredUserName}.` }}
+        </p>
+        <button class="submit-btn neon-border-btn" style="width:100%" @click="$emit('back')">
+          {{ currentLang === 'ko' ? '홈페이지로 가기' : 'Go to Homepage' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="auth-container animate-fade" v-else>
       <div class="auth-box glass-panel">
         <div class="auth-header">
           <h2>{{ isLogin ? t.loginTitle : t.signupTitle }}</h2>
