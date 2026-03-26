@@ -46,17 +46,6 @@ const goToDetail = (productName) => {
 }
 
 
-const goToAuth = (isMobile = false) => {
-  if (isMobile && isMobileMenuOpen.value) {
-    toggleMobileMenu()
-  }
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'auth'
-  window.scrollTo(0, 0)
-}
 
 const currentAuthMode = ref('login')
 const goToAuth = (mode = 'login', isMobile = false) => {
