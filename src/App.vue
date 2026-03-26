@@ -160,10 +160,6 @@ onMounted(() => {
             <span style="color:rgba(255,255,255,0.2)">|</span>
             <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
           </div>
-          <div class="search-bar">
-            <span class="search-icon">🔍</span>
-            <input type="text" :placeholder="t.nav.search" />
-          </div>
           <a href="#cart" class="icon-btn hide-mobile">🛒</a>
           <a href="#" class="icon-btn hide-mobile" @click.prevent="goToAuth('login', false)">👤</a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
