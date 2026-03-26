@@ -89,7 +89,7 @@ onMounted(() => {
 }
 
 .guestbook-title {
-  font-size: 2.63rem;
+  font-size: 3.75rem;
   font-weight: 900;
   text-align: center;
   margin-bottom: 3rem;
@@ -131,7 +131,7 @@ onMounted(() => {
 }
 
 .error-hint {
-  font-size: 0.94rem;
+  font-size: 1.35rem;
   opacity: 0.8;
   margin-top: 0.5rem;
 }
@@ -169,12 +169,12 @@ onMounted(() => {
 
 .author {
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.65rem;
   color: #667eea;
 }
 
 .timestamp {
-  font-size: 0.89rem;
+  font-size: 1.27rem;
   color: #888;
 }
 
@@ -202,7 +202,7 @@ onMounted(() => {
   }
   
   .guestbook-title {
-    font-size: 2.1rem;
+    font-size: 3rem;
     margin-bottom: 2rem;
   }
   

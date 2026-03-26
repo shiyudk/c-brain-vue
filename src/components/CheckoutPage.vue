@@ -120,14 +120,14 @@ const requestPayment = async () => {
 }
 
 .header h2 {
-  font-size: 25.2px;
+  font-size: 36px;
   font-weight: bold;
   margin-bottom: 8px;
 }
 
 .subtitle {
   color: #666;
-  font-size: 14.7px;
+  font-size: 21px;
 }
 
 .box {
@@ -139,7 +139,7 @@ const requestPayment = async () => {
 }
 
 .product-info h3 {
-  font-size: 16.8px;
+  font-size: 24px;
   margin-bottom: 16px;
   border-bottom: 1px solid #ddd;
   padding-bottom: 8px;
@@ -163,14 +163,14 @@ const requestPayment = async () => {
   padding-top: 16px;
   border-top: 1px dashed #ccc;
   font-weight: bold;
-  font-size: 18.9px;
+  font-size: 27px;
   color: #3182f6; /* Toss Blue */
 }
 
 .pay-button {
   width: 100%;
   padding: 16px;
-  font-size: 18.9px;
+  font-size: 27px;
   font-weight: bold;
   color: white;
   background-color: #3182f6; /* Toss Primary Blue */
