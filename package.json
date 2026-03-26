@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.95.3",
+    "@supabase/supabase-js": "^2.100.0",
     "@tosspayments/payment-sdk": "^1.9.2",
     "@tosspayments/payment-widget-sdk": "^0.12.1",
     "vue": "^3.5.27"

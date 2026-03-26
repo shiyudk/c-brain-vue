@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { supabase } from '../supabase.js'
 
 const props = defineProps({
   currentLang: {
@@ -19,6 +20,7 @@ const isLogin = ref(props.initialMode === 'login')
 watch(() => props.initialMode, (newVal) => {
   isLogin.value = newVal === 'login'
 })
+
 const email = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
@@ -49,7 +51,11 @@ const t = computed(() => {
       backBtn: '← 뒤로가기',
       google: 'Google로 시작하기',
       kakao: '카카오로 시작하기',
-      agreeTerms: '가입 시 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다.'
+      agreeTerms: '가입 시 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다.',
+      errKey: 'API 키가 설정되지 않았습니다. 가이드를 참고해 환경변수를 등록해주세요.',
+      loginSuccess: '로그인 성공!',
+      signupSuccess: '회원가입 성공! 등록한 이메일을 확인하여 인증해주세요.',
+      pwMismatch: '비밀번호가 서로 일치하지 않습니다.'
     },
     en: {
       loginTitle: 'Welcome Back',
@@ -66,18 +72,46 @@ const t = computed(() => {
       backBtn: '← Back',
       google: 'Continue with Google',
       kakao: 'Continue with Kakao',
-      agreeTerms: 'By signing up, you agree to our Terms of Service and Privacy Policy.'
+      agreeTerms: 'By signing up, you agree to our Terms of Service and Privacy Policy.',
+      errKey: 'API keys are missing. Please setup environment variables.',
+      loginSuccess: 'Login Successful!',
+      signupSuccess: 'Signup Successful! Please check your email to verify your account.',
+      pwMismatch: 'Passwords do not match.'
     }
   }
   return dict[props.currentLang] || dict.ko
 })
 
-const handleSubmit = () => {
-  if (isLogin.value) {
-    alert(props.currentLang === 'ko' ? '인증 서버 연결 준비중입니다.' : 'Authentication server is pending.')
-  } else {
-    alert(props.currentLang === 'ko' ? '회원가입 기능 준비중입니다.' : 'Registration feature is pending.')
+const handleSubmit = async () => {
+  if (!supabase) {
+    alert(t.value.errKey); return;
   }
+  if (isLogin.value) {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.value,
+      password: password.value,
+    })
+    if (error) alert(error.message)
+    else { alert(t.value.loginSuccess); emit('back'); }
+  } else {
+    if (password.value !== passwordConfirm.value) {
+      alert(t.value.pwMismatch)
+      return
+    }
+    const { error } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+      options: { data: { full_name: name.value } }
+    })
+    if (error) alert(error.message)
+    else { alert(t.value.signupSuccess); isLogin.value = true; }
+  }
+}
+
+const loginWithProvider = async (providerName) => {
+  if (!supabase) { alert(t.value.errKey); return; }
+  const { error } = await supabase.auth.signInWithOAuth({ provider: providerName })
+  if (error) alert(error.message)
 }
 </script>
 
@@ -127,10 +161,10 @@ const handleSubmit = () => {
           <div class="divider">
             <span>OR</span>
           </div>
-          <button class="social-btn google" type="button">
+          <button class="social-btn google" type="button" @click="loginWithProvider('google')">
             <span class="icon">G</span> {{ t.google }}
           </button>
-          <button class="social-btn kakao" type="button">
+          <button class="social-btn kakao" type="button" @click="loginWithProvider('kakao')">
             <span class="icon">K</span> {{ t.kakao }}
           </button>
         </div>
