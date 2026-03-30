@@ -29,16 +29,17 @@ const customerKey = 'test_customer_key_' + Math.random().toString(36).substring(
 
 // Forms State
 const buyer = ref({
-  name: '김토스',
-  phone: '010-0000-0000',
-  email: 'contact@c-braindesign.com'
+  name: '',
+  phone: '',
+  email: ''
 });
 
 const shipping = ref({
-  name: '김토스',
-  phone: '010-0000-0000',
-  address: '서울특별시 동대문구 한천로 46길 85-6',
-  zipCode: '12345'
+  receiver: '',
+  phone: '',
+  zipCode: '',
+  address: '',
+  detailAddress: ''
 });
 
 const isWidgetLoaded = ref(false);
@@ -46,6 +47,14 @@ const paymentWidget = ref(null);
 const paymentMethodWidget = ref(null);
 
 onMounted(async () => {
+  // Load Daum Postcode Script
+  if (!window.daum) {
+    const script = document.createElement('script');
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+
   try {
     paymentWidget.value = await loadPaymentWidget(widgetClientKey, customerKey);
 
@@ -69,7 +78,27 @@ onMounted(async () => {
   }
 });
 
+const openPostcode = () => {
+  if (!window.daum) {
+    alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+  new window.daum.Postcode({
+    oncomplete: (data) => {
+      shipping.value.address = data.roadAddress || data.jibunAddress;
+      shipping.value.zipCode = data.zonecode;
+      // Focus detail address field
+      document.getElementById('detailAddress')?.focus();
+    }
+  }).open();
+};
+
 const requestPayment = async () => {
+  if (!buyer.value.name || !shipping.value.receiver || !shipping.value.address) {
+    alert('모든 배송 정보를 입력해주세요.');
+    return;
+  }
+
   try {
     if (!paymentWidget.value) return;
 
@@ -105,27 +134,49 @@ const requestPayment = async () => {
         </section>
 
         <section class="checkout-section">
-          <div class="section-header">
-            <h2 class="section-title">주문자 정보</h2>
-            <button class="edit-btn">수정</button>
-          </div>
-          <div class="info-card glass-panel">
-            <p class="info-text"><strong>{{ buyer.name }}</strong></p>
-            <p class="info-text">{{ buyer.phone }}</p>
-            <p class="info-text">{{ buyer.email }}</p>
+          <h2 class="section-title">주문자 정보</h2>
+          <div class="form-grid glass-panel">
+            <div class="input-group">
+              <label>이름</label>
+              <input type="text" v-model="buyer.name" placeholder="주문자 성함" />
+            </div>
+            <div class="input-group">
+              <label>연락처</label>
+              <input type="tel" v-model="buyer.phone" placeholder="010-0000-0000" />
+            </div>
+            <div class="input-group full-width">
+              <label>이메일</label>
+              <input type="email" v-model="buyer.email" placeholder="example@naver.com" />
+            </div>
           </div>
         </section>
 
         <section class="checkout-section">
-          <div class="section-header">
-            <h2 class="section-title">배송 정보</h2>
-            <button class="edit-btn">변경</button>
-          </div>
-          <div class="info-card glass-panel">
-            <p class="info-text"><strong>{{ shipping.name }}</strong></p>
-            <p class="info-text">{{ shipping.phone }}</p>
-            <p class="info-text">{{ shipping.address }}</p>
-            <p class="info-text">({{ shipping.zipCode }})</p>
+          <h2 class="section-title">배송 정보</h2>
+          <div class="form-grid glass-panel">
+            <div class="input-group">
+              <label>수령인</label>
+              <input type="text" v-model="shipping.receiver" placeholder="받으실 분 성함" />
+            </div>
+            <div class="input-group">
+              <label>연락처</label>
+              <input type="tel" v-model="shipping.phone" placeholder="010-0000-0000" />
+            </div>
+            <div class="input-group full-width address-search-group">
+               <label>우편번호</label>
+               <div class="flex-row">
+                  <input type="text" v-model="shipping.zipCode" readonly placeholder="00000" />
+                  <button class="search-btn" @click="openPostcode">주소 검색</button>
+               </div>
+            </div>
+            <div class="input-group full-width">
+              <label>기본 주소</label>
+              <input type="text" v-model="shipping.address" readonly placeholder="검색 버튼을 눌러주세요" />
+            </div>
+            <div class="input-group full-width">
+              <label>상세 주소</label>
+              <input type="text" id="detailAddress" v-model="shipping.detailAddress" placeholder="나머지 상세 주소를 입력하세요" />
+            </div>
           </div>
         </section>
 
@@ -163,7 +214,7 @@ const requestPayment = async () => {
             :disabled="!isWidgetLoaded" 
             @click="requestPayment"
           >
-            {{ isWidgetLoaded ? `결제하기` : '준비 중...' }}
+            {{ isWidgetLoaded ? `결제하기` : '결제 모듈 로딩 중...' }}
           </button>
         </div>
       </aside>
@@ -196,17 +247,10 @@ const requestPayment = async () => {
   margin-bottom: 40px;
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
 .section-title {
   font-size: 1.44rem;
   font-weight: 700;
-  margin: 0 0 15px;
+  margin: 0 0 20px;
   color: var(--tech-accent, #59B3D9);
 }
 
@@ -214,8 +258,80 @@ const requestPayment = async () => {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  padding: 20px;
+  padding: 25px;
   border-radius: 12px;
+}
+
+/* Form Styles */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .full-width {
+    grid-column: span 1;
+  }
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.input-group input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 15px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #59B3D9;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.address-search-group .flex-row {
+  display: flex;
+  gap: 10px;
+}
+
+.address-search-group input {
+  flex: 1;
+}
+
+.search-btn {
+  background: #59B3D9;
+  color: #000;
+  border: none;
+  padding: 0 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-btn:hover {
+  background: #4ab8e6;
 }
 
 .order-item-card {
@@ -253,29 +369,13 @@ const requestPayment = async () => {
   opacity: 0.7;
 }
 
-.info-text {
-  margin: 5px 0;
-  line-height: 1.5;
-  opacity: 0.9;
-}
-
-.edit-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: #fff;
-  padding: 5px 12px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
 .payment-widget-area {
   padding: 0;
   overflow: hidden;
 }
 
 #payment-method, #agreement {
-  background: #fff; /* 위젯은 하얀 배경이 기본적으로 깔끔함 */
+  background: #fff;
   border-radius: 0;
 }
 
