@@ -18,6 +18,15 @@ const currentLang = ref('ko')
 const translations = {
   ko: {
     nav: { mall: '쇼핑몰', support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
+    recruit: {
+      title: '클립스컨설팅 파트너 강사·코치 상시 모집',
+      desc: '기업 교육 및 코칭 분야의 다양한 경험과 전문성 갖춘 강사, 코치 및 컨설턴트 분들을 환영합니다!',
+      name: '이름',
+      phone: '연락처',
+      email: '이메일',
+      content: '내용',
+      submit: '작성'
+    },
     hero: { quote1: '"시스템은 자유를 제한하는 것이 아니라,<br>더 큰 자유로 가는 길을 여는 것입니다."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: '현대인의 의사결정 위기', crisisDesc1: '우리는 매 순간 수많은 정보와 감정의 파도 속에서 결정을 내립니다. 하지만 그 결정이 정말 당신의 의지에 의한 것입니까?', crisisDesc2: '<strong>파편화된 선택과 순간의 충동</strong>은 우리의 삶을 불안정한 궤도로 몰아넣고 있습니다.', waverTitle: '왜 우리는 항상 흔들리는가', waverSub: '신경계 구조의 관점', waverDesc: '우리의 뇌는 <strong>불확실성</strong>을 생존의 위협으로 간주합니다. 기준이 없는 선택은 뇌의 \'편도체\'를 자극하여 불안을 증폭시킵니다.', waverBox: '🧠 <strong>감정 vs 시스템:</strong> 감정은 위험을 알리는 \'신호\'일 뿐이며, 의사결정의 \'기준\'이 되어서는 안 됩니다.', signalTitle: '감정은 신호지, 기준이 아니다', signalList1: '<strong>생각이 많을수록 인생이 느려지는 이유:</strong> 기준 없이 감정에 매몰되어 \'생각의 루프\'에 갇히기 때문입니다.', signalList2: '<strong>불안한 사람일수록 기준이 필요하다:</strong> 외부 환경이 흔들릴 때 나를 잡아줄 수 있는 것은 오직 명확한 \'판단 기준\'뿐입니다.', signalList3: '<strong>치유가 아닌 설계:</strong> 불안을 달래는 힐링보다, 불안 속에서도 작동하는 사고 구조를 만드는 것이 핵심입니다.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: '시스템이 감정을 앞섭니다', systemDesc1: '인간의 의지력은 고갈되는 자원입니다. 우리는 감정에 의존하지 않아도 일관된 성과를 낼 수 있는 실행 프로세스를 구축합니다.', systemDesc2: '기분이 좋지 않아도, 의지가 약해져도 작동하는 견고한 시스템이 당신의 일상을 보호합니다.' },
     products: { ai: 'AI로봇 기반 컨설팅', personal: '하이엔드 퍼스널 컨설팅', kids: '프리미엄 키즈 컨설팅', cakeKnife: '케익칼', dipSauce: '딥소스', otherProducts: 'Brain Design 기타 제품', inquireBtn: '견적문의', purchaseBtn: '구매하기' },
     detail: { backBtn: '← 뒤로가기', detailInfo: '상세 정보', shipping: '🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.', payCake: '결제하기 (2,000원)', payDip: '결제하기 (8,000원)' },
@@ -39,6 +48,15 @@ const translations = {
   },
   en: {
     nav: { mall: 'Shop', support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
+    recruit: {
+      title: 'Partner Instructors & Coaches Recruitment',
+      desc: 'We welcome instructors, coaches, and consultants with diverse experience and expertise in corporate training and coaching!',
+      name: 'Name',
+      phone: 'Phone',
+      email: 'Email',
+      content: 'Message',
+      submit: 'Submit'
+    },
     hero: { quote1: '"A system does not restrict freedom,<br>but opens the path to greater freedom."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: 'The Crisis of Decision Making', crisisDesc1: 'We make decisions amidst a sea of information and emotions. But are those decisions truly yours?', crisisDesc2: '<strong>Fragmented choices and momentary impulses</strong> are driving our lives into an unstable orbit.', waverTitle: 'Why We Always Waver', waverSub: 'A Nervous System Perspective', waverDesc: 'Our brains interpret <strong>uncertainty</strong> as a threat. Choices without standards stimulate the amygdala, amplifying anxiety.', waverBox: '🧠 <strong>Emotion vs System:</strong> Emotion is a \'signal\' for danger, not a \'standard\' for decision making.', signalTitle: 'Emotion is a Signal, Not a Standard', signalList1: '<strong>Why overthinking slows down life:</strong> Being trapped in a \'thought loop\' without clear standards.', signalList2: '<strong>Anxiety begs standardizations:</strong> Only clear \'judgments\' can ground you when the environment shakes.', signalList3: '<strong>Design, not healing:</strong> The key is building a thought process that works even in anxiety.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: 'The System Precedes Emotion', systemDesc1: 'Human willpower is a depleting resource. We build execution processes that yield consistent results without relying on emotions.', systemDesc2: 'A solid system protects your daily life, even when you\'re feeling down or weak.' },
     products: { ai: 'AI Algorithm Check', personal: 'High-End Personal Core', kids: 'Premium Kids Builder', cakeKnife: 'Cake Knife', dipSauce: 'Dipping Sauce', otherProducts: 'Brain Design Other Products', inquireBtn: 'Inquire', purchaseBtn: 'Purchase' },
     detail: { backBtn: '← Back', detailInfo: 'Details', shipping: '🚚 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
@@ -91,6 +109,15 @@ const goToAuth = (mode = 'login', isMobile = false) => {
   }
   previousView.value = currentView.value
   currentView.value = 'auth'
+  window.scrollTo(0, 0)
+}
+
+const goToJobs = () => {
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'recruit'
   window.scrollTo(0, 0)
 }
 
@@ -330,6 +357,7 @@ onMounted(() => {
       <nav class="mobile-nav-links">
         <a href="#company" @click="toggleMobileMenu">{{ t.nav.company }}</a>
         <a href="#" @click.prevent="goToMall(); toggleMobileMenu()" style="color: #59B3D9; font-weight: 700;">{{ t.nav.mall }}</a>
+        <a href="#" @click.prevent="goToJobs(); toggleMobileMenu()">{{ t.nav.jobs }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
@@ -451,6 +479,43 @@ onMounted(() => {
         </section>
       </div>
       
+      <template v-if="currentView === 'recruit'">
+        <div class="recruit-view-container">
+           <div class="recruit-header">
+                <h2>{{ t.recruit.title }}</h2>
+                <p>{{ t.recruit.desc }}</p>
+           </div>
+           
+           <form class="recruit-form glass-panel container-narrow" @submit.prevent="alert('지원되었습니다.')">
+             <div class="recruit-input-group">
+               <label>{{ t.recruit.name }}</label>
+               <input type="text" required />
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.recruit.phone }}</label>
+               <div class="phone-inputs">
+                  <input type="tel" maxlength="3" required /> <span>-</span>
+                  <input type="tel" maxlength="4" required /> <span>-</span>
+                  <input type="tel" maxlength="4" required />
+               </div>
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.recruit.email }}</label>
+               <input type="email" required />
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.recruit.content }}</label>
+               <textarea rows="6" required></textarea>
+             </div>
+             
+             <button type="submit" class="recruit-submit-btn">{{ t.recruit.submit }}</button>
+           </form>
+        </div>
+      </template>
+
       <template v-if="currentView === 'detail'">
         <div class="detail-header">
           <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
@@ -1885,5 +1950,93 @@ html {
 }
 .lang-btn:hover {
   color: rgba(255, 255, 255, 0.8);
+}
+
+/* Recruitment View */
+.recruit-view-container {
+  background-color: #CBDCF7; /* Light periwinkle like image */
+  color: #333;
+  min-height: 100vh;
+  padding: 140px 20px 80px;
+}
+
+.recruit-header {
+  max-width: 900px;
+  margin: 0 auto 40px;
+  text-align: left;
+}
+
+.recruit-header h2 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+}
+
+.recruit-header p {
+  font-size: 1.14rem;
+  line-height: 1.6;
+  opacity: 0.8;
+  max-width: 500px;
+}
+
+.recruit-form {
+  background: white;
+  padding: 40px;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.recruit-input-group {
+  margin-bottom: 25px;
+}
+
+.recruit-input-group label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.recruit-input-group input, 
+.recruit-input-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #eee;
+  background: #fcfcfc;
+  font-size: 1rem;
+  outline: none;
+}
+
+.phone-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.phone-inputs input {
+  width: 80px;
+  text-align: center;
+}
+
+.recruit-submit-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: block;
+  margin: 20px auto 0;
+}
+
+.recruit-submit-btn:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .recruit-header h2 { font-size: 1.8rem; }
+  .recruit-form { padding: 20px; }
 }
 </style>
