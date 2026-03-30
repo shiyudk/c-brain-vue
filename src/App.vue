@@ -27,6 +27,20 @@ const translations = {
       content: '내용',
       submit: '작성'
     },
+    support: {
+      title: '고객지원 및 문의',
+      desc: '궁금하신 점이나 상담이 필요하신 내용을 남겨주시면 정성껏 답변해 드리겠습니다.',
+      name: '성함',
+      email: '이메일 주소',
+      phone: '연락처 (선택)',
+      category: '문의 유형',
+      cat1: '제품 관련 문의',
+      cat2: '컨설팅 상담 예약',
+      cat3: '기타 문의',
+      subject: '제목',
+      content: '문의 내용',
+      submit: '문의하기'
+    },
     hero: { quote1: '"시스템은 자유를 제한하는 것이 아니라,<br>더 큰 자유로 가는 길을 여는 것입니다."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: '현대인의 의사결정 위기', crisisDesc1: '우리는 매 순간 수많은 정보와 감정의 파도 속에서 결정을 내립니다. 하지만 그 결정이 정말 당신의 의지에 의한 것입니까?', crisisDesc2: '<strong>파편화된 선택과 순간의 충동</strong>은 우리의 삶을 불안정한 궤도로 몰아넣고 있습니다.', waverTitle: '왜 우리는 항상 흔들리는가', waverSub: '신경계 구조의 관점', waverDesc: '우리의 뇌는 <strong>불확실성</strong>을 생존의 위협으로 간주합니다. 기준이 없는 선택은 뇌의 \'편도체\'를 자극하여 불안을 증폭시킵니다.', waverBox: '🧠 <strong>감정 vs 시스템:</strong> 감정은 위험을 알리는 \'신호\'일 뿐이며, 의사결정의 \'기준\'이 되어서는 안 됩니다.', signalTitle: '감정은 신호지, 기준이 아니다', signalList1: '<strong>생각이 많을수록 인생이 느려지는 이유:</strong> 기준 없이 감정에 매몰되어 \'생각의 루프\'에 갇히기 때문입니다.', signalList2: '<strong>불안한 사람일수록 기준이 필요하다:</strong> 외부 환경이 흔들릴 때 나를 잡아줄 수 있는 것은 오직 명확한 \'판단 기준\'뿐입니다.', signalList3: '<strong>치유가 아닌 설계:</strong> 불안을 달래는 힐링보다, 불안 속에서도 작동하는 사고 구조를 만드는 것이 핵심입니다.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: '시스템이 감정을 앞섭니다', systemDesc1: '인간의 의지력은 고갈되는 자원입니다. 우리는 감정에 의존하지 않아도 일관된 성과를 낼 수 있는 실행 프로세스를 구축합니다.', systemDesc2: '기분이 좋지 않아도, 의지가 약해져도 작동하는 견고한 시스템이 당신의 일상을 보호합니다.' },
     products: { ai: 'AI로봇 기반 컨설팅', personal: '하이엔드 퍼스널 컨설팅', kids: '프리미엄 키즈 컨설팅', cakeKnife: '케익칼', dipSauce: '딥소스', otherProducts: 'Brain Design 기타 제품', inquireBtn: '견적문의', purchaseBtn: '구매하기' },
     detail: { backBtn: '← 뒤로가기', detailInfo: '상세 정보', shipping: '🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.', payCake: '결제하기 (2,000원)', payDip: '결제하기 (8,000원)' },
@@ -56,6 +70,20 @@ const translations = {
       email: 'Email',
       content: 'Message',
       submit: 'Submit'
+    },
+    support: {
+      title: 'Customer Support & Inquiry',
+      desc: 'Please leave any questions or consultation requests, and we will respond promptly.',
+      name: 'Full Name',
+      email: 'Email Address',
+      phone: 'Phone (Optional)',
+      category: 'Inquiry Category',
+      cat1: 'Product-related',
+      cat2: 'Consultation Booking',
+      cat3: 'Other Inquiries',
+      subject: 'Subject',
+      content: 'Message content',
+      submit: 'Submit Inquiry'
     },
     hero: { quote1: '"A system does not restrict freedom,<br>but opens the path to greater freedom."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: 'The Crisis of Decision Making', crisisDesc1: 'We make decisions amidst a sea of information and emotions. But are those decisions truly yours?', crisisDesc2: '<strong>Fragmented choices and momentary impulses</strong> are driving our lives into an unstable orbit.', waverTitle: 'Why We Always Waver', waverSub: 'A Nervous System Perspective', waverDesc: 'Our brains interpret <strong>uncertainty</strong> as a threat. Choices without standards stimulate the amygdala, amplifying anxiety.', waverBox: '🧠 <strong>Emotion vs System:</strong> Emotion is a \'signal\' for danger, not a \'standard\' for decision making.', signalTitle: 'Emotion is a Signal, Not a Standard', signalList1: '<strong>Why overthinking slows down life:</strong> Being trapped in a \'thought loop\' without clear standards.', signalList2: '<strong>Anxiety begs standardizations:</strong> Only clear \'judgments\' can ground you when the environment shakes.', signalList3: '<strong>Design, not healing:</strong> The key is building a thought process that works even in anxiety.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: 'The System Precedes Emotion', systemDesc1: 'Human willpower is a depleting resource. We build execution processes that yield consistent results without relying on emotions.', systemDesc2: 'A solid system protects your daily life, even when you\'re feeling down or weak.' },
     products: { ai: 'AI Algorithm Check', personal: 'High-End Personal Core', kids: 'Premium Kids Builder', cakeKnife: 'Cake Knife', dipSauce: 'Dipping Sauce', otherProducts: 'Brain Design Other Products', inquireBtn: 'Inquire', purchaseBtn: 'Purchase' },
@@ -123,6 +151,19 @@ const goToJobs = () => {
 
 const handleRecruitSubmit = () => {
   alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
+}
+
+const handleSupportSubmit = () => {
+  alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
+}
+
+const goToSupport = () => {
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'support'
+  window.scrollTo(0, 0)
 }
 
 const toggleMobileMenu = () => {
@@ -320,7 +361,7 @@ onMounted(() => {
     <div class="top-utility-bar">
       <div class="utility-content">
         <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
-        <a href="#">{{ t.nav.support }}</a>
+        <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
         <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
         <template v-if="currentUser">
           <a href="#" @click.prevent="handleLogout">로그아웃</a>
@@ -387,6 +428,49 @@ onMounted(() => {
     </div>
 
     <main class="main-content">
+      <template v-if="currentView === 'support'">
+        <div class="recruit-view-container support-view">
+           <div class="recruit-header">
+                <h2>{{ t.support.title }}</h2>
+                <p>{{ t.support.desc }}</p>
+           </div>
+           
+           <form class="recruit-form glass-panel container-narrow" @submit.prevent="handleSupportSubmit">
+             <div class="recruit-input-group">
+               <label>{{ t.support.name }}</label>
+               <input type="text" required />
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.support.email }}</label>
+               <input type="email" required />
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.support.category }}</label>
+               <select required class="support-select">
+                  <option value="">{{ t.support.category }}</option>
+                  <option>{{ t.support.cat1 }}</option>
+                  <option>{{ t.support.cat2 }}</option>
+                  <option>{{ t.support.cat3 }}</option>
+               </select>
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.support.subject }}</label>
+               <input type="text" required />
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ t.support.content }}</label>
+               <textarea rows="8" required></textarea>
+             </div>
+             
+             <button type="submit" class="recruit-submit-btn">{{ t.support.submit }}</button>
+           </form>
+        </div>
+      </template>
+
       <div v-show="currentView === 'home'">
         <section id="philosophy" class="philosophy-section">
             <div class="full-screen-quote intro-fade-in">
@@ -2055,6 +2139,23 @@ html {
 .recruit-submit-btn:hover {
   opacity: 0.8;
   transform: translateY(-2px);
+}
+
+.support-select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.support-select option {
+  background: #1a1b26;
+  color: #fff;
 }
 
 @media (max-width: 768px) {
