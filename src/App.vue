@@ -709,7 +709,7 @@ html {
 
 /* 최상단 유틸리티 바 (매우 작고 연한 텍스트) */
 .top-utility-bar {
-  background-color: #0c0d12;
+  background-color: var(--tech-nav-bg);
   width: 100%;
   position: fixed;
   top: 0;
