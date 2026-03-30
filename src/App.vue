@@ -480,7 +480,10 @@ onMounted(() => {
                 </div>
                 <div class="tech-card-info">
                   <h3>{{ t.products.cakeKnife }}</h3>
-                  <button>{{ t.products.purchaseBtn }}</button>
+                  <div class="btn-group-row">
+                    <button class="small-btn" @click="goToDetail('케익칼')">{{ t.products.purchaseBtn }}</button>
+                    <button class="small-btn outline-btn" @click.stop="addToCart('케익칼')">{{ t.cart.addBtn }}</button>
+                  </div>
                 </div>
               </div>
 
@@ -490,7 +493,10 @@ onMounted(() => {
                 </div>
                 <div class="tech-card-info">
                   <h3>{{ t.products.dipSauce }}</h3>
-                  <button>{{ t.products.purchaseBtn }}</button>
+                  <div class="btn-group-row">
+                    <button class="small-btn" @click="goToDetail('딥소스')">{{ t.products.purchaseBtn }}</button>
+                    <button class="small-btn outline-btn" @click.stop="addToCart('딥소스')">{{ t.cart.addBtn }}</button>
+                  </div>
                 </div>
               </div>
             </div>
