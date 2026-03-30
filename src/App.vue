@@ -590,7 +590,7 @@ onMounted(() => {
           <h2>{{ t.nav.mall }}</h2>
         </div>
         
-        <section class="products-section mall-view" style="padding-top: 0;">
+        <section class="products-section mall-view" style="padding-top: 40px;">
           <div class="section-container">
             <div class="grid-container flex-center">
               <div class="tech-card" @click="goToDetail('케익칼')">
@@ -1633,7 +1633,7 @@ html {
   position: relative;
 }
 .mall-header {
-  margin-bottom: 28.8px;
+  margin-bottom: 60px;
 }
 
 /* --------------------------------------
