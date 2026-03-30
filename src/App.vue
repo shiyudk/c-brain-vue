@@ -19,8 +19,8 @@ const translations = {
   ko: {
     nav: { mall: '쇼핑몰', support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
     recruit: {
-      title: 'Brain Design 파트너 강사·코치 상시 모집',
-      desc: '기업 교육 및 코칭 분야의 다양한 경험과 전문성 갖춘 강사, 코치 및 컨설턴트 분들을 환영합니다!',
+      title: 'Brain Design 파트너 컨설턴트 상시 모집',
+      desc: '기업 교육 및 코칭 분야의 다양한 경험과 전문성 갖춘 컨설턴트 분들을 환영합니다!',
       name: '이름',
       phone: '연락처',
       email: '이메일',
@@ -63,8 +63,8 @@ const translations = {
   en: {
     nav: { mall: 'Shop', support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
     recruit: {
-      title: 'Partner Instructors & Coaches Recruitment',
-      desc: 'We welcome instructors, coaches, and consultants with diverse experience and expertise in corporate training and coaching!',
+      title: 'Partner Consultants Recruitment',
+      desc: 'We welcome consultants with diverse experience and expertise in corporate training and coaching!',
       name: 'Name',
       phone: 'Phone',
       email: 'Email',
