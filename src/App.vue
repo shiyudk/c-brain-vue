@@ -570,7 +570,7 @@ onMounted(() => {
       </template>
 
       <template v-if="currentView === 'mall'">
-        <div class="detail-header">
+        <div class="detail-header mall-header">
           <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
           <h2>{{ t.nav.mall }}</h2>
         </div>
@@ -1616,6 +1616,9 @@ html {
   padding: 0 20px;
   text-align: center;
   position: relative;
+}
+.mall-header {
+  margin-bottom: 28.8px;
 }
 
 /* --------------------------------------
