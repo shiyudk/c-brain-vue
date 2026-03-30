@@ -205,14 +205,14 @@ const goToCart = () => {
   window.scrollTo(0, 0)
 }
 
-const checkoutFromCart = () => {
+const checkoutFromCart = (isGuest = false) => {
   const selectedItems = cart.value.filter(item => item.selected)
   if (selectedItems.length === 0) {
     alert(currentLang.value === 'ko' ? '결제할 상품을 선택해주세요.' : 'Please select items to checkout.')
     return
   }
 
-  if (!currentUser.value) {
+  if (!isGuest && !currentUser.value) {
     alert(currentLang.value === 'ko' ? '로그인 후 결제가 가능합니다.' : 'Please login to proceed with checkout.')
     goToAuth('login')
     return
@@ -557,8 +557,8 @@ onMounted(() => {
                 <span class="total-price">{{ cartTotal.toLocaleString() }} 원</span>
               </div>
               <div class="check-actions-row">
-                 <button class="primary-btn huge-btn" @click="checkoutFromCart">{{ t.cart.checkout }}</button>
-                 <button class="outline-btn huge-btn" @click="checkoutFromCart" style="margin-top: 10px;">{{ t.cart.guest }}</button>
+                 <button class="primary-btn huge-btn" @click="checkoutFromCart(false)">{{ t.cart.checkout }}</button>
+                 <button class="outline-btn huge-btn" @click="checkoutFromCart(true)" style="margin-top: 10px;">{{ t.cart.guest }}</button>
               </div>
             </div>
           </div>
