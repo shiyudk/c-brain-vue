@@ -24,7 +24,18 @@ const translations = {
     checkout: { title: '결제/상담예약' },
     modal: { title: '견적 및 상담 문의', desc: '아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.', copy: '주소 복사하기', app: '메일 앱 열기' },
     footer: { company: '상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희', bizNo: '사업자등록번호: 746-36-01588 | 통신판매업신고번호: 0000-0000-0000 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6', contact: '대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' },
-    cart: { title: '장바구니', empty: '장바구니가 비어있습니다.', addBtn: '장바구니 담기', checkout: '선택 상품 결제', checkoutAll: '전체 상품 결제', delete: '삭제', total: '총 결제 금액', guest: '비회원 구매' }
+    cart: { title: '장바구니', empty: '장바구니가 비어있습니다.', addBtn: '장바구니 담기', checkout: '선택 상품 결제', checkoutAll: '전체 상품 결제', delete: '삭제', total: '총 결제 금액', guest: '비회원 구매' },
+    policy: {
+      returnTitle: '교환 및 반품 정보',
+      refundInfo: '/ 환불 & 교환\n- 환불 및 교환은 수령하신 날을 포함하여 7일 내에 요청을 해주셔야만 가능합니다. (홈페이지 내 Q&A 접수)\n- 오염 및 미세한 잡사, 착용의 흔적, 수령 후 7일 이후 환불/교환 신청은 불가하니 참고부탁드립니다.\n- 단순 변심은 왕복 배송비 5000원이 청구됩니다.',
+      addrTitle: '/ 반품 주소',
+      addr: '서울특별시 동대문구 한천로 46길 85-6',
+      shippingNotice: '* 색상 교환 및 고객 변심은 고객 부담 왕복 배송비입니다. (사이즈 교환 포함)',
+      shippingTitle: '배송정보',
+      shippingDetail: '/ 배송안내\n배송방법 : 택배\n배송지역 : 전국 지역',
+      cancelTitle: '제 19조 결제 취소 & 환불',
+      cancelDetail: '① 회사와 구매에 관한 계약을 체결한 회원은 아래와 같이 결제에 대한 취소 및 환불을 요구할 수 있습니다.\n- 이용계약의 신청 후, 회사로부터의 상담이 제공되지 않은 경우, 결제취소가 가능합니다.\n- 회원이 상담 후 상대 프로필카드를 2회 이상 수령한 경우, 잔여횟수가 남은 회원에 한하여 이용 금액과 위약금 10%를 제외한 부분 환불이 가능합니다.'
+    }
   },
   en: {
     nav: { mall: 'Shop', support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
@@ -34,7 +45,18 @@ const translations = {
     checkout: { title: 'Checkout / Booking' },
     modal: { title: 'Quote & Inquiry', desc: 'Please leave inquiries via email below for a rapid response.', copy: 'Copy Address', app: 'Open Mail App' },
     footer: { company: 'Company: Continuum Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: 0000-0000-0000 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' },
-    cart: { title: 'Shopping Cart', empty: 'Your cart is empty.', addBtn: 'Add to Cart', checkout: 'Checkout Selected', checkoutAll: 'Checkout All', delete: 'Delete', total: 'Total Amount', guest: 'Guest Checkout' }
+    cart: { title: 'Shopping Cart', empty: 'Your cart is empty.', addBtn: 'Add to Cart', checkout: 'Checkout Selected', checkoutAll: 'Checkout All', delete: 'Delete', total: 'Total Amount', guest: 'Guest Checkout' },
+    policy: {
+      returnTitle: 'Exchange & Return Info',
+      refundInfo: '/ Refund & Exchange\n- Requests must be made within 7 days of receipt.\n- Items with stains, yarn defects, or signs of wear cannot be refunded/exchanged after 7 days.\n- A round-trip shipping fee of 5,000 KRW applies for simple change of mind.',
+      addrTitle: '/ Return Address',
+      addr: '85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul',
+      shippingNotice: '* Round-trip shipping for color/size exchange or change of mind is at the customer\'s expense.',
+      shippingTitle: 'Shipping Info',
+      shippingDetail: '/ Shipping Guide\nMethod: Courier\nRegion: Nationwide',
+      cancelTitle: 'Article 19: Cancellation & Refund',
+      cancelDetail: '① Members who have entered into a contract with the company may request cancellation and refund as follows.\n- Cancellation is possible if no consultation has been provided after the application.\n- If a profile card has been received twice or more after consultation, a partial refund excluding utilized amount and a 10% penalty is possible for remaining sessions.'
+    }
   }
 }
 
@@ -422,6 +444,29 @@ onMounted(() => {
               {{ t.cart.addBtn }}
             </button>
           </div>
+
+          <!-- 정책 섹션 추가 -->
+          <div class="policy-container glass-panel">
+            <div class="policy-block">
+              <h3>{{ t.policy.returnTitle }}</h3>
+              <p class="pre-line">{{ t.policy.refundInfo }}</p>
+              <div class="addr-box">
+                <h4>{{ t.policy.addrTitle }}</h4>
+                <p>{{ t.policy.addr }}</p>
+              </div>
+              <p class="notice">{{ t.policy.shippingNotice }}</p>
+            </div>
+            
+            <div class="policy-block">
+              <h3>{{ t.policy.shippingTitle }}</h3>
+              <p class="pre-line">{{ t.policy.shippingDetail }}</p>
+            </div>
+
+            <div class="policy-block">
+              <h3>{{ t.policy.cancelTitle }}</h3>
+              <p class="pre-line text-small">{{ t.policy.cancelDetail }}</p>
+            </div>
+          </div>
         </div>
       </template>
 
@@ -431,6 +476,24 @@ onMounted(() => {
           <h2>{{ selectedProduct === '케익칼' ? t.products.cakeKnife : selectedProduct === '딥소스' ? t.products.dipSauce : selectedProduct }} {{ t.checkout.title }}</h2>
         </div>
         <CheckoutPage :productName="selectedProduct" />
+        
+        <!-- 결제 페이지 하단에도 동일 정책 노출 -->
+        <div class="policy-container glass-panel container-narrow" style="margin-top: 40px;">
+          <div class="policy-block">
+            <h3>{{ t.policy.returnTitle }}</h3>
+            <p class="pre-line">{{ t.policy.refundInfo }}</p>
+            <div class="addr-box">
+              <h4>{{ t.policy.addrTitle }}</h4>
+              <p>{{ t.policy.addr }}</p>
+            </div>
+            <p class="notice">{{ t.policy.shippingNotice }}</p>
+          </div>
+          
+          <div class="policy-block">
+            <h3>{{ t.policy.shippingTitle }}</h3>
+            <p class="pre-line">{{ t.policy.shippingDetail }}</p>
+          </div>
+        </div>
       </template>
     
       <template v-if="currentView === 'cart'">
@@ -1519,6 +1582,57 @@ html {
   padding: 0 20px;
   text-align: center;
   position: relative;
+}
+
+/* --------------------------------------
+   Policy UI (Shipping/Refund)
+-------------------------------------- */
+.policy-container {
+  margin-top: 50px;
+  padding: 30px;
+  text-align: left;
+}
+
+.policy-block {
+  margin-bottom: 30px;
+}
+
+.policy-block h3 {
+  font-size: 1.25rem;
+  color: #59B3D9;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--tech-border);
+  padding-bottom: 10px;
+}
+
+.policy-block h4 {
+  font-size: 1rem;
+  margin: 15px 0 5px;
+  opacity: 0.9;
+}
+
+.pre-line {
+  white-space: pre-line;
+  line-height: 1.6;
+  opacity: 0.8;
+  font-size: 0.96rem;
+}
+
+.addr-box {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.notice {
+  font-size: 0.84rem;
+  color: #ff6b6b;
+  margin-top: 10px;
+}
+
+.text-small {
+  font-size: 0.84rem;
 }
 .detail-header h2 {
   font-size: 28.8px;
