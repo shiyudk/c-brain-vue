@@ -17,7 +17,7 @@ const currentLang = ref('ko')
 
 const translations = {
   ko: {
-    nav: { support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
+    nav: { mall: '쇼핑몰', support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
     hero: { quote1: '"시스템은 자유를 제한하는 것이 아니라,<br>더 큰 자유로 가는 길을 여는 것입니다."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: '현대인의 의사결정 위기', crisisDesc1: '우리는 매 순간 수많은 정보와 감정의 파도 속에서 결정을 내립니다. 하지만 그 결정이 정말 당신의 의지에 의한 것입니까?', crisisDesc2: '<strong>파편화된 선택과 순간의 충동</strong>은 우리의 삶을 불안정한 궤도로 몰아넣고 있습니다.', waverTitle: '왜 우리는 항상 흔들리는가', waverSub: '신경계 구조의 관점', waverDesc: '우리의 뇌는 <strong>불확실성</strong>을 생존의 위협으로 간주합니다. 기준이 없는 선택은 뇌의 \'편도체\'를 자극하여 불안을 증폭시킵니다.', waverBox: '🧠 <strong>감정 vs 시스템:</strong> 감정은 위험을 알리는 \'신호\'일 뿐이며, 의사결정의 \'기준\'이 되어서는 안 됩니다.', signalTitle: '감정은 신호지, 기준이 아니다', signalList1: '<strong>생각이 많을수록 인생이 느려지는 이유:</strong> 기준 없이 감정에 매몰되어 \'생각의 루프\'에 갇히기 때문입니다.', signalList2: '<strong>불안한 사람일수록 기준이 필요하다:</strong> 외부 환경이 흔들릴 때 나를 잡아줄 수 있는 것은 오직 명확한 \'판단 기준\'뿐입니다.', signalList3: '<strong>치유가 아닌 설계:</strong> 불안을 달래는 힐링보다, 불안 속에서도 작동하는 사고 구조를 만드는 것이 핵심입니다.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: '시스템이 감정을 앞섭니다', systemDesc1: '인간의 의지력은 고갈되는 자원입니다. 우리는 감정에 의존하지 않아도 일관된 성과를 낼 수 있는 실행 프로세스를 구축합니다.', systemDesc2: '기분이 좋지 않아도, 의지가 약해져도 작동하는 견고한 시스템이 당신의 일상을 보호합니다.' },
     products: { ai: 'AI로봇 기반 컨설팅', personal: '하이엔드 퍼스널 컨설팅', kids: '프리미엄 키즈 컨설팅', cakeKnife: '케익칼', dipSauce: '딥소스', otherProducts: 'Brain Design 기타 제품', inquireBtn: '견적문의', purchaseBtn: '구매하기' },
     detail: { backBtn: '← 뒤로가기', detailInfo: '상세 정보', shipping: '🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.', payCake: '결제하기 (2,000원)', payDip: '결제하기 (8,000원)' },
@@ -26,7 +26,7 @@ const translations = {
     footer: { company: '상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희', bizNo: '사업자등록번호: 746-36-01588 | 통신판매업신고번호: 0000-0000-0000 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6', contact: '대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' }
   },
   en: {
-    nav: { support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
+    nav: { mall: 'Shop', support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
     hero: { quote1: '"A system does not restrict freedom,<br>but opens the path to greater freedom."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: 'The Crisis of Decision Making', crisisDesc1: 'We make decisions amidst a sea of information and emotions. But are those decisions truly yours?', crisisDesc2: '<strong>Fragmented choices and momentary impulses</strong> are driving our lives into an unstable orbit.', waverTitle: 'Why We Always Waver', waverSub: 'A Nervous System Perspective', waverDesc: 'Our brains interpret <strong>uncertainty</strong> as a threat. Choices without standards stimulate the amygdala, amplifying anxiety.', waverBox: '🧠 <strong>Emotion vs System:</strong> Emotion is a \'signal\' for danger, not a \'standard\' for decision making.', signalTitle: 'Emotion is a Signal, Not a Standard', signalList1: '<strong>Why overthinking slows down life:</strong> Being trapped in a \'thought loop\' without clear standards.', signalList2: '<strong>Anxiety begs standardizations:</strong> Only clear \'judgments\' can ground you when the environment shakes.', signalList3: '<strong>Design, not healing:</strong> The key is building a thought process that works even in anxiety.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: 'The System Precedes Emotion', systemDesc1: 'Human willpower is a depleting resource. We build execution processes that yield consistent results without relying on emotions.', systemDesc2: 'A solid system protects your daily life, even when you\'re feeling down or weak.' },
     products: { ai: 'AI Algorithm Check', personal: 'High-End Personal Core', kids: 'Premium Kids Builder', cakeKnife: 'Cake Knife', dipSauce: 'Dipping Sauce', otherProducts: 'Brain Design Other Products', inquireBtn: 'Inquire', purchaseBtn: 'Purchase' },
     detail: { backBtn: '← Back', detailInfo: 'Details', shipping: '🚚 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
@@ -102,6 +102,15 @@ const goHome = () => {
   setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
 }
 
+const goToMall = () => {
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'mall'
+  window.scrollTo(0, 0)
+}
+
 const scrollToConsulting = (isMobile = false) => {
   if (isMobile && isMobileMenuOpen.value) {
     toggleMobileMenu()
@@ -153,8 +162,9 @@ onMounted(() => {
 
 <template>
   <div class="app-container">
-    <div class="top-utility-bar" v-show="currentView === 'home'">
+    <div class="top-utility-bar" v-show="currentView === 'home' || currentView === 'mall'">
       <div class="utility-content">
+        <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
         <a href="#">{{ t.nav.support }}</a>
         <a href="#">{{ t.nav.jobs }}</a>
         <template v-if="currentUser">
@@ -203,6 +213,7 @@ onMounted(() => {
       </div>
       <nav class="mobile-nav-links">
         <a href="#company" @click="toggleMobileMenu">{{ t.nav.company }}</a>
+        <a href="#" @click.prevent="goToMall(); toggleMobileMenu()" style="color: #59B3D9; font-weight: 700;">{{ t.nav.mall }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
@@ -390,7 +401,40 @@ onMounted(() => {
       </template>
     
       <template v-if="currentView === 'auth'">
-        <AuthPage :currentLang="currentLang" @back="goHome" />
+        <AuthPage :currentLang="currentLang" :initialMode="currentAuthMode" @back="goHome" />
+      </template>
+
+      <template v-if="currentView === 'mall'">
+        <div class="detail-header" style="margin-top: 140px;">
+          <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
+          <h2>{{ t.nav.mall }}</h2>
+        </div>
+        
+        <section class="products-section mall-view" style="padding-top: 0;">
+          <div class="section-container">
+            <div class="grid-container flex-center">
+              <div class="tech-card" @click="goToDetail('케익칼')">
+                <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
+                  <span class="glow"></span>
+                </div>
+                <div class="tech-card-info">
+                  <h3>{{ t.products.cakeKnife }}</h3>
+                  <button>{{ t.products.purchaseBtn }}</button>
+                </div>
+              </div>
+
+              <div class="tech-card" @click="goToDetail('딥소스')">
+                <div class="card-img-placeholder" style="background-image: url('/images/dip_sauce.png'); background-size: cover; background-position: center;">
+                  <span class="glow"></span>
+                </div>
+                <div class="tech-card-info">
+                  <h3>{{ t.products.dipSauce }}</h3>
+                  <button>{{ t.products.purchaseBtn }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </template>
     </main>
 
@@ -410,10 +454,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <template v-if="currentView === 'auth'">
-      <AuthPage :currentLang="currentLang" :initialMode="currentAuthMode" @back="goHome" />
-    </template>
-
+    </div>
     <footer class="app-footer">
       <div class="footer-content">
         <p>{{ t.footer.company }}</p>
