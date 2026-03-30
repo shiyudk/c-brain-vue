@@ -23,7 +23,8 @@ const translations = {
     detail: { backBtn: '← 뒤로가기', detailInfo: '상세 정보', shipping: '🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.', payCake: '결제하기 (2,000원)', payDip: '결제하기 (8,000원)' },
     checkout: { title: '결제/상담예약' },
     modal: { title: '견적 및 상담 문의', desc: '아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.', copy: '주소 복사하기', app: '메일 앱 열기' },
-    footer: { company: '상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희', bizNo: '사업자등록번호: 746-36-01588 | 통신판매업신고번호: 0000-0000-0000 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6', contact: '대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' }
+    footer: { company: '상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희', bizNo: '사업자등록번호: 746-36-01588 | 통신판매업신고번호: 0000-0000-0000 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6', contact: '대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' },
+    cart: { title: '장바구니', empty: '장바구니가 비어있습니다.', addBtn: '장바구니 담기', checkout: '선택 상품 결제', checkoutAll: '전체 상품 결제', delete: '삭제', total: '총 결제 금액', guest: '비회원 구매' }
   },
   en: {
     nav: { mall: 'Shop', support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
@@ -32,7 +33,8 @@ const translations = {
     detail: { backBtn: '← Back', detailInfo: 'Details', shipping: '🚚 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
     checkout: { title: 'Checkout / Booking' },
     modal: { title: 'Quote & Inquiry', desc: 'Please leave inquiries via email below for a rapid response.', copy: 'Copy Address', app: 'Open Mail App' },
-    footer: { company: 'Company: Continuum Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: 0000-0000-0000 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' }
+    footer: { company: 'Company: Continuum Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: 0000-0000-0000 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' },
+    cart: { title: 'Shopping Cart', empty: 'Your cart is empty.', addBtn: 'Add to Cart', checkout: 'Checkout Selected', checkoutAll: 'Checkout All', delete: 'Delete', total: 'Total Amount', guest: 'Guest Checkout' }
   }
 }
 
@@ -121,6 +123,56 @@ const scrollToConsulting = (isMobile = false) => {
   }
 }
 
+// ----------------------------------------------------
+// Cart Logic
+// ----------------------------------------------------
+const cart = ref([])
+
+const addToCart = (productName) => {
+  const price = productName === '케익칼' ? 2000 : 8000
+  cart.value.push({
+    id: Date.now(),
+    name: productName,
+    price: price,
+    selected: true
+  })
+  alert(currentLang.value === 'ko' ? '장바구니에 담겼습니다!' : 'Added to cart!')
+}
+
+const removeFromCart = (id) => {
+  cart.value = cart.value.filter(item => item.id !== id)
+}
+
+const cartTotal = computed(() => {
+  return cart.value
+    .filter(item => item.selected)
+    .reduce((sum, item) => sum + item.price, 0)
+})
+
+const goToCart = () => {
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'cart'
+  window.scrollTo(0, 0)
+}
+
+const checkoutFromCart = () => {
+  const selectedItems = cart.value.filter(item => item.selected)
+  if (selectedItems.length === 0) {
+    alert(currentLang.value === 'ko' ? '결제할 상품을 선택해주세요.' : 'Please select items to checkout.')
+    return
+  }
+  
+  // Multiple items checkout simplified to total amount for Toss Widget
+  const multiName = selectedItems.length > 1 
+    ? `${selectedItems[0].name} 외 ${selectedItems.length - 1}건`
+    : selectedItems[0].name
+    
+  goToCheckout(multiName)
+}
+
 const showContactModal = ref(false)
 
 const sendMail = () => {
@@ -194,7 +246,7 @@ onMounted(() => {
             <span style="color:rgba(255,255,255,0.2)">|</span>
             <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
           </div>
-          <a href="#cart" class="icon-btn hide-mobile">🛒</a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToCart">🛒 <span v-if="cart.length > 0" class="cart-count">{{ cart.length }}</span></a>
           <a href="#" class="icon-btn hide-mobile" @click.prevent="currentUser ? goHome() : goToAuth('login', false)">👤</a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
@@ -374,6 +426,41 @@ onMounted(() => {
         <CheckoutPage :productName="selectedProduct" />
       </template>
     
+      <template v-if="currentView === 'cart'">
+        <div class="detail-header" style="margin-top: 140px;">
+          <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
+          <h2>{{ t.cart.title }}</h2>
+        </div>
+        
+        <section class="cart-section container-narrow">
+          <div v-if="cart.length === 0" class="empty-cart">
+            <p>{{ t.cart.empty }}</p>
+            <button class="primary-btn" @click="goToMall">{{ t.nav.mall }}</button>
+          </div>
+          
+          <div v-else class="cart-list glass-panel">
+            <div v-for="item in cart" :key="item.id" class="cart-item">
+              <input type="checkbox" v-model="item.selected" />
+              <div class="item-info">
+                <h3>{{ item.name === '케익칼' ? t.products.cakeKnife : item.name === '딥소스' ? t.products.dipSauce : item.name }}</h3>
+                <p>{{ item.price.toLocaleString() }} 원</p>
+              </div>
+              <button class="del-btn" @click="removeFromCart(item.id)">{{ t.cart.delete }}</button>
+            </div>
+            
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>{{ t.cart.total }}</span>
+                <span class="total-price">{{ cartTotal.toLocaleString() }} 원</span>
+              </div>
+              <div class="check-actions-row">
+                 <button class="primary-btn huge-btn" @click="checkoutFromCart">{{ t.cart.checkout }}</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </template>
+
       <template v-if="currentView === 'auth'">
         <AuthPage :currentLang="currentLang" :initialMode="currentAuthMode" @back="goHome" />
       </template>
@@ -1422,6 +1509,87 @@ html {
   color: #fff;
   margin: 0;
 }
+
+/* --------------------------------------
+   Shopping Cart UI
+-------------------------------------- */
+.cart-section {
+  max-width: 800px;
+  margin: 0 auto 100px;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--tech-muted);
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--tech-border);
+}
+
+.cart-item h3 {
+  margin: 0;
+  font-size: 1.14rem;
+}
+
+.cart-item p {
+  margin: 5px 0 0;
+  color: #59B3D9;
+  font-weight: bold;
+}
+
+.del-btn {
+  background: rgba(255,107,107,0.1);
+  color: #ff6b6b;
+  border: 1px solid rgba(255,107,107,0.3);
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.cart-summary {
+  padding: 30px;
+  border-top: 2px solid var(--tech-border);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.total-price {
+  font-size: 1.5rem;
+  color: #59B3D9;
+  font-weight: 800;
+}
+
+.btn-group-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.small-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 0.84rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.container-narrow {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .detail-header .back-btn {
   position: absolute;
   left: 20px;

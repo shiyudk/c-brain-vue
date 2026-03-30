@@ -193,6 +193,9 @@ const loginWithProvider = async (providerName) => {
           <button class="social-btn kakao" type="button" @click="loginWithProvider('kakao')">
             <span class="icon">K</span> {{ t.kakao }}
           </button>
+          <button class="submit-btn outline-btn" style="width:100%; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); margin-top: 12px;" @click="$emit('back')">
+            {{ currentLang === 'ko' ? '비회원 구매하기' : 'Guest Checkout' }}
+          </button>
         </div>
 
         <div class="auth-footer">
