@@ -454,7 +454,6 @@ onMounted(() => {
       </div>
     </div>
 
-    </div>
     <footer class="app-footer">
       <div class="footer-content">
         <p>{{ t.footer.company }}</p>
