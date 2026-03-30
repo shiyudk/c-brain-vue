@@ -709,9 +709,9 @@ html {
 
 /* 최상단 유틸리티 바 (매우 작고 연한 텍스트) */
 .top-utility-bar {
-  background-color: transparent;
+  background-color: #0c0d12;
   width: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   z-index: 1001;
   padding: 8px 0;
