@@ -63,8 +63,10 @@ const translations = {
 const t = computed(() => translations[currentLang.value])
 
 const currentView = ref('home')
-const selectedProduct = ref(null)
+const selectedProduct = ref('')
 const selectedDetailProduct = ref(null)
+const checkoutAmount = ref(0)
+const currentAuthMode = ref('login')
 const isMobileMenuOpen = ref(false)
 const savedScrollY = ref(0)
 const previousView = ref('home')
@@ -79,9 +81,6 @@ const goToDetail = (productName) => {
   window.scrollTo(0, 0)
 }
 
-
-
-const currentAuthMode = ref('login')
 const goToAuth = (mode = 'login', isMobile = false) => {
   currentAuthMode.value = mode
   if (isMobile && isMobileMenuOpen.value) {
@@ -100,12 +99,13 @@ const toggleMobileMenu = () => {
   document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : ''
 }
 
-const goToCheckout = (productName) => {
-  if (currentView.value === 'home') {
+const goToCheckout = (productName, amount = 0) => {
+  if (currentView.value === 'home' || currentView.value === 'mall' || currentView.value === 'cart') {
     savedScrollY.value = window.scrollY
   }
   previousView.value = currentView.value
   selectedProduct.value = productName
+  checkoutAmount.value = amount
   currentView.value = 'checkout'
   window.scrollTo(0, 0)
 }
@@ -209,12 +209,12 @@ const checkoutFromCart = () => {
     return
   }
   
-  // Multiple items checkout simplified to total amount for Toss Widget
+  const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const multiName = selectedItems.length > 1 
     ? `${selectedItems[0].name} 외 ${selectedItems.length - 1}건`
     : selectedItems[0].name
     
-  goToCheckout(multiName)
+  goToCheckout(multiName, total)
 }
 
 const showContactModal = ref(false)
@@ -490,7 +490,7 @@ onMounted(() => {
           <button @click="goBackFromCheckout" class="back-btn">{{ t.detail.backBtn }}</button>
           <h2>{{ selectedProduct === '케익칼' ? t.products.cakeKnife : selectedProduct === '딥소스' ? t.products.dipSauce : selectedProduct }} {{ t.checkout.title }}</h2>
         </div>
-        <CheckoutPage :productName="selectedProduct" />
+        <CheckoutPage :productName="selectedProduct" :amount="checkoutAmount" />
         
         <!-- 결제 페이지 하단에도 동일 정책 노출 -->
         <div class="policy-container glass-panel container-narrow" style="margin-top: 40px;">
@@ -545,6 +545,7 @@ onMounted(() => {
               </div>
               <div class="check-actions-row">
                  <button class="primary-btn huge-btn" @click="checkoutFromCart">{{ t.cart.checkout }}</button>
+                 <button class="outline-btn huge-btn" @click="checkoutFromCart" style="margin-top: 10px;">{{ t.cart.guest }}</button>
               </div>
             </div>
           </div>
