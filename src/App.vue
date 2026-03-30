@@ -211,6 +211,12 @@ const checkoutFromCart = () => {
     alert(currentLang.value === 'ko' ? '결제할 상품을 선택해주세요.' : 'Please select items to checkout.')
     return
   }
+
+  if (!currentUser.value) {
+    alert(currentLang.value === 'ko' ? '로그인 후 결제가 가능합니다.' : 'Please login to proceed with checkout.')
+    goToAuth('login')
+    return
+  }
   
   const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const multiName = selectedItems.length > 1 
@@ -244,6 +250,10 @@ onMounted(() => {
     })
     supabase.auth.onAuthStateChange((_event, session) => {
       currentUser.value = session?.user || null
+      // 로그인 후 이전에 장바구니에 있었다면 다시 장바구니로 이동
+      if (session?.user && currentView.value === 'auth' && previousView.value === 'cart') {
+        currentView.value = 'cart'
+      }
     })
   }
 
