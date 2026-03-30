@@ -407,12 +407,12 @@ onMounted(() => {
             <p v-html="t.detail.shipping"></p>
           </div>
           
-          <div class="detail-action-bottom">
-            <button class="primary-btn huge-btn" @click="goToCheckout('케익칼')" v-if="selectedDetailProduct === '케익칼'">
-              {{ t.detail.payCake }}
+          <div class="detail-action-bottom" style="display:flex; gap:10px;">
+            <button class="primary-btn huge-btn" @click="goToCheckout(selectedDetailProduct)" style="flex:2;">
+              {{ selectedDetailProduct === '케익칼' ? t.detail.payCake : t.detail.payDip }}
             </button>
-            <button class="primary-btn huge-btn" @click="goToCheckout('딥소스')" v-else-if="selectedDetailProduct === '딥소스'">
-              {{ t.detail.payDip }}
+            <button class="outline-btn huge-btn" @click="addToCart(selectedDetailProduct)" style="flex:1;">
+              {{ t.cart.addBtn }}
             </button>
           </div>
         </div>
