@@ -111,7 +111,10 @@ const goToCheckout = (productName, amount = 0) => {
 }
 
 const goBackFromCheckout = () => {
-  if (previousView.value === 'detail') {
+  if (previousView.value === 'cart') {
+    currentView.value = 'cart'
+    window.scrollTo(0, 0)
+  } else if (previousView.value === 'detail') {
     currentView.value = 'detail'
     previousView.value = 'home'
     window.scrollTo(0, 0)
