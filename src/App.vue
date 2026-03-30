@@ -159,12 +159,19 @@ const cart = ref([])
 
 const addToCart = (productName) => {
   const price = productName === '케익칼' ? 2000 : 8000
-  cart.value.push({
-    id: Date.now(),
-    name: productName,
-    price: price,
-    selected: true
-  })
+  const existingItem = cart.value.find(item => item.name === productName)
+  
+  if (existingItem) {
+    existingItem.quantity++
+  } else {
+    cart.value.push({
+      id: Date.now(),
+      name: productName,
+      price: price,
+      quantity: 1,
+      selected: true
+    })
+  }
   alert(currentLang.value === 'ko' ? '장바구니에 담겼습니다!' : 'Added to cart!')
 }
 
@@ -172,10 +179,18 @@ const removeFromCart = (id) => {
   cart.value = cart.value.filter(item => item.id !== id)
 }
 
+const updateQuantity = (id, delta) => {
+  const item = cart.value.find(i => i.id === id)
+  if (item) {
+    const newQty = item.quantity + delta
+    if (newQty > 0) item.quantity = newQty
+  }
+}
+
 const cartTotal = computed(() => {
   return cart.value
     .filter(item => item.selected)
-    .reduce((sum, item) => sum + item.price, 0)
+    .reduce((sum, item) => sum + (item.price * item.quantity), 0)
 })
 
 const goToCart = () => {
@@ -513,7 +528,12 @@ onMounted(() => {
               <input type="checkbox" v-model="item.selected" />
               <div class="item-info">
                 <h3>{{ item.name === '케익칼' ? t.products.cakeKnife : item.name === '딥소스' ? t.products.dipSauce : item.name }}</h3>
-                <p>{{ item.price.toLocaleString() }} 원</p>
+                <p>{{ (item.price * item.quantity).toLocaleString() }} 원</p>
+                <div class="qty-control">
+                  <button class="qty-btn" @click="updateQuantity(item.id, -1)">-</button>
+                  <span class="qty-val">{{ item.quantity }}</span>
+                  <button class="qty-btn" @click="updateQuantity(item.id, 1)">+</button>
+                </div>
               </div>
               <button class="del-btn" @click="removeFromCart(item.id)">{{ t.cart.delete }}</button>
             </div>
@@ -1671,6 +1691,44 @@ html {
   margin: 5px 0 0;
   color: #59B3D9;
   font-weight: bold;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  width: fit-content;
+  padding: 5px 12px;
+  border-radius: 6px;
+}
+
+.qty-btn {
+  background: transparent;
+  border: 1px solid var(--tech-border);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.qty-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+.qty-val {
+  font-weight: bold;
+  font-size: 1.08rem;
+  min-width: 20px;
+  text-align: center;
 }
 
 .del-btn {
