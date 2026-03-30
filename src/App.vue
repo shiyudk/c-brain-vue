@@ -331,32 +331,6 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-
-            <div class="section-divider">
-              <h2>{{ t.products.otherProducts }}</h2>
-            </div>
-
-            <div class="grid-container flex-center">
-              <div class="tech-card" @click="goToDetail('케익칼')">
-                <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.cakeKnife }}</h3>
-                  <button>{{ t.products.purchaseBtn }}</button>
-                </div>
-              </div>
-
-              <div class="tech-card" @click="goToDetail('딥소스')">
-                <div class="card-img-placeholder" style="background-image: url('/images/dip_sauce.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.dipSauce }}</h3>
-                  <button>{{ t.products.purchaseBtn }}</button>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
       </div>
