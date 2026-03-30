@@ -19,7 +19,7 @@ const translations = {
   ko: {
     nav: { mall: '쇼핑몰', support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
     recruit: {
-      title: '클립스컨설팅 파트너 강사·코치 상시 모집',
+      title: 'Brain Design 파트너 강사·코치 상시 모집',
       desc: '기업 교육 및 코칭 분야의 다양한 경험과 전문성 갖춘 강사, 코치 및 컨설턴트 분들을 환영합니다!',
       name: '이름',
       phone: '연락처',
@@ -1968,8 +1968,8 @@ html {
 
 /* Recruitment View */
 .recruit-view-container {
-  background-color: #CBDCF7; /* Light periwinkle like image */
-  color: #333;
+  background-color: var(--tech-bg);
+  color: #fff;
   min-height: 100vh;
   padding: 140px 20px 80px;
 }
@@ -1984,7 +1984,7 @@ html {
   font-size: 2.1rem;
   font-weight: 800;
   margin-bottom: 20px;
-  color: #1a1a1a;
+  color: #fff;
 }
 
 .recruit-header p {
@@ -1992,13 +1992,15 @@ html {
   line-height: 1.6;
   opacity: 0.8;
   max-width: 500px;
+  color: #fff;
 }
 
 .recruit-form {
-  background: white;
+  background: rgba(255, 255, 255, 0.05);
   padding: 40px;
-  border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
 }
 
 .recruit-input-group {
@@ -2009,17 +2011,19 @@ html {
   display: block;
   font-size: 0.9rem;
   margin-bottom: 8px;
-  color: #666;
+  color: #9DA1B4;
 }
 
 .recruit-input-group input, 
 .recruit-input-group textarea {
   width: 100%;
   padding: 12px;
-  border: 1px solid #eee;
-  background: #fcfcfc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
   font-size: 1rem;
   outline: none;
+  border-radius: 6px;
 }
 
 .phone-inputs {
@@ -2028,25 +2032,31 @@ html {
   gap: 10px;
 }
 
+.phone-inputs span {
+  color: var(--tech-muted);
+}
+
 .phone-inputs input {
   width: 80px;
   text-align: center;
 }
 
 .recruit-submit-btn {
-  background: #333;
-  color: #fff;
+  background: #59B3D9;
+  color: #111;
   border: none;
-  padding: 12px 30px;
+  padding: 12px 40px;
   font-weight: bold;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.2s;
   display: block;
   margin: 20px auto 0;
+  border-radius: 30px;
 }
 
 .recruit-submit-btn:hover {
   opacity: 0.8;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
