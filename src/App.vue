@@ -121,6 +121,10 @@ const goToJobs = () => {
   window.scrollTo(0, 0)
 }
 
+const handleRecruitSubmit = () => {
+  alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
+}
+
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
   document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : ''
@@ -175,6 +179,14 @@ const scrollToPhilosophy = () => {
 const scrollToConsulting = (isMobile = false) => {
   if (isMobile && isMobileMenuOpen.value) {
     toggleMobileMenu()
+  }
+  if (currentView.value !== 'home') {
+    goHome()
+    setTimeout(() => {
+      const el = document.getElementById('consulting-boxes')
+      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }, 100)
+    return
   }
   const el = document.getElementById('consulting-boxes')
   if (el) {
@@ -309,7 +321,7 @@ onMounted(() => {
       <div class="utility-content">
         <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
         <a href="#">{{ t.nav.support }}</a>
-        <a href="#">{{ t.nav.jobs }}</a>
+        <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
         <template v-if="currentUser">
           <a href="#" @click.prevent="handleLogout">로그아웃</a>
         </template>
@@ -326,10 +338,12 @@ onMounted(() => {
         </a>
         <nav class="nav-links">
           <a href="#" @click.prevent="currentView === 'home' ? scrollToPhilosophy() : (goHome(), setTimeout(scrollToPhilosophy, 0))">{{ t.nav.company }}</a>
+          <a href="#" @click.prevent="goToMall">{{ t.nav.mall }}</a>
+          <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
           <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.ai }}</a>
           <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.personal }}</a>
           <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.kids }}</a>
-      </nav>
+        </nav>
 
         <div class="nav-actions">
           <div class="lang-toggle">
@@ -486,7 +500,7 @@ onMounted(() => {
                 <p>{{ t.recruit.desc }}</p>
            </div>
            
-           <form class="recruit-form glass-panel container-narrow" @submit.prevent="alert('지원되었습니다.')">
+           <form class="recruit-form glass-panel container-narrow" @submit.prevent="handleRecruitSubmit">
              <div class="recruit-input-group">
                <label>{{ t.recruit.name }}</label>
                <input type="text" required />
