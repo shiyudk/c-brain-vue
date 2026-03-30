@@ -113,6 +113,13 @@ const goToMall = () => {
   window.scrollTo(0, 0)
 }
 
+const scrollToPhilosophy = () => {
+  const el = document.getElementById('philosophy')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
 const scrollToConsulting = (isMobile = false) => {
   if (isMobile && isMobileMenuOpen.value) {
     toggleMobileMenu()
@@ -214,7 +221,7 @@ onMounted(() => {
 
 <template>
   <div class="app-container">
-    <div class="top-utility-bar" v-show="currentView === 'home' || currentView === 'mall'">
+    <div class="top-utility-bar">
       <div class="utility-content">
         <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
         <a href="#">{{ t.nav.support }}</a>
@@ -228,16 +235,16 @@ onMounted(() => {
       </div>
     </div>
 
-    <header class="navbar" v-show="currentView === 'home'">
+    <header class="navbar">
       <div class="nav-content">
-        <a href="#" class="logo">
+        <a href="#" class="logo" @click.prevent="goHome">
           <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
         </a>
         <nav class="nav-links">
-          <a href="#company">{{ t.nav.company }}</a>
-          <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.ai }}</a>
-          <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.personal }}</a>
-          <a href="#" @click.prevent="scrollToConsulting(false)">{{ t.nav.kids }}</a>
+          <a href="#" @click.prevent="currentView === 'home' ? scrollToPhilosophy() : (goHome(), setTimeout(scrollToPhilosophy, 0))">{{ t.nav.company }}</a>
+          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.ai }}</a>
+          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.personal }}</a>
+          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.kids }}</a>
       </nav>
 
         <div class="nav-actions">
@@ -427,7 +434,7 @@ onMounted(() => {
       </template>
     
       <template v-if="currentView === 'cart'">
-        <div class="detail-header" style="margin-top: 140px;">
+        <div class="detail-header">
           <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
           <h2>{{ t.cart.title }}</h2>
         </div>
@@ -466,7 +473,7 @@ onMounted(() => {
       </template>
 
       <template v-if="currentView === 'mall'">
-        <div class="detail-header" style="margin-top: 140px;">
+        <div class="detail-header">
           <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
           <h2>{{ t.nav.mall }}</h2>
         </div>
@@ -1503,9 +1510,12 @@ html {
   font-size: 1.44rem;
   cursor: pointer;
 }
+.main-content {
+  padding-top: 120px; /* 고정 네비게이션 공간 확보 */
+}
 .detail-header {
   max-width: 800px;
-  margin: 40px auto 20px;
+  margin: 20px auto 20px;
   padding: 0 20px;
   text-align: center;
   position: relative;
