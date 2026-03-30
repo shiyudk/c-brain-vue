@@ -13,7 +13,8 @@ const props = defineProps({
   }
 });
 
-const checkoutPrice = computed(() => {
+const deliveryFee = 3000;
+const productPrice = computed(() => {
   if (props.amount > 0) return props.amount;
   if (props.productName === '케익칼') return 2000;
   if (props.productName === '딥소스') return 8000;
@@ -21,12 +22,25 @@ const checkoutPrice = computed(() => {
   return 50000;
 });
 
+const totalAmount = computed(() => productPrice.value + deliveryFee);
+
 const widgetClientKey = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
 const customerKey = 'test_customer_key_' + Math.random().toString(36).substring(2, 10);
 
-// ----------------------------------------------------
-// UI State
-// ----------------------------------------------------
+// Forms State
+const buyer = ref({
+  name: '김토스',
+  phone: '010-0000-0000',
+  email: 'contact@c-braindesign.com'
+});
+
+const shipping = ref({
+  name: '김토스',
+  phone: '010-0000-0000',
+  address: '서울특별시 동대문구 한천로 46길 85-6',
+  zipCode: '12345'
+});
+
 const isWidgetLoaded = ref(false);
 const paymentWidget = ref(null);
 const paymentMethodWidget = ref(null);
@@ -37,7 +51,7 @@ onMounted(async () => {
 
     paymentMethodWidget.value = paymentWidget.value.renderPaymentMethods(
       '#payment-method', 
-      { value: checkoutPrice.value },
+      { value: totalAmount.value },
       { variantKey: 'DEFAULT' }
     );
 
@@ -64,147 +78,257 @@ const requestPayment = async () => {
       orderName: props.productName,
       successUrl: window.location.origin + '/success',
       failUrl: window.location.origin + '/fail',
-      customerEmail: 'contact@c-braindesign.com',
-      customerName: '고객',
+      customerEmail: buyer.value.email,
+      customerName: buyer.value.name,
     });
   } catch (err) {
-    console.error('결제 요청 중 실패 (사용자 취소 등):', err);
+    console.error('결제 요청 중 실패:', err);
   }
 };
 </script>
 
 <template>
-  <div class="checkout-container">
-    <div class="header">
-      <h2>결제하기</h2>
-      <p class="subtitle">{{ props.productName }} 구매</p>
-    </div>
+  <div class="checkout-wrapper">
+    <div class="checkout-layout">
+      <!-- Left Column: Forms -->
+      <div class="checkout-main">
+        <section class="checkout-section">
+          <h2 class="section-title">주문 상품 정보</h2>
+          <div class="order-item-card glass-panel">
+             <div class="item-img">📦</div>
+             <div class="item-details">
+                <div class="item-name">{{ props.productName }}</div>
+                <div class="item-price">{{ productPrice.toLocaleString() }}원</div>
+             </div>
+          </div>
+          <div class="fee-notice">배송비 {{ deliveryFee.toLocaleString() }}원</div>
+        </section>
 
-    <div class="product-info box">
-      <h3>주문 정보</h3>
-      <div class="item">
-        <span>{{ props.productName }}</span>
-        <span class="price">{{ checkoutPrice.toLocaleString() }} 원</span>
+        <section class="checkout-section">
+          <div class="section-header">
+            <h2 class="section-title">주문자 정보</h2>
+            <button class="edit-btn">수정</button>
+          </div>
+          <div class="info-card glass-panel">
+            <p class="info-text"><strong>{{ buyer.name }}</strong></p>
+            <p class="info-text">{{ buyer.phone }}</p>
+            <p class="info-text">{{ buyer.email }}</p>
+          </div>
+        </section>
+
+        <section class="checkout-section">
+          <div class="section-header">
+            <h2 class="section-title">배송 정보</h2>
+            <button class="edit-btn">변경</button>
+          </div>
+          <div class="info-card glass-panel">
+            <p class="info-text"><strong>{{ shipping.name }}</strong></p>
+            <p class="info-text">{{ shipping.phone }}</p>
+            <p class="info-text">{{ shipping.address }}</p>
+            <p class="info-text">({{ shipping.zipCode }})</p>
+          </div>
+        </section>
+
+        <section class="checkout-section">
+          <h2 class="section-title">결제수단</h2>
+          <div class="payment-widget-area glass-panel">
+            <div id="payment-method"></div>
+            <div id="agreement"></div>
+          </div>
+        </section>
       </div>
-      <div class="total-row">
-        <span>총 결제금액</span>
-        <span class="total-price">{{ checkoutPrice.toLocaleString() }} 원</span>
-      </div>
-    </div>
 
-    <!-- 결제 UI가 그려질 영역 -->
-    <div class="payment-widget-area box">
-      <div id="payment-method"></div>
-      <div id="agreement"></div>
-    </div>
+      <!-- Right Column: Summary -->
+      <aside class="checkout-sidebar">
+        <div class="summary-card glass-panel">
+          <h2 class="section-title">주문 요약</h2>
+          <div class="summary-row">
+            <span>상품가격</span>
+            <span>{{ productPrice.toLocaleString() }}원</span>
+          </div>
+          <div class="summary-row">
+            <span>배송비</span>
+            <span>+{{ deliveryFee.toLocaleString() }}원</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span>총 주문금액</span>
+            <span class="total-price">{{ totalAmount.toLocaleString() }}원</span>
+          </div>
+        </div>
 
-    <button 
-      class="pay-button" 
-      :disabled="!isWidgetLoaded" 
-      @click="requestPayment"
-    >
-      {{ isWidgetLoaded ? `${checkoutPrice.toLocaleString()}원 결제하기` : '결제 모듈 불러오는 중...' }}
-    </button>
+        <div class="action-card">
+          <button 
+            class="pay-button" 
+            :disabled="!isWidgetLoaded" 
+            @click="requestPayment"
+          >
+            {{ isWidgetLoaded ? `결제하기` : '준비 중...' }}
+          </button>
+        </div>
+      </aside>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.checkout-container {
-  max-width: 600px;
-  margin: 40px auto;
+.checkout-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 850px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.checkout-section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-title {
+  font-size: 1.44rem;
+  font-weight: 700;
+  margin: 0 0 15px;
+  color: var(--tech-accent, #59B3D9);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 20px;
-  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  color: #333;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 30px;
+.order-item-card {
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
-.header h2 {
-  font-size: 28.8px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  color: #666;
-  font-size: 16.8px;
-}
-
-.box {
-  background: #f9f9fc;
+.item-img {
+  width: 80px;
+  height: 80px;
+  background: #2a2a2a;
   border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid #ebf0f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
 }
 
-.product-info h3 {
-  font-size: 19.2px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 8px;
+.item-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 5px;
 }
 
-.item {
+.item-price {
+  font-weight: 700;
+  color: #59B3D9;
+}
+
+.fee-notice {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.info-text {
+  margin: 5px 0;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.edit-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.payment-widget-area {
+  padding: 0;
+  overflow: hidden;
+}
+
+#payment-method, #agreement {
+  background: #fff; /* 위젯은 하얀 배경이 기본적으로 깔끔함 */
+  border-radius: 0;
+}
+
+/* Sidebar Styles */
+.checkout-sidebar {
+  position: sticky;
+  top: 140px;
+  height: fit-content;
+}
+
+.summary-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
-  color: #444;
+  margin-bottom: 15px;
+  font-size: 1rem;
 }
 
-.price {
-  font-weight: 500;
+.summary-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 20px 0;
 }
 
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px dashed #ccc;
-  font-weight: bold;
-  font-size: 21.6px;
-  color: #3182f6; /* Toss Blue */
+.total {
+  font-size: 1.32rem;
+  font-weight: 800;
+}
+
+.total-price {
+  color: #59B3D9;
 }
 
 .pay-button {
   width: 100%;
-  padding: 16px;
-  font-size: 21.6px;
-  font-weight: bold;
-  color: white;
-  background-color: #3182f6; /* Toss Primary Blue */
+  padding: 20px;
+  font-size: 1.44rem;
+  font-weight: 800;
+  background: #59B3D9;
+  color: #000;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 10px;
+  margin-top: 20px;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .pay-button:hover:not(:disabled) {
-  background-color: #1b64da;
+  background: #4ab8e6;
+  transform: translateY(-2px);
 }
 
 .pay-button:disabled {
-  background-color: #a0c3f5;
+  opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* 다크모드 대응 (원한다면) */
-@media (prefers-color-scheme: dark) {
-  .checkout-container {
-    background: #1a1a1a;
-    color: #eee;
-  }
-  .box {
-    background: #2a2a2a;
-    border-color: #444;
-  }
-  .item { color: #ccc; }
 }
 </style>

@@ -190,10 +190,17 @@ const updateQuantity = (id, delta) => {
   }
 }
 
-const cartTotal = computed(() => {
+const shippingFee = 3000
+
+const cartItemsTotal = computed(() => {
   return cart.value
     .filter(item => item.selected)
     .reduce((sum, item) => sum + (item.price * item.quantity), 0)
+})
+
+const cartTotal = computed(() => {
+  const base = cartItemsTotal.value
+  return base > 0 ? base + shippingFee : 0
 })
 
 const goToCart = () => {
@@ -552,6 +559,14 @@ onMounted(() => {
             </div>
             
             <div class="cart-summary">
+              <div class="summary-row" style="font-size: 1rem; opacity: 0.8; margin-bottom: 0.5rem;">
+                <span>상품 합계</span>
+                <span>{{ cartItemsTotal.toLocaleString() }} 원</span>
+              </div>
+              <div class="summary-row" style="font-size: 1rem; opacity: 0.8; margin-bottom: 1rem;">
+                <span>배송비</span>
+                <span>+{{ shippingFee.toLocaleString() }} 원</span>
+              </div>
               <div class="summary-row">
                 <span>{{ t.cart.total }}</span>
                 <span class="total-price">{{ cartTotal.toLocaleString() }} 원</span>
