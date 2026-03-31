@@ -1,6 +1,6 @@
 <!-- Terminology Update Trigger -->
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import CheckoutPage from './components/CheckoutPage.vue'
 import AuthPage from './components/AuthPage.vue'
 import { supabase } from './supabase.js'
@@ -359,7 +359,11 @@ const scrollToConsulting = (isMobile = false) => {
 // ----------------------------------------------------
 // Cart Logic
 // ----------------------------------------------------
-const cart = ref([])
+const cart = ref(JSON.parse(localStorage.getItem('cbd_cart') || '[]'))
+
+watch(cart, (newVal) => {
+  localStorage.setItem('cbd_cart', JSON.stringify(newVal))
+}, { deep: true })
 
 const addToCart = (productName) => {
   const price = productName === '케익칼' ? 2000 : 8000
