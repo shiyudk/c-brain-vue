@@ -194,62 +194,103 @@ const goToJobs = () => {
 }
 
 const handleRecruitSubmit = async () => {
+  let emailSuccess = false
+  let dbSuccess = false
+  let errorMsg = ''
+
+  const fullPhone = `${recruitForm.value.phone1}-${recruitForm.value.phone2}-${recruitForm.value.phone3}`
+  const templateParams = {
+    from_name: recruitForm.value.name,
+    from_email: recruitForm.value.email,
+    phone: fullPhone,
+    message: recruitForm.value.content,
+    type: 'Recruitment Application'
+  }
+
+  // 1. EmailJS Attempt
   try {
-    const fullPhone = `${recruitForm.value.phone1}-${recruitForm.value.phone2}-${recruitForm.value.phone3}`
-    const templateParams = {
-      from_name: recruitForm.value.name,
-      from_email: recruitForm.value.email,
-      phone: fullPhone,
-      message: recruitForm.value.content,
-      type: 'Recruitment Application'
-    }
     await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
-    
+    emailSuccess = true
+  } catch (err) {
+    console.error('EmailJS Error:', err)
+    errorMsg += `[Email Error: ${err.text || err.message || 'Unknown'}] `
+  }
+
+  // 2. Supabase Attempt
+  try {
     if (supabase) {
-      await supabase.from('recruitment_applications').insert([{
+      const { error } = await supabase.from('recruitment_applications').insert([{
         name: recruitForm.value.name,
         email: recruitForm.value.email,
         phone: fullPhone,
         content: recruitForm.value.content
       }])
+      if (error) throw error
+      dbSuccess = true
       if (currentUser.value) fetchUserDashboardData()
     }
+  } catch (err) {
+    console.error('Database Error:', err)
+    errorMsg += `[DB Error: ${err.message || 'Table not found? Check SQL setup'}] `
+  }
+
+  if (emailSuccess || dbSuccess) {
     alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
     recruitForm.value = { name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' }
-  } catch (err) {
-    console.error(err)
-    alert('전송 중 오류가 발생했습니다.')
+    if (errorMsg) console.warn('Partial success with notices:', errorMsg)
+  } else {
+    alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
   }
 }
 
 const handleSupportSubmit = async () => {
-  try {
-    const templateParams = {
-      from_name: supportForm.value.name,
-      from_email: supportForm.value.email,
-      category: supportForm.value.category,
-      subject: supportForm.value.subject,
-      message: supportForm.value.content,
-      type: 'Customer Inquiry'
-    }
-    await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
+  let emailSuccess = false
+  let dbSuccess = false
+  let errorMsg = ''
 
+  const templateParams = {
+    from_name: supportForm.value.name,
+    from_email: supportForm.value.email,
+    category: supportForm.value.category,
+    subject: supportForm.value.subject,
+    message: supportForm.value.content,
+    type: 'Customer Inquiry'
+  }
+
+  // 1. EmailJS Attempt
+  try {
+    await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
+    emailSuccess = true
+  } catch (err) {
+    console.error('EmailJS Error:', err)
+    errorMsg += `[Email Error: ${err.text || err.message || 'Unknown'}] `
+  }
+
+  // 2. Supabase Attempt
+  try {
     if (supabase) {
-      await supabase.from('inquiries').insert([{
+      const { error } = await supabase.from('inquiries').insert([{
         name: supportForm.value.name,
         email: supportForm.value.email,
         category: supportForm.value.category,
         subject: supportForm.value.subject,
         content: supportForm.value.content
       }])
-      // 문의 신청 후 내역 갱신
+      if (error) throw error
+      dbSuccess = true
       if (currentUser.value) fetchUserDashboardData()
     }
+  } catch (err) {
+    console.error('Database Error:', err)
+    errorMsg += `[DB Error: ${err.message || 'Table not found? Check SQL setup'}] `
+  }
+
+  if (emailSuccess || dbSuccess) {
     alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
     supportForm.value = { name: '', email: '', category: '', subject: '', content: '' }
-  } catch (err) {
-    console.error(err)
-    alert('전송 중 오류가 발생했습니다.')
+    if (errorMsg) console.warn('Partial success with notices:', errorMsg)
+  } else {
+    alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
   }
 }
 
