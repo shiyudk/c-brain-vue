@@ -1,3 +1,4 @@
+<!-- Terminology Update Trigger -->
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import CheckoutPage from './components/CheckoutPage.vue'
