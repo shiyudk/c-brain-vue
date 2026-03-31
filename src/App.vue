@@ -17,6 +17,53 @@ const adminRecruitments = ref([])
 const adminOrders = ref([])
 const adminActiveTab = ref('inquiries')
 
+const selectedInquiries = ref([])
+const selectedRecruitments = ref([])
+
+const deleteSelected = async (type) => {
+  if (!supabase || !isAdmin.value) return
+  
+  const selectedList = type === 'inquiries' ? selectedInquiries.value : selectedRecruitments.value
+  const table = type === 'inquiries' ? 'inquiries' : 'recruitment_applications'
+  
+  if (selectedList.length === 0) {
+    alert('삭제할 항목을 선택해주세요.')
+    return
+  }
+  
+  if (!confirm(`선택한 ${selectedList.length}개의 항목을 정말 삭제하시겠습니까?`)) return
+  
+  try {
+    const { error } = await supabase.from(table).delete().in('id', selectedList)
+    if (error) throw error
+    
+    // Update local state
+    if (type === 'inquiries') {
+      adminInquiries.value = adminInquiries.value.filter(item => !selectedList.includes(item.id))
+      selectedInquiries.value = []
+    } else {
+      adminRecruitments.value = adminRecruitments.value.filter(item => !selectedList.includes(item.id))
+      selectedRecruitments.value = []
+    }
+    
+    alert('삭제되었습니다.')
+  } catch (err) {
+    console.error('Delete error:', err)
+    alert(`삭제 실패: ${err.message}`)
+  }
+}
+
+const toggleAll = (type) => {
+  const list = type === 'inquiries' ? adminInquiries.value : adminRecruitments.value
+  const selected = type === 'inquiries' ? selectedInquiries : selectedRecruitments
+  
+  if (selected.value.length === list.length) {
+    selected.value = []
+  } else {
+    selected.value = list.map(item => item.id)
+  }
+}
+
 const userInquiries = ref([])
 const userRecruitments = ref([])
 const userOrders = ref([])
@@ -738,10 +785,14 @@ onMounted(() => {
           
           <!-- Inquiries Admin -->
           <div v-if="adminActiveTab === 'inquiries'" class="admin-section glass-panel">
+            <div class="admin-actions-bar" style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+              <button @click="deleteSelected('inquiries')" class="admin-del-btn" :disabled="selectedInquiries.length === 0">선택 삭제 ({{ selectedInquiries.length }})</button>
+            </div>
             <div class="table-scroll">
               <table class="admin-table">
                 <thead>
                   <tr>
+                    <th style="width: 40px;"><input type="checkbox" :checked="selectedInquiries.length === adminInquiries.length && adminInquiries.length > 0" @change="toggleAll('inquiries')" /></th>
                     <th>날짜</th>
                     <th>이름</th>
                     <th>과목</th>
@@ -752,6 +803,7 @@ onMounted(() => {
                 </thead>
                 <tbody>
                   <tr v-for="inq in adminInquiries" :key="inq.id" @click="viewDetail(inq)" class="clickable-row">
+                    <td @click.stop><input type="checkbox" v-model="selectedInquiries" :value="inq.id" /></td>
                     <td>{{ new Date(inq.created_at).toLocaleDateString() }}</td>
                     <td>{{ inq.name }}</td>
                     <td><span class="tag-cat">{{ inq.category }}</span></td>
@@ -773,10 +825,14 @@ onMounted(() => {
 
           <!-- Recruitments Admin -->
           <div v-if="adminActiveTab === 'recruitments'" class="admin-section glass-panel">
+            <div class="admin-actions-bar" style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+              <button @click="deleteSelected('recruitments')" class="admin-del-btn" :disabled="selectedRecruitments.length === 0">선택 삭제 ({{ selectedRecruitments.length }})</button>
+            </div>
             <div class="table-scroll">
               <table class="admin-table">
                 <thead>
                   <tr>
+                    <th style="width: 40px;"><input type="checkbox" :checked="selectedRecruitments.length === adminRecruitments.length && adminRecruitments.length > 0" @change="toggleAll('recruitments')" /></th>
                     <th>날짜</th>
                     <th>이름</th>
                     <th>연락처</th>
@@ -787,6 +843,7 @@ onMounted(() => {
                 </thead>
                 <tbody>
                   <tr v-for="rec in adminRecruitments" :key="rec.id" @click="viewDetail(rec)" class="clickable-row">
+                    <td @click.stop><input type="checkbox" v-model="selectedRecruitments" :value="rec.id" /></td>
                     <td>{{ new Date(rec.created_at).toLocaleDateString() }}</td>
                     <td>{{ rec.name }}</td>
                     <td>{{ rec.phone }}</td>
@@ -1383,6 +1440,29 @@ html {
   border-color: #59B3D9;
   color: #59B3D9;
   border-bottom: 2px solid #59B3D9;
+}
+
+.admin-del-btn {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-del-btn:hover:not(:disabled) {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: #ff6b6b;
+  transform: translateY(-1px);
+}
+
+.admin-del-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .table-scroll {
