@@ -14,6 +14,7 @@ const supportForm = ref({ name: '', email: '', category: '', subject: '', conten
 
 const adminInquiries = ref([])
 const adminRecruitments = ref([])
+const adminOrders = ref([])
 const adminActiveTab = ref('inquiries')
 
 const userInquiries = ref([])
@@ -270,6 +271,70 @@ const handleRecruitSubmit = async () => {
   }
 }
 
+const fetchAdminData = async () => {
+  if (!supabase || !isAdmin.value) return
+  const { data: inq } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
+  const { data: rec } = await supabase.from('recruitment_applications').select('*').order('created_at', { ascending: false })
+  const { data: ord } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
+  
+  adminInquiries.value = inq || []
+  adminRecruitments.value = rec || []
+  adminOrders.value = ord || []
+}
+
+const updateStatus = async (table, id, newStatus, field = 'status') => {
+  if (!supabase || !isAdmin.value) {
+    alert('관리자 권한이 없습니다.')
+    return
+  }
+  
+  console.log(`[Updating] ${table} ID:${id} to ${newStatus}`)
+
+  const updateData = {}
+  updateData[field] = newStatus
+  
+  // 1. 서버 업데이트 시도
+  const { data, error } = await supabase
+    .from(table)
+    .update(updateData)
+    .eq('id', id)
+    .select()
+
+  if (error) {
+    console.error('Update operation failed:', error)
+    alert(`[치명적 오류] ${error.message}`)
+    await fetchAdminData()
+    return
+  }
+
+  // 업데이트된 데이터가 없다면 (RLS 등에 막힘)
+  if (!data || data.length === 0) {
+    console.warn('0 rows affected. RLS may be blocking.')
+    alert('서버 권한 문제로 저장이 거부되었습니다.\nSQL Editor에서 DISABLE ROW LEVEL SECURITY를 실행해주세요.')
+    await fetchAdminData()
+    return
+  }
+
+  // 2. 성공 시 로컬 데이터를 즉시 갱신하고 알림 없이 종료
+  if (table === 'inquiries') {
+    const item = adminInquiries.value.find(i => i.id === id)
+    if (item) item[field] = newStatus
+  } else if (table === 'recruitment_applications') {
+    const item = adminRecruitments.value.find(i => i.id === id)
+    if (item) item[field] = newStatus
+  } else if (table === 'orders') {
+    const item = adminOrders.value.find(i => i.id === id)
+    if (item) item[field] = newStatus
+  }
+
+  console.log('Update success!')
+}
+
+const goToAdmin = () => {
+  currentView.value = 'admin'
+  fetchAdminData()
+}
+
 const handleSupportSubmit = async () => {
   let emailSuccess = false
   let dbSuccess = false
@@ -332,22 +397,11 @@ const fetchUserDashboardData = async () => {
   
   const { data: inq } = await supabase.from('inquiries').select('*').eq('email', userEmail).order('created_at', { ascending: false })
   const { data: rec } = await supabase.from('recruitment_applications').select('*').eq('email', userEmail).order('created_at', { ascending: false })
+  const { data: ord } = await supabase.from('orders').select('*').eq('user_email', userEmail).order('created_at', { ascending: false })
   
   userInquiries.value = inq || []
   userRecruitments.value = rec || []
-}
-
-const fetchAdminData = async () => {
-  if (!supabase || !isAdmin.value) return
-  const { data: inq } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
-  const { data: rec } = await supabase.from('recruitment_applications').select('*').order('created_at', { ascending: false })
-  adminInquiries.value = inq || []
-  adminRecruitments.value = rec || []
-}
-
-const goToAdmin = () => {
-  currentView.value = 'admin'
-  fetchAdminData()
+  userOrders.value = ord || []
 }
 
 const toggleMobileMenu = () => {
@@ -671,6 +725,125 @@ onMounted(() => {
         </div>
       </template>
 
+      <template v-if="currentView === 'admin'">
+        <div class="admin-view-container container">
+          <div class="admin-header">
+             <h1>Admin Control Panel</h1>
+             <div class="admin-tabs">
+               <button @click="adminActiveTab = 'inquiries'" :class="{ active: adminActiveTab === 'inquiries' }">고객 문의 ({{ adminInquiries.length }})</button>
+               <button @click="adminActiveTab = 'recruitments'" :class="{ active: adminActiveTab === 'recruitments' }">채용 지원 ({{ adminRecruitments.length }})</button>
+               <button @click="adminActiveTab = 'mall'" :class="{ active: adminActiveTab === 'mall' }">쇼핑몰 주문 ({{ adminOrders.length }})</button>
+             </div>
+          </div>
+          
+          <!-- Inquiries Admin -->
+          <div v-if="adminActiveTab === 'inquiries'" class="admin-section glass-panel">
+            <div class="table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>이름</th>
+                    <th>과목</th>
+                    <th>제목</th>
+                    <th>상태</th>
+                    <th>기능</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="inq in adminInquiries" :key="inq.id" @click="viewDetail(inq)" class="clickable-row">
+                    <td>{{ new Date(inq.created_at).toLocaleDateString() }}</td>
+                    <td>{{ inq.name }}</td>
+                    <td><span class="tag-cat">{{ inq.category }}</span></td>
+                    <td class="text-truncate" style="max-width: 250px;">{{ inq.subject }}</td>
+                    <td>
+                      <span class="status-tag" :class="inq.status">{{ inq.status === 'pending' ? '확인대기' : '처리완료' }}</span>
+                    </td>
+                    <td @click.stop>
+                      <select :value="inq.status" @change="e => updateStatus('inquiries', inq.id, e.target.value)" class="admin-select">
+                        <option value="pending">확인대기</option>
+                        <option value="completed">처리완료</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recruitments Admin -->
+          <div v-if="adminActiveTab === 'recruitments'" class="admin-section glass-panel">
+            <div class="table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>이름</th>
+                    <th>연락처</th>
+                    <th>이메일</th>
+                    <th>상태</th>
+                    <th>기능</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="rec in adminRecruitments" :key="rec.id" @click="viewDetail(rec)" class="clickable-row">
+                    <td>{{ new Date(rec.created_at).toLocaleDateString() }}</td>
+                    <td>{{ rec.name }}</td>
+                    <td>{{ rec.phone }}</td>
+                    <td>{{ rec.email }}</td>
+                    <td>
+                      <span class="status-tag" :class="rec.status">{{ rec.status === 'pending' ? '심사중' : '심사완료' }}</span>
+                    </td>
+                    <td @click.stop>
+                       <select :value="rec.status" @change="e => updateStatus('recruitment_applications', rec.id, e.target.value)" class="admin-select">
+                        <option value="pending">심사중</option>
+                        <option value="completed">심사완료</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Orders Admin -->
+          <div v-if="adminActiveTab === 'mall'" class="admin-section glass-panel">
+            <div class="table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>주문일</th>
+                    <th>상품명</th>
+                    <th>구매자</th>
+                    <th>총액</th>
+                    <th>주문상태</th>
+                    <th>배송현황</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="ord in adminOrders" :key="ord.id" @click="viewDetail(ord)" class="clickable-row">
+                    <td>{{ new Date(ord.created_at).toLocaleDateString() }}</td>
+                    <td>{{ ord.product_name }}</td>
+                    <td>{{ ord.receiver_name || ord.user_email }}</td>
+                    <td>{{ ord.total_amount.toLocaleString() }}원</td>
+                    <td>
+                      <span class="status-tag" :class="ord.order_status">{{ ord.order_status === 'payment_pending' ? '결제대기' : '결제완료' }}</span>
+                    </td>
+                    <td>
+                       <select :value="ord.delivery_status" @change="e => updateStatus('orders', ord.id, e.target.value, 'delivery_status')" class="admin-select" @click.stop>
+                        <option value="preparing">배송준비</option>
+                        <option value="shipping">배송중</option>
+                        <option value="delivered">배송완료</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </template>
+
       <template v-if="currentView === 'mypage'">
         <div class="mypage-view-container container">
           <div class="mypage-header" style="text-align: center; margin-bottom: 50px;">
@@ -688,13 +861,22 @@ onMounted(() => {
               <div class="card-content">
                 <div class="stat-row">
                   <span>{{ t.mypage.totalOrders }}</span>
-                  <span class="stat-val">0</span>
+                  <span class="stat-val">{{ userOrders.length }}</span>
                 </div>
                 <div class="stat-row">
                   <span>{{ t.mypage.activeDelivery }}</span>
-                  <span class="stat-val">0</span>
+                  <span class="stat-val">{{ userOrders.filter(o => o.delivery_status === 'shipping').length }}</span>
                 </div>
-                <p class="empty-msg">{{ t.mypage.empty }}</p>
+                <div class="user-history-list" v-if="userOrders.length > 0">
+                   <div v-for="ord in userOrders" :key="ord.id" class="history-item clickable" @click="viewDetail(ord)">
+                     <span class="h-date">{{ new Date(ord.created_at).toLocaleDateString() }}</span>
+                     <span class="h-title" style="color: #59B3D9;">{{ ord.product_name }}</span>
+                     <span class="h-status" :class="ord.delivery_status">
+                       {{ ord.delivery_status === 'preparing' ? '배송준비' : ord.delivery_status === 'shipping' ? '배송중' : '배송완료' }}
+                     </span>
+                   </div>
+                </div>
+                <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
               </div>
             </div>
 
@@ -744,7 +926,7 @@ onMounted(() => {
                   <div v-for="app in userRecruitments" :key="app.id" class="history-item clickable" @click="viewDetail(app)">
                     <span class="h-date">{{ new Date(app.created_at).toLocaleDateString() }}</span>
                     <span class="h-title">{{ app.name }} 컨설턴트 지원</span>
-                    <span class="h-status pending">심사중</span>
+                    <span class="h-status" :class="app.status">{{ app.status === 'pending' ? '심사중' : '심사완료' }}</span>
                   </div>
                 </div>
                 <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
@@ -1170,6 +1352,114 @@ html {
 </style>
 
 <style scoped>
+.admin-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  background: linear-gradient(90deg, #fff, #59B3D9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.admin-tabs button {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.admin-tabs button.active {
+  background: rgba(89, 179, 217, 0.1);
+  border-color: #59B3D9;
+  color: #59B3D9;
+  border-bottom: 2px solid #59B3D9;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+  padding: 18px 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.admin-table th {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+.clickable-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.tag-cat {
+  background: rgba(89, 179, 217, 0.1);
+  color: #59B3D9;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.status-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-tag.pending, .status-tag.payment_pending, .status-tag.preparing {
+  background: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+}
+
+.status-tag.completed, .status-tag.delivered, .status-tag.payment_finished {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28A745;
+}
+
+.status-tag.shipping {
+  background: rgba(89, 179, 217, 0.1);
+  color: #59B3D9;
+}
+
+.admin-select {
+  background: #2D2E3A;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .app-footer {
   background: var(--tech-bg);
   padding: 3rem 0;
@@ -2731,6 +3021,10 @@ html {
   background: rgba(89, 179, 217, 0.1);
   color: #59B3D9;
 }
+
+.h-status.preparing { background: rgba(255, 193, 7, 0.1); color: #FFC107; }
+.h-status.shipping { background: rgba(89, 179, 217, 0.1); color: #59B3D9; }
+.h-status.delivered { background: rgba(40, 167, 69, 0.1); color: #28A745; }
 
 .h-status.pending {
   color: #59B3D9;

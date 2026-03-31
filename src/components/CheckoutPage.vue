@@ -100,6 +100,21 @@ const requestPayment = async () => {
   }
 
   try {
+    // 1. Supabase에 주문 기록 (결제 요청 전)
+    if (supabase) {
+      const fullAddress = `${shipping.value.address} ${shipping.value.detailAddress}`;
+      await supabase.from('orders').insert([{
+        user_email: buyer.value.email,
+        product_name: props.productName,
+        total_amount: totalAmount.value,
+        order_status: 'payment_finished', // 테스트를 위해 바로 완료로 표시 (실제 환경은 PG사 콜백 필요)
+        delivery_status: 'preparing',
+        shipping_address: fullAddress,
+        receiver_name: shipping.value.receiver,
+        receiver_phone: shipping.value.phone
+      }]);
+    }
+
     if (!paymentWidget.value) return;
 
     await paymentWidget.value.requestPayment({
