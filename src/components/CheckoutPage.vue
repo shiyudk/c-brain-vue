@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { loadPaymentWidget } from '@tosspayments/payment-widget-sdk';
+import { supabase } from '../supabase.js';
 
 const props = defineProps({
   productName: {

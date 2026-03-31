@@ -115,11 +115,19 @@ const handleSubmit = async () => {
 
 const loginWithProvider = async (providerName) => {
   if (!supabase) { alert(t.value.errKey); return; }
+  
+  const options = {
+    redirectTo: `${window.location.origin}/`
+  }
+
+  // If Kakao, explicitly set scopes to exclude account_email which is not permitted yet
+  if (providerName === 'kakao') {
+    options.scopes = 'profile_nickname profile_image'
+  }
+
   const { error } = await supabase.auth.signInWithOAuth({ 
     provider: providerName,
-    options: {
-      redirectTo: `${window.location.origin}/`
-    }
+    options
   })
   if (error) alert(error.message)
 }
