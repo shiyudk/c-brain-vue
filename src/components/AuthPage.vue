@@ -124,7 +124,7 @@ const loginWithProvider = async (providerName) => {
   if (providerName === 'kakao') {
     options.scopes = 'profile_nickname,profile_image'
     options.queryParams = {
-      scope: 'profile_nickname,profile_image'
+      scope: 'profile_nickname profile_image'
     }
   }
 
