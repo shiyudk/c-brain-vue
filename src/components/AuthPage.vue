@@ -122,7 +122,10 @@ const loginWithProvider = async (providerName) => {
 
   // If Kakao, explicitly set scopes to exclude account_email which is not permitted yet
   if (providerName === 'kakao') {
-    options.scopes = 'profile_nickname profile_image'
+    options.scopes = 'profile_nickname,profile_image'
+    options.queryParams = {
+      scope: 'profile_nickname,profile_image'
+    }
   }
 
   const { error } = await supabase.auth.signInWithOAuth({ 
