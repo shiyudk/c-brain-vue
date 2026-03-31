@@ -4,8 +4,21 @@ import { ref, onMounted, computed } from 'vue'
 import CheckoutPage from './components/CheckoutPage.vue'
 import AuthPage from './components/AuthPage.vue'
 import { supabase } from './supabase.js'
+import emailjs from '@emailjs/browser'
 
 const currentUser = ref(null)
+const isAdmin = computed(() => currentUser.value?.email === 'contact@c-braindesign.com')
+
+const recruitForm = ref({ name: '', email: '', phone: '', content: '' })
+const supportForm = ref({ name: '', email: '', category: '', subject: '', content: '' })
+
+const adminInquiries = ref([])
+const adminRecruitments = ref([])
+const adminActiveTab = ref('inquiries')
+
+const userInquiries = ref([])
+const userRecruitments = ref([])
+const userOrders = ref([])
 const handleLogout = async () => {
   if (supabase) {
     await supabase.auth.signOut()
@@ -180,30 +193,88 @@ const goToJobs = () => {
   window.scrollTo(0, 0)
 }
 
-const handleRecruitSubmit = () => {
-  alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
-}
-
-const handleSupportSubmit = () => {
-  alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
-}
-
-const goToSupport = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
+const handleRecruitSubmit = async () => {
+  try {
+    const templateParams = {
+      from_name: recruitForm.value.name,
+      from_email: recruitForm.value.email,
+      phone: recruitForm.value.phone,
+      message: recruitForm.value.content,
+      type: 'Recruitment Application'
+    }
+    await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
+    
+    if (supabase) {
+      await supabase.from('recruitment_applications').insert([{
+        name: recruitForm.value.name,
+        email: recruitForm.value.email,
+        phone: recruitForm.value.phone,
+        content: recruitForm.value.content
+      }])
+      // 재지원 시 내역 갱신
+      if (currentUser.value) fetchUserDashboardData()
+    }
+    alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
+    recruitForm.value = { name: '', email: '', phone: '', content: '' }
+  } catch (err) {
+    console.error(err)
+    alert('전송 중 오류가 발생했습니다.')
   }
-  previousView.value = currentView.value
-  currentView.value = 'support'
-  window.scrollTo(0, 0)
 }
 
-const goToMyPage = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
+const handleSupportSubmit = async () => {
+  try {
+    const templateParams = {
+      from_name: supportForm.value.name,
+      from_email: supportForm.value.email,
+      category: supportForm.value.category,
+      subject: supportForm.value.subject,
+      message: supportForm.value.content,
+      type: 'Customer Inquiry'
+    }
+    await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
+
+    if (supabase) {
+      await supabase.from('inquiries').insert([{
+        name: supportForm.value.name,
+        email: supportForm.value.email,
+        category: supportForm.value.category,
+        subject: supportForm.value.subject,
+        content: supportForm.value.content
+      }])
+      // 문의 신청 후 내역 갱신
+      if (currentUser.value) fetchUserDashboardData()
+    }
+    alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
+    supportForm.value = { name: '', email: '', category: '', subject: '', content: '' }
+  } catch (err) {
+    console.error(err)
+    alert('전송 중 오류가 발생했습니다.')
   }
-  previousView.value = currentView.value
-  currentView.value = 'mypage'
-  window.scrollTo(0, 0)
+}
+
+const fetchUserDashboardData = async () => {
+  if (!supabase || !currentUser.value) return
+  const userEmail = currentUser.value.email
+  
+  const { data: inq } = await supabase.from('inquiries').select('*').eq('email', userEmail).order('created_at', { ascending: false })
+  const { data: rec } = await supabase.from('recruitment_applications').select('*').eq('email', userEmail).order('created_at', { ascending: false })
+  
+  userInquiries.value = inq || []
+  userRecruitments.value = rec || []
+}
+
+const fetchAdminData = async () => {
+  if (!supabase || !isAdmin.value) return
+  const { data: inq } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
+  const { data: rec } = await supabase.from('recruitment_applications').select('*').order('created_at', { ascending: false })
+  adminInquiries.value = inq || []
+  adminRecruitments.value = rec || []
+}
+
+const goToAdmin = () => {
+  currentView.value = 'admin'
+  fetchAdminData()
 }
 
 const toggleMobileMenu = () => {
@@ -247,6 +318,16 @@ const goToMall = () => {
   }
   previousView.value = currentView.value
   currentView.value = 'mall'
+  window.scrollTo(0, 0)
+}
+
+const goToMyPage = () => {
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'mypage'
+  fetchUserDashboardData()
   window.scrollTo(0, 0)
 }
 
@@ -403,6 +484,7 @@ onMounted(() => {
         <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
         <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
         <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
+        <a href="#" v-if="isAdmin" @click.prevent="goToAdmin" style="color: #ff6b6b; font-weight: 700; margin-left: 1rem;">ADMIN</a>
         <template v-if="currentUser">
           <a href="#" @click.prevent="handleLogout">로그아웃</a>
         </template>
@@ -419,9 +501,9 @@ onMounted(() => {
         </a>
         <nav class="nav-links">
           <a href="#" @click.prevent="currentView === 'home' ? scrollToPhilosophy() : (goHome(), setTimeout(scrollToPhilosophy, 0))">{{ t.nav.company }}</a>
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.ai }}</a>
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.personal }}</a>
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.kids }}</a>
+          <a href="#" @click.prevent="goToMall">{{ t.nav.mall }}</a>
+          <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
+          <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
         </nav>
 
         <div class="nav-actions">
@@ -556,9 +638,16 @@ onMounted(() => {
               <div class="card-content">
                 <div class="stat-row">
                   <span>{{ t.mypage.myInquiries }}</span>
-                  <span class="stat-val">0</span>
+                  <span class="stat-val">{{ userInquiries.length }}</span>
                 </div>
-                <p class="empty-msg">{{ t.mypage.empty }}</p>
+                <div class="user-history-list" v-if="userInquiries.length > 0">
+                  <div v-for="inq in userInquiries" :key="inq.id" class="history-item">
+                    <span class="h-date">{{ new Date(inq.created_at).toLocaleDateString() }}</span>
+                    <span class="h-title">{{ inq.subject }}</span>
+                    <span class="h-status pending">{{ inq.status === 'pending' ? '접수완료' : '답변완료' }}</span>
+                  </div>
+                </div>
+                <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
               </div>
             </div>
 
@@ -569,9 +658,16 @@ onMounted(() => {
               <div class="card-content">
                 <div class="stat-row">
                   <span>{{ t.mypage.myApps }}</span>
-                  <span class="stat-val">0</span>
+                  <span class="stat-val">{{ userRecruitments.length }}</span>
                 </div>
-                <p class="empty-msg">{{ t.mypage.empty }}</p>
+                <div class="user-history-list" v-if="userRecruitments.length > 0">
+                  <div v-for="app in userRecruitments" :key="app.id" class="history-item">
+                    <span class="h-date">{{ new Date(app.created_at).toLocaleDateString() }}</span>
+                    <span class="h-title">{{ app.name }} 컨설턴트 지원</span>
+                    <span class="h-status pending">심사중</span>
+                  </div>
+                </div>
+                <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
               </div>
             </div>
           </div>
@@ -2377,6 +2473,143 @@ html {
 .logout-btn:hover {
   background: #ff6b6b;
   color: #fff;
+}
+
+/* Admin Dashboard */
+.admin-view-container {
+  padding: 140px 20px 80px;
+}
+
+.admin-top {
+  margin-bottom: 40px;
+}
+
+.admin-top h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge {
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.admin-tabs {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-tabs button {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 700;
+  position: relative;
+}
+
+.admin-tabs button.active {
+  color: #59B3D9;
+}
+
+.admin-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #59B3D9;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  font-size: 0.9rem;
+  color: #9DA1B4;
+}
+
+.admin-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.9rem;
+}
+
+.category-tag {
+  background: rgba(89, 179, 217, 0.1);
+  color: #59B3D9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.content-cell {
+  max-width: 300px;
+  white-space: pre-wrap;
+  color: rgba(255,255,255,0.7);
+}
+
+/* User History List in My Page */
+.user-history-list {
+  margin-top: 15px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.user-history-list::-webkit-scrollbar {
+  width: 4px;
+}
+.user-history-list::-webkit-scrollbar-thumb {
+  background: rgba(89, 179, 217, 0.3);
+  border-radius: 10px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.82rem;
+}
+
+.h-date {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.75rem;
+  min-width: 70px;
+}
+
+.h-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.h-status {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(89, 179, 217, 0.1);
+  color: #59B3D9;
+}
+
+.h-status.pending {
+  color: #59B3D9;
 }
 
 @media (max-width: 768px) {
