@@ -2074,7 +2074,6 @@ html {
   font-size: 1.14rem;
   line-height: 1.6;
   opacity: 0.8;
-  max-width: 500px;
   color: #fff;
   margin: 0;
 }
