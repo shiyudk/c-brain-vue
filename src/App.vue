@@ -244,9 +244,12 @@ const handleRecruitSubmit = async () => {
   }
 
   if (emailSuccess || dbSuccess) {
-    alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
+    if (emailSuccess && !dbSuccess) {
+      alert(currentLang.value === 'ko' ? '메일은 발송되었으나, 내역 저장(DB)에 실패했습니다. SQL 설정을 확인해주세요.' : 'Email sent, but DB save failed. Check SQL setup.')
+    } else {
+      alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
+    }
     recruitForm.value = { name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' }
-    if (errorMsg) console.warn('Partial success with notices:', errorMsg)
   } else {
     alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
   }
@@ -295,9 +298,12 @@ const handleSupportSubmit = async () => {
   }
 
   if (emailSuccess || dbSuccess) {
-    alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
+    if (emailSuccess && !dbSuccess) {
+      alert(currentLang.value === 'ko' ? '메일은 발송되었으나, 내역 저장(DB)에 실패했습니다. SQL 설정을 확인해주세요.' : 'Email sent, but DB save failed. Check SQL setup.')
+    } else {
+      alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
+    }
     supportForm.value = { name: '', email: '', category: '', subject: '', content: '' }
-    if (errorMsg) console.warn('Partial success with notices:', errorMsg)
   } else {
     alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
   }
