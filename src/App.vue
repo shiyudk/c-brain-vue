@@ -9,7 +9,7 @@ import emailjs from '@emailjs/browser'
 const currentUser = ref(null)
 const isAdmin = computed(() => currentUser.value?.email === 'contact@c-braindesign.com')
 
-const recruitForm = ref({ name: '', email: '', phone: '', content: '' })
+const recruitForm = ref({ name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' })
 const supportForm = ref({ name: '', email: '', category: '', subject: '', content: '' })
 
 const adminInquiries = ref([])
@@ -195,10 +195,11 @@ const goToJobs = () => {
 
 const handleRecruitSubmit = async () => {
   try {
+    const fullPhone = `${recruitForm.value.phone1}-${recruitForm.value.phone2}-${recruitForm.value.phone3}`
     const templateParams = {
       from_name: recruitForm.value.name,
       from_email: recruitForm.value.email,
-      phone: recruitForm.value.phone,
+      phone: fullPhone,
       message: recruitForm.value.content,
       type: 'Recruitment Application'
     }
@@ -208,14 +209,13 @@ const handleRecruitSubmit = async () => {
       await supabase.from('recruitment_applications').insert([{
         name: recruitForm.value.name,
         email: recruitForm.value.email,
-        phone: recruitForm.value.phone,
+        phone: fullPhone,
         content: recruitForm.value.content
       }])
-      // 재지원 시 내역 갱신
       if (currentUser.value) fetchUserDashboardData()
     }
     alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
-    recruitForm.value = { name: '', email: '', phone: '', content: '' }
+    recruitForm.value = { name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' }
   } catch (err) {
     console.error(err)
     alert('전송 중 오류가 발생했습니다.')
@@ -540,6 +540,7 @@ onMounted(() => {
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
         <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
+        <a href="#" v-if="isAdmin" @click.prevent="goToAdmin(); toggleMobileMenu()" style="color: #ff6b6b; font-weight: 700;">ADMIN DASHBOARD</a>
         <template v-if="currentUser">
           <a href="#" @click.prevent="handleLogout" style="margin-top: 24px; font-weight: 700; color: #ff6b6b;">
             {{ currentLang === 'ko' ? '로그아웃' : 'Logout' }}
@@ -564,17 +565,17 @@ onMounted(() => {
            <form class="recruit-form glass-panel container-narrow" @submit.prevent="handleSupportSubmit">
              <div class="recruit-input-group">
                <label>{{ t.support.name }}</label>
-               <input type="text" required />
+               <input type="text" v-model="supportForm.name" required />
              </div>
              
              <div class="recruit-input-group">
                <label>{{ t.support.email }}</label>
-               <input type="email" required />
+               <input type="email" v-model="supportForm.email" required />
              </div>
              
              <div class="recruit-input-group">
                <label>{{ t.support.category }}</label>
-               <select required class="support-select">
+               <select required class="support-select" v-model="supportForm.category">
                   <option value="">{{ t.support.category }}</option>
                   <option>{{ t.support.cat1 }}</option>
                   <option>{{ t.support.cat2 }}</option>
@@ -584,12 +585,12 @@ onMounted(() => {
              
              <div class="recruit-input-group">
                <label>{{ t.support.subject }}</label>
-               <input type="text" required />
+               <input type="text" v-model="supportForm.subject" required />
              </div>
              
              <div class="recruit-input-group">
                <label>{{ t.support.content }}</label>
-               <textarea rows="8" required></textarea>
+               <textarea rows="8" v-model="supportForm.content" required></textarea>
              </div>
              
              <button type="submit" class="recruit-submit-btn">{{ t.support.submit }}</button>
@@ -796,26 +797,26 @@ onMounted(() => {
            <form class="recruit-form glass-panel container-narrow" @submit.prevent="handleRecruitSubmit">
              <div class="recruit-input-group">
                <label>{{ t.recruit.name }}</label>
-               <input type="text" required />
+               <input type="text" v-model="recruitForm.name" required />
              </div>
              
              <div class="recruit-input-group">
                <label>{{ t.recruit.phone }}</label>
                <div class="phone-inputs">
-                  <input type="tel" maxlength="3" required /> <span>-</span>
-                  <input type="tel" maxlength="4" required /> <span>-</span>
-                  <input type="tel" maxlength="4" required />
+                  <input type="tel" maxlength="3" v-model="recruitForm.phone1" required /> <span>-</span>
+                  <input type="tel" maxlength="4" v-model="recruitForm.phone2" required /> <span>-</span>
+                  <input type="tel" maxlength="4" v-model="recruitForm.phone3" required />
                </div>
              </div>
              
              <div class="recruit-input-group">
                <label>{{ t.recruit.email }}</label>
-               <input type="email" required />
+               <input type="email" v-model="recruitForm.email" required />
              </div>
              
              <div class="recruit-input-group">
                <label>{{ t.recruit.content }}</label>
-               <textarea rows="6" required></textarea>
+               <textarea rows="6" v-model="recruitForm.content" required></textarea>
              </div>
              
              <button type="submit" class="recruit-submit-btn">{{ t.recruit.submit }}</button>
