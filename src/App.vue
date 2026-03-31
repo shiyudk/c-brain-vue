@@ -673,9 +673,11 @@ onMounted(() => {
 
       <template v-if="currentView === 'mypage'">
         <div class="mypage-view-container container">
-          <div class="mypage-header">
+          <div class="mypage-header" style="text-align: center; margin-bottom: 50px;">
             <h1>{{ t.mypage.title }}</h1>
-            <p class="user-welcome">{{ currentUser?.email?.split('@')[0] }}{{ t.mypage.welcome }}</p>
+            <p class="user-welcome" style="font-size: 1.1rem; color: #59B3D9; margin-top: 10px;">
+              {{ currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] }}{{ t.mypage.welcome }}
+            </p>
           </div>
 
           <div class="mypage-grid">
