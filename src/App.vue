@@ -221,12 +221,14 @@ const handleRecruitSubmit = async () => {
   let errorMsg = ''
 
   const fullPhone = `${recruitForm.value.phone1}-${recruitForm.value.phone2}-${recruitForm.value.phone3}`
+  const now = new Date().toLocaleString()
   const templateParams = {
-    from_name: recruitForm.value.name,
-    from_email: recruitForm.value.email,
+    name: recruitForm.value.name,
+    email: recruitForm.value.email,
     phone: fullPhone,
     message: recruitForm.value.content,
-    type: 'Recruitment Application'
+    title: '채용 지원 (Recruitment)',
+    time: now
   }
 
   // 1. EmailJS Attempt
@@ -273,13 +275,15 @@ const handleSupportSubmit = async () => {
   let dbSuccess = false
   let errorMsg = ''
 
+  const now = new Date().toLocaleString()
   const templateParams = {
-    from_name: supportForm.value.name,
-    from_email: supportForm.value.email,
+    name: supportForm.value.name,
+    email: supportForm.value.email,
     category: supportForm.value.category,
     subject: supportForm.value.subject,
     message: supportForm.value.content,
-    type: 'Customer Inquiry'
+    title: `고객 문의: ${supportForm.value.subject}`,
+    time: now
   }
 
   // 1. EmailJS Attempt
