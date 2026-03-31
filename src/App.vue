@@ -19,6 +19,19 @@ const adminActiveTab = ref('inquiries')
 const userInquiries = ref([])
 const userRecruitments = ref([])
 const userOrders = ref([])
+
+const selectedItemDetail = ref(null)
+const showDetailModal = ref(false)
+
+const viewDetail = (item) => {
+  selectedItemDetail.value = item
+  showDetailModal.value = true
+}
+
+const closeDetailModal = () => {
+  selectedItemDetail.value = null
+  showDetailModal.value = false
+}
 const handleLogout = async () => {
   if (supabase) {
     await supabase.auth.signOut()
@@ -702,7 +715,7 @@ onMounted(() => {
                   <span class="stat-val">{{ userInquiries.length }}</span>
                 </div>
                 <div class="user-history-list" v-if="userInquiries.length > 0">
-                  <div v-for="inq in userInquiries" :key="inq.id" class="history-item">
+                  <div v-for="inq in userInquiries" :key="inq.id" class="history-item clickable" @click="viewDetail(inq)">
                     <span class="h-date">{{ new Date(inq.created_at).toLocaleDateString() }}</span>
                     <span class="h-title">{{ inq.subject }}</span>
                     <span class="h-status pending">{{ inq.status === 'pending' ? '접수완료' : '답변완료' }}</span>
@@ -722,7 +735,7 @@ onMounted(() => {
                   <span class="stat-val">{{ userRecruitments.length }}</span>
                 </div>
                 <div class="user-history-list" v-if="userRecruitments.length > 0">
-                  <div v-for="app in userRecruitments" :key="app.id" class="history-item">
+                  <div v-for="app in userRecruitments" :key="app.id" class="history-item clickable" @click="viewDetail(app)">
                     <span class="h-date">{{ new Date(app.created_at).toLocaleDateString() }}</span>
                     <span class="h-title">{{ app.name }} 컨설턴트 지원</span>
                     <span class="h-status pending">심사중</span>
@@ -1066,6 +1079,50 @@ onMounted(() => {
           <button class="primary-btn" @click="triggerMailApp">{{ t.modal.app }}</button>
         </div>
         <button class="close-btn" @click="showContactModal = false">✕</button>
+      </div>
+    </div>
+
+    <!-- 상세 보기 모달 추가 -->
+    <div class="modal-overlay" v-if="showDetailModal" @click="closeDetailModal">
+      <div class="modal-content detail-modal-content" @click.stop>
+        <div class="detail-header-row">
+          <h3>📂 {{ selectedItemDetail?.subject || (selectedItemDetail?.name + ' 지원 내역') }}</h3>
+          <button class="close-btn" @click="closeDetailModal">✕</button>
+        </div>
+        
+        <div class="detail-body glass-panel">
+          <div class="detail-info-grid">
+            <div class="info-cell">
+              <label>이름</label>
+              <span>{{ selectedItemDetail?.name }}</span>
+            </div>
+            <div class="info-cell">
+              <label>이메일</label>
+              <span>{{ selectedItemDetail?.email }}</span>
+            </div>
+            <div class="info-cell" v-if="selectedItemDetail?.phone">
+              <label>연락처</label>
+              <span>{{ selectedItemDetail?.phone }}</span>
+            </div>
+            <div class="info-cell" v-if="selectedItemDetail?.category">
+              <label>카테고리</label>
+              <span>{{ selectedItemDetail?.category }}</span>
+            </div>
+            <div class="info-cell">
+              <label>작성 일시</label>
+              <span>{{ new Date(selectedItemDetail?.created_at).toLocaleString() }}</span>
+            </div>
+          </div>
+          
+          <div class="detail-desc-box">
+             <label>내용 원문</label>
+             <div class="content-text">{{ selectedItemDetail?.content }}</div>
+          </div>
+        </div>
+        
+        <div class="modal-actions" style="margin-top:20px;">
+           <button class="primary-btn" @click="closeDetailModal">닫기</button>
+        </div>
       </div>
     </div>
 
@@ -2671,6 +2728,82 @@ html {
 
 .h-status.pending {
   color: #59B3D9;
+}
+
+.history-item.clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.history-item.clickable:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Detail Modal Styles */
+.detail-modal-content {
+  max-width: 600px !important;
+  width: 90% !important;
+}
+
+.detail-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 15px;
+}
+
+.detail-header-row h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #59B3D9;
+}
+
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-cell label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.info-cell span {
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.detail-desc-box {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.detail-desc-box label {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+}
+
+.content-text {
+  background: rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: rgba(255,255,255,0.9);
+  min-height: 100px;
 }
 
 @media (max-width: 768px) {
