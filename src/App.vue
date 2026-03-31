@@ -2060,7 +2060,7 @@ html {
 .recruit-header {
   max-width: 800px;
   margin: 0 auto 40px;
-  text-align: center;
+  text-align: left;
 }
 
 .recruit-header h2 {
@@ -2076,7 +2076,7 @@ html {
   opacity: 0.8;
   max-width: 500px;
   color: #fff;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .recruit-form {
@@ -2096,15 +2096,13 @@ html {
   font-size: 0.9rem;
   margin-bottom: 8px;
   color: #9DA1B4;
-  text-align: center;
+  text-align: left;
 }
 
 .recruit-input-group input, 
 .recruit-input-group textarea {
   display: block;
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -2112,13 +2110,20 @@ html {
   font-size: 1rem;
   outline: none;
   border-radius: 6px;
+  box-sizing: border-box;
 }
 
 .phone-inputs {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
+  width: 100%;
+}
+
+.phone-inputs input {
+  flex: 1;
+  text-align: center;
 }
 
 .phone-inputs span {
@@ -2151,8 +2156,6 @@ html {
 .support-select {
   display: block;
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -2161,6 +2164,7 @@ html {
   outline: none;
   border-radius: 6px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .support-select option {
