@@ -59,6 +59,21 @@ const translations = {
       shippingDetail: '/ 배송안내\n배송방법 : 택배\n배송지역 : 전국 지역',
       cancelTitle: '제 19조 결제 취소 & 환불',
       cancelDetail: '① 회사와 구매에 관한 계약을 체결한 회원은 아래와 같이 결제에 대한 취소 및 환불을 요구할 수 있습니다.\n- 이용계약의 신청 후, 회사로부터의 상담이 제공되지 않은 경우, 결제취소가 가능합니다.\n- 회원이 상담 후 상대 프로필카드를 2회 이상 수령한 경우, 잔여횟수가 남은 회원에 한하여 이용 금액과 위약금 10%를 제외한 부분 환불이 가능합니다.'
+    },
+    mypage: {
+      title: '마이페이지',
+      welcome: '님, 반갑습니다.',
+      orderStatus: '주문/배송 현황',
+      cartStatus: '장바구니 현황',
+      inquiryStatus: '문의 현황',
+      recruitStatus: '채용 지원 현황',
+      empty: '내역이 없습니다.',
+      viewCart: '장바구니 보기',
+      totalOrders: '총 주문',
+      activeDelivery: '배송중',
+      itemsInCart: '담긴 상품',
+      myInquiries: '내 문의 내역',
+      myApps: '채용 지원 내역'
     }
   },
   en: {
@@ -103,6 +118,21 @@ const translations = {
       shippingDetail: '/ Shipping Guide\nMethod: Courier\nRegion: Nationwide',
       cancelTitle: 'Article 19: Cancellation & Refund',
       cancelDetail: '① Members who have entered into a contract with the company may request cancellation and refund as follows.\n- Cancellation is possible if no consultation has been provided after the application.\n- If a profile card has been received twice or more after consultation, a partial refund excluding utilized amount and a 10% penalty is possible for remaining sessions.'
+    },
+    mypage: {
+      title: 'My Page',
+      welcome: ', Welcome back.',
+      orderStatus: 'Orders / Delivery',
+      cartStatus: 'Shopping Cart',
+      inquiryStatus: 'Support Inquiries',
+      recruitStatus: 'Recruitment Status',
+      empty: 'No records found.',
+      viewCart: 'View Cart',
+      totalOrders: 'Total Orders',
+      activeDelivery: 'Shipping',
+      itemsInCart: 'Items in Cart',
+      myInquiries: 'Inquiry History',
+      myApps: 'Application History'
     }
   }
 }
@@ -164,6 +194,15 @@ const goToSupport = () => {
   }
   previousView.value = currentView.value
   currentView.value = 'support'
+  window.scrollTo(0, 0)
+}
+
+const goToMyPage = () => {
+  if (currentView.value === 'home') {
+    savedScrollY.value = window.scrollY
+  }
+  previousView.value = currentView.value
+  currentView.value = 'mypage'
   window.scrollTo(0, 0)
 }
 
@@ -392,7 +431,7 @@ onMounted(() => {
             <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
           </div>
           <a href="#" class="icon-btn hide-mobile" @click.prevent="goToCart">🛒 <span v-if="cart.length > 0" class="cart-count">{{ cart.length }}</span></a>
-          <a href="#" class="icon-btn hide-mobile" @click.prevent="currentUser ? goHome() : goToAuth('login', false)">👤</a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="currentUser ? goToMyPage() : goToAuth('login', false)">👤</a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -469,6 +508,77 @@ onMounted(() => {
              
              <button type="submit" class="recruit-submit-btn">{{ t.support.submit }}</button>
            </form>
+        </div>
+      </template>
+
+      <template v-if="currentView === 'mypage'">
+        <div class="mypage-view-container container">
+          <div class="mypage-header">
+            <h1>{{ t.mypage.title }}</h1>
+            <p class="user-welcome">{{ currentUser?.email?.split('@')[0] }}{{ t.mypage.welcome }}</p>
+          </div>
+
+          <div class="mypage-grid">
+            <div class="mypage-card glass-panel">
+              <div class="card-header">
+                <h3>📦 {{ t.mypage.orderStatus }}</h3>
+              </div>
+              <div class="card-content">
+                <div class="stat-row">
+                  <span>{{ t.mypage.totalOrders }}</span>
+                  <span class="stat-val">0</span>
+                </div>
+                <div class="stat-row">
+                  <span>{{ t.mypage.activeDelivery }}</span>
+                  <span class="stat-val">0</span>
+                </div>
+                <p class="empty-msg">{{ t.mypage.empty }}</p>
+              </div>
+            </div>
+
+            <div class="mypage-card glass-panel">
+              <div class="card-header">
+                <h3>🛒 {{ t.mypage.cartStatus }}</h3>
+              </div>
+              <div class="card-content">
+                <div class="stat-row">
+                  <span>{{ t.mypage.itemsInCart }}</span>
+                  <span class="stat-val">{{ cart.length }}</span>
+                </div>
+                <button class="small-action-btn" @click="goToCart">{{ t.mypage.viewCart }}</button>
+              </div>
+            </div>
+
+            <div class="mypage-card glass-panel">
+              <div class="card-header">
+                <h3>💬 {{ t.mypage.inquiryStatus }}</h3>
+              </div>
+              <div class="card-content">
+                <div class="stat-row">
+                  <span>{{ t.mypage.myInquiries }}</span>
+                  <span class="stat-val">0</span>
+                </div>
+                <p class="empty-msg">{{ t.mypage.empty }}</p>
+              </div>
+            </div>
+
+            <div class="mypage-card glass-panel">
+              <div class="card-header">
+                <h3>📄 {{ t.mypage.recruitStatus }}</h3>
+              </div>
+              <div class="card-content">
+                <div class="stat-row">
+                  <span>{{ t.mypage.myApps }}</span>
+                  <span class="stat-val">0</span>
+                </div>
+                <p class="empty-msg">{{ t.mypage.empty }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 40px;">
+            <button class="logout-btn" @click="handleLogout">{{ currentLang === 'ko' ? '로그아웃' : 'Logout' }}</button>
+          </div>
         </div>
       </template>
 
@@ -2168,6 +2278,104 @@ html {
 
 .support-select option {
   background: #1a1b26;
+  color: #fff;
+}
+
+/* My Page Styles */
+.mypage-view-container {
+  padding: 140px 20px 80px;
+  min-height: 100vh;
+}
+
+.mypage-header {
+  margin-bottom: 40px;
+}
+
+.mypage-header h1 {
+  font-size: 2.16rem;
+  margin-bottom: 8px;
+}
+
+.user-welcome {
+  color: #59B3D9;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.mypage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.mypage-card {
+  padding: 24px;
+  border-radius: 16px;
+  transition: transform 0.3s;
+}
+
+.mypage-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header h3 {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 12px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: rgba(255,255,255,0.7);
+}
+
+.stat-val {
+  color: #59B3D9;
+  font-weight: 700;
+}
+
+.empty-msg {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.3);
+  margin-top: 12px;
+  text-align: center;
+}
+
+.small-action-btn {
+  background: rgba(89, 179, 217, 0.1);
+  border: 1px solid #59B3D9;
+  color: #59B3D9;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+
+.small-action-btn:hover {
+  background: #59B3D9;
+  color: #111;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+  padding: 8px 24px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #ff6b6b;
   color: #fff;
 }
 
