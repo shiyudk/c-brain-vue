@@ -1552,6 +1552,7 @@ html {
 .nav-logo-img {
   height: 68px; /* 1.5배 크기로 상향 */
   vertical-align: middle;
+  object-fit: contain;
   /* CSS Magic: 압도적인 대비로 JPG 아티팩트를 완벽 블랙으로 눌러 투명처리 */
   filter: grayscale(1) invert(1) contrast(1000%) brightness(150%);
   mix-blend-mode: screen;
