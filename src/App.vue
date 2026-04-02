@@ -10,6 +10,7 @@ const currentUser = ref(null)
 const isAdmin = computed(() => currentUser.value?.email === 'contact@c-braindesign.com')
 
 const recruitForm = ref({ name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' })
+const selectedCvFile = ref(null)
 const supportForm = ref({ name: '', email: '', category: '', subject: '', content: '' })
 
 const adminInquiries = ref([])
@@ -279,6 +280,31 @@ const handleRecruitSubmit = async () => {
     time: now
   }
 
+  let cvUrl = ''
+  if (selectedCvFile.value) {
+    if (!supabase) { alert('Supabase 연결 오류로 파일을 업로드할 수 없습니다.'); return }
+    try {
+      const fileExt = selectedCvFile.value.name.split('.').pop()
+      const fileName = `${Date.now()}_cv.${fileExt}`
+      const { data, error } = await supabase.storage.from('resumes').upload(fileName, selectedCvFile.value)
+      if (error) {
+        alert("이력서 업로드 실패. Supabase에 'resumes' 라는 Public 버킷이 있는지 확인해주세요. 에러: " + error.message)
+        return
+      }
+      const { data: urlData } = supabase.storage.from('resumes').getPublicUrl(fileName)
+      cvUrl = urlData.publicUrl
+    } catch (err) {
+      alert("파일 처리 중 오류: " + err.message)
+      return
+    }
+  }
+
+  const finalContent = cvUrl 
+    ? `${recruitForm.value.content}\n\n[첨부된 이력서/포트폴리오 다운로드]\n${cvUrl}`
+    : recruitForm.value.content
+    
+  templateParams.message = finalContent
+
   // 1. EmailJS Attempt
   try {
     await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
@@ -295,7 +321,7 @@ const handleRecruitSubmit = async () => {
         name: recruitForm.value.name,
         email: recruitForm.value.email,
         phone: fullPhone,
-        content: recruitForm.value.content
+        content: finalContent
       }])
       if (error) throw error
       dbSuccess = true
@@ -313,8 +339,27 @@ const handleRecruitSubmit = async () => {
       alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
     }
     recruitForm.value = { name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' }
+    selectedCvFile.value = null
+    // HTML file input 리셋을 위해 꼼수 사용
+    const fileInput = document.getElementById('cvFileInput')
+    if (fileInput) fileInput.value = ''
   } else {
     alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
+  }
+}
+
+const handleCvFileChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert("파일 크기는 5MB 이하여야 합니다.")
+      e.target.value = ''
+      selectedCvFile.value = null
+      return
+    }
+    selectedCvFile.value = file
+  } else {
+    selectedCvFile.value = null
   }
 }
 
@@ -1126,6 +1171,12 @@ onMounted(() => {
              <div class="recruit-input-group">
                <label>{{ t.recruit.email }}</label>
                <input type="email" v-model="recruitForm.email" required />
+             </div>
+             
+             <div class="recruit-input-group">
+               <label>{{ currentLang === 'ko' ? '이력서/포트폴리오 첨부 (PDF, Word, ZIP)' : 'Attach CV/Portfolio (PDF, Word, ZIP)' }}</label>
+               <input id="cvFileInput" type="file" @change="handleCvFileChange" accept=".pdf,.doc,.docx,.zip" />
+               <small style="color: #9DA1B4; margin-top:-5px;">(최대 5MB 제한)</small>
              </div>
              
              <div class="recruit-input-group">
