@@ -75,9 +75,16 @@ const adminReplyText = ref('')
 
 const formatContent = (text) => {
   if (!text) return ''
-  return text
-    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #59B3D9; text-decoration: underline;">$1</a>')
-    .replace(/\n/g, '<br/>')
+  // 1. XSS 방지 (HTML 태그 이스케이프)
+  let safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  
+  // 2. 이력서 파일 태그 변환 [FILE:파일명|URL]
+  safeText = safeText.replace(/\[FILE:([^|]+)\|([^\]]+)\]/g, '<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline; font-weight: bold;">📎 $1</a>');
+  
+  // 3. 일반 웹 주소 변환 (단, a 태그 안의 href=" URL " 형태는 건너뜀)
+  safeText = safeText.replace(/(^|[^"'])((https?):\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline;">$2</a>');
+
+  return safeText.replace(/\n/g, '<br/>')
 }
 
 const viewDetail = (item) => {
@@ -310,7 +317,7 @@ const handleRecruitSubmit = async () => {
   }
 
   const finalContent = cvUrl 
-    ? `${recruitForm.value.content}\n\n[첨부된 이력서/포트폴리오 다운로드]\n${cvUrl}`
+    ? `${recruitForm.value.content}\n\n[첨부된 문서 다운로드]\n[FILE:${selectedCvFile.value.name}|${cvUrl}]`
     : recruitForm.value.content
     
   templateParams.message = finalContent
