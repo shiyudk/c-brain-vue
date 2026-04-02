@@ -71,14 +71,24 @@ const userOrders = ref([])
 
 const selectedItemDetail = ref(null)
 const showDetailModal = ref(false)
+const adminReplyText = ref('')
+
+const formatContent = (text) => {
+  if (!text) return ''
+  return text
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #59B3D9; text-decoration: underline;">$1</a>')
+    .replace(/\n/g, '<br/>')
+}
 
 const viewDetail = (item) => {
   selectedItemDetail.value = item
+  adminReplyText.value = item.admin_reply || ''
   showDetailModal.value = true
 }
 
 const closeDetailModal = () => {
   selectedItemDetail.value = null
+  adminReplyText.value = ''
   showDetailModal.value = false
 }
 const handleLogout = async () => {
@@ -420,6 +430,35 @@ const updateStatus = async (table, id, newStatus, field = 'status') => {
   }
 
   console.log('Update success!')
+}
+
+const submitAdminReply = async (id) => {
+  if (!supabase || !isAdmin.value) return
+  try {
+    const { error } = await supabase
+      .from('inquiries')
+      .update({ admin_reply: adminReplyText.value, status: 'completed' })
+      .eq('id', id)
+      
+    if (error) {
+      alert("데이터베이스에 'admin_reply' (text) 컬럼이 존재하는지 확인해주세요! 에러: " + error.message)
+      return
+    }
+    
+    alert('답변이 저장되었습니다.')
+    // 로컬 데이터 갱신
+    if (selectedItemDetail.value) {
+      selectedItemDetail.value.admin_reply = adminReplyText.value
+      selectedItemDetail.value.status = 'completed'
+    }
+    const item = adminInquiries.value.find(i => i.id === id)
+    if (item) {
+      item.admin_reply = adminReplyText.value
+      item.status = 'completed'
+    }
+  } catch (err) {
+    alert("오류 발생: " + err.message)
+  }
 }
 
 const goToAdmin = () => {
@@ -1412,7 +1451,30 @@ onMounted(() => {
           
           <div class="detail-desc-box">
              <label>내용 원문</label>
-             <div class="content-text">{{ selectedItemDetail?.content }}</div>
+             <div class="content-text" v-html="formatContent(selectedItemDetail?.content)"></div>
+          </div>
+
+          <!-- 답변 섹션 (문의내역인 경우에만: subject 속성으로 판별) -->
+          <div v-if="selectedItemDetail?.subject" class="detail-desc-box" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+             <label>관리자 답변</label>
+             
+             <!-- 관리자 시점: 답변 작성/수정 -->
+             <div v-if="isAdmin">
+                <textarea rows="4" v-model="adminReplyText" placeholder="고객에게 보낼 답변을 작성하세요" style="width: 100%; border-radius: 6px; padding: 10px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1); margin-top: 8px;"></textarea>
+                <div style="text-align: right; margin-top: 10px;">
+                  <button class="primary-btn" style="padding: 8px 16px; font-size: 0.9rem;" @click="submitAdminReply(selectedItemDetail.id)">답변 저장 및 완료처리</button>
+                </div>
+             </div>
+             
+             <!-- 일반 사용자 시점: 답변 열람 -->
+             <div v-else>
+                <div class="content-text" v-if="selectedItemDetail?.admin_reply" style="background: rgba(89, 179, 217, 0.1); border-left: 4px solid #59B3D9; padding: 15px; border-radius: 4px; margin-top: 8px;">
+                  <span v-html="formatContent(selectedItemDetail.admin_reply)"></span>
+                </div>
+                <div v-else class="content-text" style="color: #888; font-style: italic; margin-top: 8px;">
+                  아직 답변이 등록되지 않았습니다.
+                </div>
+             </div>
           </div>
         </div>
         
