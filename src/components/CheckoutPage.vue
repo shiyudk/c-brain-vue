@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch, watchEffect } from 'vue';
+
 import { loadPaymentWidget } from '@tosspayments/payment-widget-sdk';
 import { useRouter } from 'vue-router';
 import { supabase } from '../supabase.js';
