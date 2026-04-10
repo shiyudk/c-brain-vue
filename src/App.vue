@@ -1,442 +1,102 @@
-<!-- Terminology Update Trigger -->
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-import CheckoutPage from './components/CheckoutPage.vue'
-import AuthPage from './components/AuthPage.vue'
+import { onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { supabase } from './supabase.js'
-import emailjs from '@emailjs/browser'
+import { 
+  state, t, isAdmin, 
+  fetchAdminData, fetchUserDashboardData, 
+  logout 
+} from './store'
 
-const currentUser = ref(null)
-const isAdmin = computed(() => currentUser.value?.email === 'contact@c-braindesign.com')
-
-const recruitForm = ref({ name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' })
-const selectedCvFile = ref(null)
-const supportForm = ref({ name: '', email: '', category: '', subject: '', content: '' })
-
-const adminInquiries = ref([])
-const adminRecruitments = ref([])
-const adminOrders = ref([])
-const adminActiveTab = ref('inquiries')
-
-const selectedInquiries = ref([])
-const selectedRecruitments = ref([])
-
-const deleteSelected = async (type) => {
-  if (!supabase || !isAdmin.value) return
-  
-  const selectedList = type === 'inquiries' ? selectedInquiries.value : selectedRecruitments.value
-  const table = type === 'inquiries' ? 'inquiries' : 'recruitment_applications'
-  
-  if (selectedList.length === 0) {
-    alert('삭제할 항목을 선택해주세요.')
-    return
-  }
-  
-  if (!confirm(`선택한 ${selectedList.length}개의 항목을 정말 삭제하시겠습니까?`)) return
-  
-  try {
-    const { error } = await supabase.from(table).delete().in('id', selectedList)
-    if (error) throw error
-    
-    // Update local state
-    if (type === 'inquiries') {
-      adminInquiries.value = adminInquiries.value.filter(item => !selectedList.includes(item.id))
-      selectedInquiries.value = []
-    } else {
-      adminRecruitments.value = adminRecruitments.value.filter(item => !selectedList.includes(item.id))
-      selectedRecruitments.value = []
-    }
-    
-    alert('삭제되었습니다.')
-  } catch (err) {
-    console.error('Delete error:', err)
-    alert(`삭제 실패: ${err.message}`)
-  }
-}
-
-const toggleAll = (type) => {
-  const list = type === 'inquiries' ? adminInquiries.value : adminRecruitments.value
-  const selected = type === 'inquiries' ? selectedInquiries : selectedRecruitments
-  
-  if (selected.value.length === list.length) {
-    selected.value = []
-  } else {
-    selected.value = list.map(item => item.id)
-  }
-}
-
-const userInquiries = ref([])
-const userRecruitments = ref([])
-const userOrders = ref([])
-
-const selectedItemDetail = ref(null)
-const showDetailModal = ref(false)
-const adminReplyText = ref('')
+const router = useRouter()
+const route = useRoute()
 
 const formatContent = (text) => {
   if (!text) return ''
-  // 1. XSS 방지 (HTML 태그 이스케이프)
   let safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  
-  // 2. 이력서 파일 태그 변환 [FILE:파일명|URL]
   safeText = safeText.replace(/\[FILE:([^|]+)\|([^\]]+)\]/g, '<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline; font-weight: bold;">📎 $1</a>');
-  
-  // 3. 일반 웹 주소 변환 (단, a 태그 안의 href=" URL " 형태는 건너뜀)
   safeText = safeText.replace(/(^|[^"'])((https?):\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline;">$2</a>');
-
   return safeText.replace(/\n/g, '<br/>')
 }
 
-const viewDetail = (item) => {
-  selectedItemDetail.value = item
-  adminReplyText.value = item.admin_reply || ''
-  showDetailModal.value = true
-}
-
-const closeDetailModal = () => {
-  selectedItemDetail.value = null
-  adminReplyText.value = ''
-  showDetailModal.value = false
-}
 const handleLogout = async () => {
-  if (supabase) {
-    await supabase.auth.signOut()
-    currentUser.value = null
-    goHome()
-  }
+  await logout()
+  router.push({ name: 'home' })
 }
 
-const currentLang = ref('ko')
-
-const translations = {
-  ko: {
-    nav: { mall: '쇼핑몰', support: '고객지원', jobs: '채용정보', signup: '회원가입', company: '회사소개', ai: 'AI로봇 컨설팅', personal: '퍼스널 컨설팅', kids: '키즈 컨설팅', search: '검색' },
-    recruit: {
-      title: 'Brain Design 파트너 컨설턴트 상시 모집',
-      desc: '기업 교육 및 코칭 분야의 다양한 경험과 전문성 갖춘 컨설턴트 분들을 환영합니다!',
-      name: '이름',
-      phone: '연락처',
-      email: '이메일',
-      content: '내용',
-      submit: '작성'
-    },
-    support: {
-      title: '고객지원 및 문의',
-      desc: '궁금하신 점이나 상담이 필요하신 내용을 남겨주시면 정성껏 답변해 드리겠습니다.',
-      name: '성함',
-      email: '이메일 주소',
-      phone: '연락처 (선택)',
-      category: '문의 유형',
-      cat1: '제품 관련 문의',
-      cat2: '컨설팅 상담 예약',
-      cat3: '기타 문의',
-      subject: '제목',
-      content: '문의 내용',
-      submit: '문의하기'
-    },
-    hero: { quote1: '"시스템은 자유를 제한하는 것이 아니라,<br>더 큰 자유로 가는 길을 여는 것입니다."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: '현대인의 의사결정 위기', crisisDesc1: '우리는 매 순간 수많은 정보와 감정의 파도 속에서 결정을 내립니다. 하지만 그 결정이 정말 당신의 의지에 의한 것입니까?', crisisDesc2: '<strong>파편화된 선택과 순간의 충동</strong>은 우리의 삶을 불안정한 궤도로 몰아넣고 있습니다.', waverTitle: '왜 우리는 항상 흔들리는가', waverSub: '신경계 구조의 관점', waverDesc: '우리의 뇌는 <strong>불확실성</strong>을 생존의 위협으로 간주합니다. 기준이 없는 선택은 뇌의 \'편도체\'를 자극하여 불안을 증폭시킵니다.', waverBox: '🧠 <strong>감정 vs 시스템:</strong> 감정은 위험을 알리는 \'신호\'일 뿐이며, 의사결정의 \'기준\'이 되어서는 안 됩니다.', signalTitle: '감정은 신호지, 기준이 아니다', signalList1: '<strong>생각이 많을수록 인생이 느려지는 이유:</strong> 기준 없이 감정에 매몰되어 \'생각의 루프\'에 갇히기 때문입니다.', signalList2: '<strong>불안한 사람일수록 기준이 필요하다:</strong> 외부 환경이 흔들릴 때 나를 잡아줄 수 있는 것은 오직 명확한 \'판단 기준\'뿐입니다.', signalList3: '<strong>치유가 아닌 설계:</strong> 불안을 달래는 힐링보다, 불안 속에서도 작동하는 사고 구조를 만드는 것이 핵심입니다.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: '시스템이 감정을 앞섭니다', systemDesc1: '인간의 의지력은 고갈되는 자원입니다. 우리는 감정에 의존하지 않아도 일관된 성과를 낼 수 있는 실행 프로세스를 구축합니다.', systemDesc2: '기분이 좋지 않아도, 의지가 약해져도 작동하는 견고한 시스템이 당신의 일상을 보호합니다.' },
-    products: { ai: 'AI로봇 기반 컨설팅', personal: '하이엔드 퍼스널 컨설팅', kids: '프리미엄 키즈 컨설팅', cakeKnife: '케익칼', dipSauce: '딥소스', otherProducts: 'Brain Design 기타 제품', inquireBtn: '견적문의', purchaseBtn: '구매하기' },
-    detail: { backBtn: '← 뒤로가기', detailInfo: '상세 정보', shipping: '🚚 <strong>배송 안내:</strong> 결제 완료 후 <strong>3일 이내</strong>에 안전하게 배송해 드립니다.', payCake: '결제하기 (2,000원)', payDip: '결제하기 (8,000원)' },
-    checkout: { title: '결제/상담예약' },
-    modal: { title: '견적 및 상담 문의', desc: '아래 이메일로 편하게 문의를 남겨주시면 빠르게 답변해 드리겠습니다.', copy: '주소 복사하기', app: '메일 앱 열기' },
-    footer: { company: '상호명: 컨티뉴엄 브레인 디자인 (CBD) | 대표자명: 윤신희', bizNo: '사업자등록번호: 746-36-01588 | 통신판매업신고번호: 제2026-서울동대문-0710호 | 사업장 주소: 서울특별시 동대문구 한천로 46길 85-6', contact: '대표문의: contact@c-braindesign.com | 대표번호: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' },
-    cart: { title: '장바구니', empty: '장바구니가 비어있습니다.', addBtn: '장바구니 담기', checkout: '선택 상품 결제', checkoutAll: '전체 상품 결제', delete: '삭제', total: '총 결제 금액', guest: '비회원 구매' },
-    policy: {
-      returnTitle: '교환 및 반품 정보',
-      refundInfo: '/ 환불 & 교환\n- 환불 및 교환은 수령하신 날을 포함하여 7일 내에 요청을 해주셔야만 가능합니다. (홈페이지 내 Q&A 접수)\n- 오염 및 미세한 잡사, 착용의 흔적, 수령 후 7일 이후 환불/교환 신청은 불가하니 참고부탁드립니다.\n- 단순 변심은 왕복 배송비 5000원이 청구됩니다.',
-      addrTitle: '/ 반품 주소',
-      addr: '서울특별시 동대문구 한천로 46길 85-6',
-      shippingNotice: '* 색상 교환 및 고객 변심은 고객 부담 왕복 배송비입니다. (사이즈 교환 포함)',
-      shippingTitle: '배송정보',
-      shippingDetail: '/ 배송안내\n배송방법 : 택배\n배송지역 : 전국 지역',
-      cancelTitle: '제 19조 결제 취소 & 환불',
-      cancelDetail: '① 회사와 구매에 관한 계약을 체결한 회원은 아래와 같이 결제에 대한 취소 및 환불을 요구할 수 있습니다.\n- 이용계약의 신청 후, 회사로부터의 상담이 제공되지 않은 경우, 결제취소가 가능합니다.\n- 회원이 상담 후 상대 프로필카드를 2회 이상 수령한 경우, 잔여횟수가 남은 회원에 한하여 이용 금액과 위약금 10%를 제외한 부분 환불이 가능합니다.'
-    },
-    mypage: {
-      title: '마이페이지',
-      welcome: '님, 반갑습니다.',
-      orderStatus: '주문/배송 현황',
-      cartStatus: '장바구니 현황',
-      inquiryStatus: '문의 현황',
-      recruitStatus: '채용 지원 현황',
-      empty: '내역이 없습니다.',
-      viewCart: '장바구니 보기',
-      totalOrders: '총 주문',
-      activeDelivery: '배송중',
-      itemsInCart: '담긴 상품',
-      myInquiries: '내 문의 내역',
-      myApps: '채용 지원 내역'
-    }
-  },
-  en: {
-    nav: { mall: 'Shop', support: 'Support', jobs: 'Careers', signup: 'Sign Up', company: 'Philosophy', ai: 'AI Algorithm', personal: 'Personal Core', kids: 'Kids Program', search: 'Search' },
-    recruit: {
-      title: 'Partner Consultants Recruitment',
-      desc: 'We welcome consultants with diverse experience and expertise in corporate training and coaching!',
-      name: 'Name',
-      phone: 'Phone',
-      email: 'Email',
-      content: 'Message',
-      submit: 'Submit'
-    },
-    support: {
-      title: 'Customer Support & Inquiry',
-      desc: 'Please leave any questions or consultation requests, and we will respond promptly.',
-      name: 'Full Name',
-      email: 'Email Address',
-      phone: 'Phone (Optional)',
-      category: 'Inquiry Category',
-      cat1: 'Product-related',
-      cat2: 'Consultation Booking',
-      cat3: 'Other Inquiries',
-      subject: 'Subject',
-      content: 'Message content',
-      submit: 'Submit Inquiry'
-    },
-    hero: { quote1: '"A system does not restrict freedom,<br>but opens the path to greater freedom."', quote2: '— Clarity over Impulse Philosophy', crisisTitle: 'The Crisis of Decision Making', crisisDesc1: 'We make decisions amidst a sea of information and emotions. But are those decisions truly yours?', crisisDesc2: '<strong>Fragmented choices and momentary impulses</strong> are driving our lives into an unstable orbit.', waverTitle: 'Why We Always Waver', waverSub: 'A Nervous System Perspective', waverDesc: 'Our brains interpret <strong>uncertainty</strong> as a threat. Choices without standards stimulate the amygdala, amplifying anxiety.', waverBox: '🧠 <strong>Emotion vs System:</strong> Emotion is a \'signal\' for danger, not a \'standard\' for decision making.', signalTitle: 'Emotion is a Signal, Not a Standard', signalList1: '<strong>Why overthinking slows down life:</strong> Being trapped in a \'thought loop\' without clear standards.', signalList2: '<strong>Anxiety begs standardizations:</strong> Only clear \'judgments\' can ground you when the environment shakes.', signalList3: '<strong>Design, not healing:</strong> The key is building a thought process that works even in anxiety.', systemTitle: 'SYSTEM BEFORE<br>EMOTIONS', systemSub: 'The System Precedes Emotion', systemDesc1: 'Human willpower is a depleting resource. We build execution processes that yield consistent results without relying on emotions.', systemDesc2: 'A solid system protects your daily life, even when you\'re feeling down or weak.' },
-    products: { ai: 'AI Algorithm Check', personal: 'High-End Personal Core', kids: 'Premium Kids Builder', cakeKnife: 'Cake Knife', dipSauce: 'Dipping Sauce', otherProducts: 'Brain Design Other Products', inquireBtn: 'Inquire', purchaseBtn: 'Purchase' },
-    detail: { backBtn: '← Back', detailInfo: 'Details', shipping: '🚚 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
-    checkout: { title: 'Checkout / Booking' },
-    modal: { title: 'Quote & Inquiry', desc: 'Please leave inquiries via email below for a rapid response.', copy: 'Copy Address', app: 'Open Mail App' },
-    footer: { company: 'Company: Continuum Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: 제2026-서울동대문-0710호 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum Brain Design. All rights reserved.' },
-    cart: { title: 'Shopping Cart', empty: 'Your cart is empty.', addBtn: 'Add to Cart', checkout: 'Checkout Selected', checkoutAll: 'Checkout All', delete: 'Delete', total: 'Total Amount', guest: 'Guest Checkout' },
-    policy: {
-      returnTitle: 'Exchange & Return Info',
-      refundInfo: '/ Refund & Exchange\n- Requests must be made within 7 days of receipt.\n- Items with stains, yarn defects, or signs of wear cannot be refunded/exchanged after 7 days.\n- A round-trip shipping fee of 5,000 KRW applies for simple change of mind.',
-      addrTitle: '/ Return Address',
-      addr: '85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul',
-      shippingNotice: '* Round-trip shipping for color/size exchange or change of mind is at the customer\'s expense.',
-      shippingTitle: 'Shipping Info',
-      shippingDetail: '/ Shipping Guide\nMethod: Courier\nRegion: Nationwide',
-      cancelTitle: 'Article 19: Cancellation & Refund',
-      cancelDetail: '① Members who have entered into a contract with the company may request cancellation and refund as follows.\n- Cancellation is possible if no consultation has been provided after the application.\n- If a profile card has been received twice or more after consultation, a partial refund excluding utilized amount and a 10% penalty is possible for remaining sessions.'
-    },
-    mypage: {
-      title: 'My Page',
-      welcome: ', Welcome back.',
-      orderStatus: 'Orders / Delivery',
-      cartStatus: 'Shopping Cart',
-      inquiryStatus: 'Support Inquiries',
-      recruitStatus: 'Recruitment Status',
-      empty: 'No records found.',
-      viewCart: 'View Cart',
-      totalOrders: 'Total Orders',
-      activeDelivery: 'Shipping',
-      itemsInCart: 'Items in Cart',
-      myInquiries: 'Inquiry History',
-      myApps: 'Application History'
-    }
-  }
+const toggleMobileMenu = () => {
+  state.isMobileMenuOpen = !state.isMobileMenuOpen
+  document.body.style.overflow = state.isMobileMenuOpen ? 'hidden' : ''
 }
 
-const t = computed(() => translations[currentLang.value])
-
-const currentView = ref('home')
-const selectedProduct = ref('')
-const selectedDetailProduct = ref(null)
-const checkoutAmount = ref(0)
-const currentAuthMode = ref('login')
-const isMobileMenuOpen = ref(false)
-const savedScrollY = ref(0)
-const previousView = ref('home')
-
-const goToDetail = (productName) => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  selectedDetailProduct.value = productName
-  currentView.value = 'detail'
-  window.scrollTo(0, 0)
+const goHome = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'home' })
 }
 
-const goToAuth = (mode = 'login', isMobile = false) => {
-  currentAuthMode.value = mode
-  if (isMobile && isMobileMenuOpen.value) {
-    toggleMobileMenu()
+const goToMall = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'mall' })
+}
+
+const goToMyPage = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  if (!state.currentUser) {
+    router.push({ name: 'auth', query: { mode: 'login' } })
+    return
   }
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'auth'
-  window.scrollTo(0, 0)
+  fetchUserDashboardData()
+  router.push({ name: 'mypage' })
+}
+
+const goToCart = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'cart' })
 }
 
 const goToSupport = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'support'
-  window.scrollTo(0, 0)
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'support' })
 }
 
 const goToJobs = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'recruit'
-  window.scrollTo(0, 0)
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'recruit' })
 }
 
-const handleRecruitSubmit = async () => {
-  let emailSuccess = false
-  let dbSuccess = false
-  let errorMsg = ''
+const goToAuth = (mode = 'login') => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'auth', query: { mode } })
+}
 
-  const fullPhone = `${recruitForm.value.phone1}-${recruitForm.value.phone2}-${recruitForm.value.phone3}`
-  const now = new Date().toLocaleString()
-  const templateParams = {
-    name: recruitForm.value.name,
-    email: recruitForm.value.email,
-    phone: fullPhone,
-    message: recruitForm.value.content,
-    title: '채용 지원 (Recruitment)',
-    time: now
-  }
+const goToAdmin = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'admin' })
+}
 
-  let cvUrl = ''
-  if (selectedCvFile.value) {
-    if (!supabase) { alert('Supabase 연결 오류로 파일을 업로드할 수 없습니다.'); return }
-    try {
-      const fileExt = selectedCvFile.value.name.split('.').pop()
-      const fileName = `${Date.now()}_cv.${fileExt}`
-      const { data, error } = await supabase.storage.from('resumes').upload(fileName, selectedCvFile.value)
-      if (error) {
-        alert("이력서 업로드 실패. Supabase에 'resumes' 라는 Public 버킷이 있는지 확인해주세요. 에러: " + error.message)
-        return
-      }
-      const { data: urlData } = supabase.storage.from('resumes').getPublicUrl(fileName)
-      cvUrl = urlData.publicUrl
-    } catch (err) {
-      alert("파일 처리 중 오류: " + err.message)
-      return
-    }
-  }
-
-  const finalContent = cvUrl 
-    ? `${recruitForm.value.content}\n\n[첨부된 문서 다운로드]\n[FILE:${selectedCvFile.value.name}|${cvUrl}]`
-    : recruitForm.value.content
-    
-  templateParams.message = finalContent
-
-  // 1. EmailJS Attempt
-  try {
-    await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
-    emailSuccess = true
-  } catch (err) {
-    console.error('EmailJS Error:', err)
-    errorMsg += `[Email Error: ${err.text || err.message || 'Unknown'}] `
-  }
-
-  // 2. Supabase Attempt
-  try {
-    if (supabase) {
-      const { error } = await supabase.from('recruitment_applications').insert([{
-        name: recruitForm.value.name,
-        email: recruitForm.value.email,
-        phone: fullPhone,
-        content: finalContent
-      }])
-      if (error) throw error
-      dbSuccess = true
-      if (currentUser.value) fetchUserDashboardData()
-    }
-  } catch (err) {
-    console.error('Database Error:', err)
-    errorMsg += `[DB Error: ${err.message || 'Table not found? Check SQL setup'}] `
-  }
-
-  if (emailSuccess || dbSuccess) {
-    if (emailSuccess && !dbSuccess) {
-      alert(currentLang.value === 'ko' ? '메일은 발송되었으나, 내역 저장(DB)에 실패했습니다. SQL 설정을 확인해주세요.' : 'Email sent, but DB save failed. Check SQL setup.')
-    } else {
-      alert(currentLang.value === 'ko' ? '지원되었습니다.' : 'Applied successfully.')
-    }
-    recruitForm.value = { name: '', email: '', phone1: '010', phone2: '', phone3: '', content: '' }
-    selectedCvFile.value = null
-    // HTML file input 리셋을 위해 꼼수 사용
-    const fileInput = document.getElementById('cvFileInput')
-    if (fileInput) fileInput.value = ''
+const scrollToPhilosophy = () => {
+  if (route.name !== 'home') {
+    router.push({ name: 'home', hash: '#philosophy' })
   } else {
-    alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
+    const el = document.getElementById('philosophy')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
 }
 
-const handleCvFileChange = (e) => {
-  const file = e.target.files[0]
-  if (file) {
-    if (file.size > 5 * 1024 * 1024) {
-      alert("파일 크기는 5MB 이하여야 합니다.")
-      e.target.value = ''
-      selectedCvFile.value = null
-      return
-    }
-    selectedCvFile.value = file
+const scrollToConsulting = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  if (route.name !== 'home') {
+    router.push({ name: 'home', hash: '#consulting-boxes' })
   } else {
-    selectedCvFile.value = null
+    const el = document.getElementById('consulting-boxes')
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }
 }
 
-const fetchAdminData = async () => {
-  if (!supabase || !isAdmin.value) return
-  const { data: inq } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
-  const { data: rec } = await supabase.from('recruitment_applications').select('*').order('created_at', { ascending: false })
-  const { data: ord } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
-  
-  adminInquiries.value = inq || []
-  adminRecruitments.value = rec || []
-  adminOrders.value = ord || []
-}
-
-const updateStatus = async (table, id, newStatus, field = 'status') => {
-  if (!supabase || !isAdmin.value) {
-    alert('관리자 권한이 없습니다.')
-    return
-  }
-  
-  console.log(`[Updating] ${table} ID:${id} to ${newStatus}`)
-
-  const updateData = {}
-  updateData[field] = newStatus
-  
-  // 1. 서버 업데이트 시도
-  const { data, error } = await supabase
-    .from(table)
-    .update(updateData)
-    .eq('id', id)
-    .select()
-
-  if (error) {
-    console.error('Update operation failed:', error)
-    alert(`[치명적 오류] ${error.message}`)
-    await fetchAdminData()
-    return
-  }
-
-  // 업데이트된 데이터가 없다면 (RLS 등에 막힘)
-  if (!data || data.length === 0) {
-    console.warn('0 rows affected. RLS may be blocking.')
-    alert('서버 권한 문제로 저장이 거부되었습니다.\nSQL Editor에서 DISABLE ROW LEVEL SECURITY를 실행해주세요.')
-    await fetchAdminData()
-    return
-  }
-
-  // 2. 성공 시 로컬 데이터를 즉시 갱신하고 알림 없이 종료
-  if (table === 'inquiries') {
-    const item = adminInquiries.value.find(i => i.id === id)
-    if (item) item[field] = newStatus
-  } else if (table === 'recruitment_applications') {
-    const item = adminRecruitments.value.find(i => i.id === id)
-    if (item) item[field] = newStatus
-  } else if (table === 'orders') {
-    const item = adminOrders.value.find(i => i.id === id)
-    if (item) item[field] = newStatus
-  }
-
-  console.log('Update success!')
+const closeDetailModal = () => {
+  state.showDetailModal = false
+  state.selectedItemDetail = null
+  state.adminReplyText = ''
 }
 
 const submitAdminReply = async (id) => {
@@ -444,23 +104,22 @@ const submitAdminReply = async (id) => {
   try {
     const { error } = await supabase
       .from('inquiries')
-      .update({ admin_reply: adminReplyText.value, status: 'completed' })
+      .update({ admin_reply: state.adminReplyText, status: 'completed' })
       .eq('id', id)
       
     if (error) {
-      alert("데이터베이스에 'admin_reply' (text) 컬럼이 존재하는지 확인해주세요! 에러: " + error.message)
+      alert("데이터베이스 오류: " + error.message)
       return
     }
     
     alert('답변이 저장되었습니다.')
-    // 로컬 데이터 갱신
-    if (selectedItemDetail.value) {
-      selectedItemDetail.value.admin_reply = adminReplyText.value
-      selectedItemDetail.value.status = 'completed'
+    if (state.selectedItemDetail) {
+      state.selectedItemDetail.admin_reply = state.adminReplyText
+      state.selectedItemDetail.status = 'completed'
     }
-    const item = adminInquiries.value.find(i => i.id === id)
+    const item = state.adminInquiries.find(i => i.id === id)
     if (item) {
-      item.admin_reply = adminReplyText.value
+      item.admin_reply = state.adminReplyText
       item.status = 'completed'
     }
   } catch (err) {
@@ -468,250 +127,9 @@ const submitAdminReply = async (id) => {
   }
 }
 
-const goToAdmin = () => {
-  currentView.value = 'admin'
-  fetchAdminData()
-}
-
-const handleSupportSubmit = async () => {
-  let emailSuccess = false
-  let dbSuccess = false
-  let errorMsg = ''
-
-  const now = new Date().toLocaleString()
-  const templateParams = {
-    name: supportForm.value.name,
-    email: supportForm.value.email,
-    category: supportForm.value.category,
-    subject: supportForm.value.subject,
-    message: supportForm.value.content,
-    title: `고객 문의: ${supportForm.value.subject}`,
-    time: now
-  }
-
-  // 1. EmailJS Attempt
-  try {
-    await emailjs.send('service_9dms7il', 'template_6umfzgp', templateParams, '5-NmkSe__nzMYraLo')
-    emailSuccess = true
-  } catch (err) {
-    console.error('EmailJS Error:', err)
-    errorMsg += `[Email Error: ${err.text || err.message || 'Unknown'}] `
-  }
-
-  // 2. Supabase Attempt
-  try {
-    if (supabase) {
-      const { error } = await supabase.from('inquiries').insert([{
-        name: supportForm.value.name,
-        email: supportForm.value.email,
-        category: supportForm.value.category,
-        subject: supportForm.value.subject,
-        content: supportForm.value.content
-      }])
-      if (error) throw error
-      dbSuccess = true
-      if (currentUser.value) fetchUserDashboardData()
-    }
-  } catch (err) {
-    console.error('Database Error:', err)
-    errorMsg += `[DB Error: ${err.message || 'Table not found? Check SQL setup'}] `
-  }
-
-  if (emailSuccess || dbSuccess) {
-    if (emailSuccess && !dbSuccess) {
-      alert(currentLang.value === 'ko' ? '메일은 발송되었으나, 내역 저장(DB)에 실패했습니다. SQL 설정을 확인해주세요.' : 'Email sent, but DB save failed. Check SQL setup.')
-    } else {
-      alert(currentLang.value === 'ko' ? '문의가 접수되었습니다. 곧 답변해 드리겠습니다!' : 'Inquiry received. We will respond shortly!')
-    }
-    supportForm.value = { name: '', email: '', category: '', subject: '', content: '' }
-  } else {
-    alert(currentLang.value === 'ko' ? `전송 실패: ${errorMsg}` : `Submission failed: ${errorMsg}`)
-  }
-}
-
-const fetchUserDashboardData = async () => {
-  if (!supabase || !currentUser.value) return
-  const userEmail = currentUser.value.email
-  
-  const { data: inq } = await supabase.from('inquiries').select('*').eq('email', userEmail).order('created_at', { ascending: false })
-  const { data: rec } = await supabase.from('recruitment_applications').select('*').eq('email', userEmail).order('created_at', { ascending: false })
-  const { data: ord } = await supabase.from('orders').select('*').eq('user_email', userEmail).order('created_at', { ascending: false })
-  
-  userInquiries.value = inq || []
-  userRecruitments.value = rec || []
-  userOrders.value = ord || []
-}
-
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-  document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : ''
-}
-
-const goToCheckout = (productName, amount = 0) => {
-  if (currentView.value === 'home' || currentView.value === 'mall' || currentView.value === 'cart') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  selectedProduct.value = productName
-  checkoutAmount.value = amount
-  currentView.value = 'checkout'
-  window.scrollTo(0, 0)
-}
-
-const goBackFromCheckout = () => {
-  if (previousView.value === 'cart') {
-    currentView.value = 'cart'
-    window.scrollTo(0, 0)
-  } else if (previousView.value === 'detail') {
-    currentView.value = 'detail'
-    previousView.value = 'home'
-    window.scrollTo(0, 0)
-  } else {
-    goHome()
-  }
-}
-
-const goHome = () => {
-  currentView.value = 'home'
-  previousView.value = 'home'
-  setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
-}
-
-const goToMall = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'mall'
-  window.scrollTo(0, 0)
-}
-
-const goToMyPage = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'mypage'
-  fetchUserDashboardData()
-  window.scrollTo(0, 0)
-}
-
-const scrollToPhilosophy = () => {
-  const el = document.getElementById('philosophy')
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth' })
-  }
-}
-
-const scrollToConsulting = (isMobile = false) => {
-  if (isMobile && isMobileMenuOpen.value) {
-    toggleMobileMenu()
-  }
-  if (currentView.value !== 'home') {
-    goHome()
-    setTimeout(() => {
-      const el = document.getElementById('consulting-boxes')
-      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    }, 100)
-    return
-  }
-  const el = document.getElementById('consulting-boxes')
-  if (el) {
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }
-}
-
-// ----------------------------------------------------
-// Cart Logic
-// ----------------------------------------------------
-const cart = ref(JSON.parse(localStorage.getItem('cbd_cart') || '[]'))
-
-watch(cart, (newVal) => {
-  localStorage.setItem('cbd_cart', JSON.stringify(newVal))
-}, { deep: true })
-
-const addToCart = (productName) => {
-  const price = productName === '케익칼' ? 2000 : 8000
-  const existingItem = cart.value.find(item => item.name === productName)
-  
-  if (existingItem) {
-    existingItem.quantity++
-  } else {
-    cart.value.push({
-      id: Date.now(),
-      name: productName,
-      price: price,
-      quantity: 1,
-      selected: true
-    })
-  }
-  alert(currentLang.value === 'ko' ? '장바구니에 담겼습니다!' : 'Added to cart!')
-}
-
-const removeFromCart = (id) => {
-  cart.value = cart.value.filter(item => item.id !== id)
-}
-
-const updateQuantity = (id, delta) => {
-  const item = cart.value.find(i => i.id === id)
-  if (item) {
-    const newQty = item.quantity + delta
-    if (newQty > 0) item.quantity = newQty
-  }
-}
-
-const shippingFee = 3000
-
-const cartItemsTotal = computed(() => {
-  return cart.value
-    .filter(item => item.selected)
-    .reduce((sum, item) => sum + (item.price * item.quantity), 0)
-})
-
-const cartTotal = computed(() => {
-  const base = cartItemsTotal.value
-  return base > 0 ? base + shippingFee : 0
-})
-
-const goToCart = () => {
-  if (currentView.value === 'home') {
-    savedScrollY.value = window.scrollY
-  }
-  previousView.value = currentView.value
-  currentView.value = 'cart'
-  window.scrollTo(0, 0)
-}
-
-const checkoutFromCart = (isGuest = false) => {
-  const selectedItems = cart.value.filter(item => item.selected)
-  if (selectedItems.length === 0) {
-    alert(currentLang.value === 'ko' ? '결제할 상품을 선택해주세요.' : 'Please select items to checkout.')
-    return
-  }
-
-  if (!isGuest && !currentUser.value) {
-    alert(currentLang.value === 'ko' ? '로그인 후 결제가 가능합니다.' : 'Please login to proceed with checkout.')
-    goToAuth('login')
-    return
-  }
-  
-  const total = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const multiName = selectedItems.length > 1 
-    ? `${selectedItems[0].name} 외 ${selectedItems.length - 1}건`
-    : selectedItems[0].name
-    
-  goToCheckout(multiName, total)
-}
-
-const showContactModal = ref(false)
-
-const sendMail = () => {
-  showContactModal.value = true
-}
-
 const copyEmail = () => {
   navigator.clipboard.writeText('contact@c-braindesign.com')
-  alert(currentLang.value === 'ko' ? '이메일 주소가 복사되었습니다!' : 'Email address copied!')
+  alert(state.currentLang === 'ko' ? '이메일 주소가 복사되었습니다!' : 'Email address copied!')
 }
 
 const triggerMailApp = () => {
@@ -721,68 +139,70 @@ const triggerMailApp = () => {
 }
 
 onMounted(() => {
-  if (supabase) {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      currentUser.value = session?.user || null
-    })
-    supabase.auth.onAuthStateChange((_event, session) => {
-      currentUser.value = session?.user || null
-      // 로그인 후 이전에 장바구니에 있었다면 다시 장바구니로 이동
-      if (session?.user && currentView.value === 'auth' && previousView.value === 'cart') {
-        currentView.value = 'cart'
-      }
-    })
-  }
+  // 강제 상단 고정 (다중 시도)
+  window.scrollTo(0, 0);
+  setTimeout(() => window.scrollTo(0, 0), 50);
+  setTimeout(() => window.scrollTo(0, 0), 300);
+  
+  const observer = new IntersectionObserver((entries) => {entries.forEach((entry) => {if (entry.isIntersecting) {entry.target.classList.add('show');}});}, { threshold: 0.1 });
+  const hiddenElements = document.querySelectorAll('.animate-hidden');
+  hiddenElements.forEach((el) => observer.observe(el));
+});
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('show')
-      }
-    })
-  }, { threshold: 0.1 })
-  const hiddenElements = document.querySelectorAll('.animate-hidden')
-  hiddenElements.forEach((el) => observer.observe(el))
+watch(() => route.hash, (newHash) => {
+  if (newHash) {
+    setTimeout(() => {
+      const el = document.querySelector(newHash)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 500)
+  }
 })
 </script>
 
 <template>
   <div class="app-container">
+    <!-- Top Utility Bar -->
     <div class="top-utility-bar">
       <div class="utility-content">
         <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
         <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
         <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
         <a href="#" v-if="isAdmin" @click.prevent="goToAdmin" style="color: #ff6b6b; font-weight: 700; margin-left: 1rem;">ADMIN</a>
-        <template v-if="currentUser">
-          <a href="#" @click.prevent="handleLogout">로그아웃</a>
+        <template v-if="state.currentUser">
+           <a href="#" @click.prevent="handleLogout">로그아웃</a>
         </template>
         <template v-else>
-          <a href="#" @click.prevent="goToAuth('signup', false)">{{ t.nav.signup }}</a>
+          <a href="#" @click.prevent="goToAuth('signup')">{{ t.nav.signup }}</a>
         </template>
       </div>
     </div>
 
+    <!-- Navbar -->
     <header class="navbar">
       <div class="nav-content">
         <a href="#" class="logo" @click.prevent="goHome">
-          <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
+          <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" loading="eager" />
         </a>
         <nav class="nav-links">
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToPhilosophy() : (goHome(), setTimeout(scrollToPhilosophy, 0))">{{ t.nav.company }}</a>
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.ai }}</a>
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.personal }}</a>
-          <a href="#" @click.prevent="currentView === 'home' ? scrollToConsulting(false) : (goHome(), setTimeout(() => scrollToConsulting(false), 0))">{{ t.nav.kids }}</a>
+          <a href="#" @click.prevent="scrollToPhilosophy">{{ t.nav.company }}</a>
+          <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.personal }}</a>
+          <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.ai }}</a>
+          <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.kids }}</a>
         </nav>
 
         <div class="nav-actions">
           <div class="lang-toggle">
-            <button @click="currentLang = 'ko'" :class="{ active: currentLang === 'ko' }" class="lang-btn">KR</button>
+            <button @click="state.currentLang = 'ko'" :class="{ active: state.currentLang === 'ko' }" class="lang-btn">KR</button>
             <span style="color:rgba(255,255,255,0.2)">|</span>
-            <button @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }" class="lang-btn">EN</button>
+            <button @click="state.currentLang = 'en'" :class="{ active: state.currentLang === 'en' }" class="lang-btn">EN</button>
           </div>
-          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToCart">🛒 <span v-if="cart.length > 0" class="cart-count">{{ cart.length }}</span></a>
-          <a href="#" class="icon-btn hide-mobile" @click.prevent="currentUser ? goToMyPage() : goToAuth('login', false)">👤</a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToCart">
+            🛒 <span v-if="state.cart.length > 0" class="cart-badge">{{ state.cart.length }}</span>
+          </a>
+          <a href="#" class="icon-btn hide-mobile my-page-icon-wrapper" @click.prevent="goToMyPage">
+            <span class="icon-emoji">👤</span>
+            <span class="my-text-label">MY</span>
+          </a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -792,721 +212,129 @@ onMounted(() => {
       </div>
     </header>
 
-    <div class="mobile-overlay" :class="{ 'is-open': isMobileMenuOpen }" @click="toggleMobileMenu"></div>
-    <div class="mobile-slide-menu" :class="{ 'is-open': isMobileMenuOpen }">
+    <!-- Mobile Slide Menu -->
+    <div class="mobile-overlay" :class="{ 'is-open': state.isMobileMenuOpen }" @click="toggleMobileMenu"></div>
+    <div class="mobile-slide-menu" :class="{ 'is-open': state.isMobileMenuOpen }">
       <div class="mobile-menu-header">
         <span class="mobile-menu-title">MENU</span>
         <button class="close-menu-btn" @click="toggleMobileMenu">✕</button>
       </div>
       <nav class="mobile-nav-links">
-        <a href="#company" @click="toggleMobileMenu">{{ t.nav.company }}</a>
-        <a href="#" @click.prevent="goToMall(); toggleMobileMenu()" style="color: #59B3D9; font-weight: 700;">{{ t.nav.mall }}</a>
-        <a href="#" @click.prevent="goToJobs(); toggleMobileMenu()">{{ t.nav.jobs }}</a>
-        <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.ai }}</a>
-        <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.personal }}</a>
-        <a href="#" @click.prevent="scrollToConsulting(true)">{{ t.nav.kids }}</a>
-        <a href="#" v-if="isAdmin" @click.prevent="goToAdmin(); toggleMobileMenu()" style="color: #ff6b6b; font-weight: 700;">ADMIN DASHBOARD</a>
-        <template v-if="currentUser">
-          <a href="#" @click.prevent="handleLogout" style="margin-top: 24px; font-weight: 700; color: #ff6b6b;">
-            {{ currentLang === 'ko' ? '로그아웃' : 'Logout' }}
-          </a>
-        </template>
-        <template v-else>
-          <a href="#" @click.prevent="goToAuth('signup', true)" style="margin-top: 24px; font-weight: 700; color: #59B3D9;">
-            {{ currentLang === 'ko' ? '회원가입' : 'Sign Up' }}
-          </a>
-        </template>
+        <a href="#" @click.prevent="scrollToPhilosophy()">{{ t.nav.company }}</a>
+        <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.personal }}</a>
+        <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.ai }}</a>
+        <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.kids }}</a>
+        <a href="#" @click.prevent="goToMall()">{{ t.nav.mall }}</a>
+        <a href="#" @click.prevent="goToJobs()">{{ t.nav.jobs }}</a>
+        <a href="#" @click.prevent="goToCart()">장바구니 ({{ state.cart.length }})</a>
+        <a href="#" @click.prevent="goToMyPage()">마이페이지</a>
+        <a href="#" v-if="isAdmin" @click.prevent="goToAdmin()" style="color: #ff6b6b; font-weight: 700;">ADMIN DASHBOARD</a>
+        <div class="mobile-lang-row">
+            <button @click="state.currentLang = 'ko'" :class="{ active: state.currentLang === 'ko' }">KOR</button>
+            <button @click="state.currentLang = 'en'" :class="{ active: state.currentLang === 'en' }">ENG</button>
+        </div>
       </nav>
     </div>
 
+    <!-- Router View for Content -->
     <main class="main-content">
-      <template v-if="currentView === 'support'">
-        <div class="recruit-view-container support-view">
-           <div class="recruit-header">
-                <h2>{{ t.support.title }}</h2>
-                <p>{{ t.support.desc }}</p>
-           </div>
-           
-           <form class="recruit-form glass-panel container-narrow" @submit.prevent="handleSupportSubmit">
-             <div class="recruit-input-group">
-               <label>{{ t.support.name }}</label>
-               <input type="text" v-model="supportForm.name" required />
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.support.email }}</label>
-               <input type="email" v-model="supportForm.email" required />
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.support.category }}</label>
-               <select required class="support-select" v-model="supportForm.category">
-                  <option value="">{{ t.support.category }}</option>
-                  <option>{{ t.support.cat1 }}</option>
-                  <option>{{ t.support.cat2 }}</option>
-                  <option>{{ t.support.cat3 }}</option>
-               </select>
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.support.subject }}</label>
-               <input type="text" v-model="supportForm.subject" required />
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.support.content }}</label>
-               <textarea rows="8" v-model="supportForm.content" required></textarea>
-             </div>
-             
-             <button type="submit" class="recruit-submit-btn">{{ t.support.submit }}</button>
-           </form>
-        </div>
-      </template>
-
-      <template v-if="currentView === 'admin'">
-        <div class="admin-view-container container">
-          <div class="admin-header">
-             <h1>Admin Control Panel</h1>
-             <div class="admin-tabs">
-               <button @click="adminActiveTab = 'inquiries'" :class="{ active: adminActiveTab === 'inquiries' }">고객 문의 ({{ adminInquiries.length }})</button>
-               <button @click="adminActiveTab = 'recruitments'" :class="{ active: adminActiveTab === 'recruitments' }">채용 지원 ({{ adminRecruitments.length }})</button>
-               <button @click="adminActiveTab = 'mall'" :class="{ active: adminActiveTab === 'mall' }">쇼핑몰 주문 ({{ adminOrders.length }})</button>
-             </div>
-          </div>
-          
-          <!-- Inquiries Admin -->
-          <div v-if="adminActiveTab === 'inquiries'" class="admin-section glass-panel">
-            <div class="admin-actions-bar" style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
-              <button @click="deleteSelected('inquiries')" class="admin-del-btn" :disabled="selectedInquiries.length === 0">선택 삭제 ({{ selectedInquiries.length }})</button>
-            </div>
-            <div class="table-scroll">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th style="width: 40px;"><input type="checkbox" :checked="selectedInquiries.length === adminInquiries.length && adminInquiries.length > 0" @change="toggleAll('inquiries')" /></th>
-                    <th>날짜</th>
-                    <th>이름</th>
-                    <th>과목</th>
-                    <th>제목</th>
-                    <th>상태</th>
-                    <th>기능</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="inq in adminInquiries" :key="inq.id" @click="viewDetail(inq)" class="clickable-row">
-                    <td @click.stop><input type="checkbox" v-model="selectedInquiries" :value="inq.id" /></td>
-                    <td>{{ new Date(inq.created_at).toLocaleDateString() }}</td>
-                    <td>{{ inq.name }}</td>
-                    <td><span class="tag-cat">{{ inq.category }}</span></td>
-                    <td class="text-truncate" style="max-width: 250px;">{{ inq.subject }}</td>
-                    <td>
-                      <span class="status-tag" :class="inq.status">{{ inq.status === 'pending' ? '확인대기' : '처리완료' }}</span>
-                    </td>
-                    <td @click.stop>
-                      <select :value="inq.status" @change="e => updateStatus('inquiries', inq.id, e.target.value)" class="admin-select">
-                        <option value="pending">확인대기</option>
-                        <option value="completed">처리완료</option>
-                      </select>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Recruitments Admin -->
-          <div v-if="adminActiveTab === 'recruitments'" class="admin-section glass-panel">
-            <div class="admin-actions-bar" style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
-              <button @click="deleteSelected('recruitments')" class="admin-del-btn" :disabled="selectedRecruitments.length === 0">선택 삭제 ({{ selectedRecruitments.length }})</button>
-            </div>
-            <div class="table-scroll">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th style="width: 40px;"><input type="checkbox" :checked="selectedRecruitments.length === adminRecruitments.length && adminRecruitments.length > 0" @change="toggleAll('recruitments')" /></th>
-                    <th>날짜</th>
-                    <th>이름</th>
-                    <th>연락처</th>
-                    <th>이메일</th>
-                    <th>상태</th>
-                    <th>기능</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="rec in adminRecruitments" :key="rec.id" @click="viewDetail(rec)" class="clickable-row">
-                    <td @click.stop><input type="checkbox" v-model="selectedRecruitments" :value="rec.id" /></td>
-                    <td>{{ new Date(rec.created_at).toLocaleDateString() }}</td>
-                    <td>{{ rec.name }}</td>
-                    <td>{{ rec.phone }}</td>
-                    <td>{{ rec.email }}</td>
-                    <td>
-                      <span class="status-tag" :class="rec.status">{{ rec.status === 'pending' ? '심사중' : '심사완료' }}</span>
-                    </td>
-                    <td @click.stop>
-                       <select :value="rec.status" @change="e => updateStatus('recruitment_applications', rec.id, e.target.value)" class="admin-select">
-                        <option value="pending">심사중</option>
-                        <option value="completed">심사완료</option>
-                      </select>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Orders Admin -->
-          <div v-if="adminActiveTab === 'mall'" class="admin-section glass-panel">
-            <div class="table-scroll">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th>주문일</th>
-                    <th>상품명</th>
-                    <th>구매자</th>
-                    <th>총액</th>
-                    <th>주문상태</th>
-                    <th>배송현황</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="ord in adminOrders" :key="ord.id" @click="viewDetail(ord)" class="clickable-row">
-                    <td>{{ new Date(ord.created_at).toLocaleDateString() }}</td>
-                    <td>{{ ord.product_name }}</td>
-                    <td>{{ ord.receiver_name || ord.user_email }}</td>
-                    <td>{{ ord.total_amount.toLocaleString() }}원</td>
-                    <td>
-                      <span class="status-tag" :class="ord.order_status">{{ ord.order_status === 'payment_pending' ? '결제대기' : '결제완료' }}</span>
-                    </td>
-                    <td>
-                       <select :value="ord.delivery_status" @change="e => updateStatus('orders', ord.id, e.target.value, 'delivery_status')" class="admin-select" @click.stop>
-                        <option value="preparing">배송준비</option>
-                        <option value="shipping">배송중</option>
-                        <option value="delivered">배송완료</option>
-                      </select>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <template v-if="currentView === 'mypage'">
-        <div class="mypage-view-container container">
-          <div class="mypage-header" style="text-align: center; margin-bottom: 50px;">
-            <h1>{{ t.mypage.title }}</h1>
-            <p class="user-welcome" style="font-size: 1.1rem; color: #59B3D9; margin-top: 10px;">
-              {{ currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] }}{{ t.mypage.welcome }}
-            </p>
-          </div>
-
-          <div class="mypage-grid">
-            <div class="mypage-card glass-panel">
-              <div class="card-header">
-                <h3>📦 {{ t.mypage.orderStatus }}</h3>
-              </div>
-              <div class="card-content">
-                <div class="stat-row">
-                  <span>{{ t.mypage.totalOrders }}</span>
-                  <span class="stat-val">{{ userOrders.length }}</span>
-                </div>
-                <div class="stat-row">
-                  <span>{{ t.mypage.activeDelivery }}</span>
-                  <span class="stat-val">{{ userOrders.filter(o => o.delivery_status === 'shipping').length }}</span>
-                </div>
-                <div class="user-history-list" v-if="userOrders.length > 0">
-                   <div v-for="ord in userOrders" :key="ord.id" class="history-item clickable" @click="viewDetail(ord)">
-                     <span class="h-date">{{ new Date(ord.created_at).toLocaleDateString() }}</span>
-                     <span class="h-title" style="color: #59B3D9;">{{ ord.product_name }}</span>
-                     <span class="h-status" :class="ord.delivery_status">
-                       {{ ord.delivery_status === 'preparing' ? '배송준비' : ord.delivery_status === 'shipping' ? '배송중' : '배송완료' }}
-                     </span>
-                   </div>
-                </div>
-                <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
-              </div>
-            </div>
-
-            <div class="mypage-card glass-panel">
-              <div class="card-header">
-                <h3>🛒 {{ t.mypage.cartStatus }}</h3>
-              </div>
-              <div class="card-content">
-                <div class="stat-row">
-                  <span>{{ t.mypage.itemsInCart }}</span>
-                  <span class="stat-val">{{ cart.length }}</span>
-                </div>
-                <button class="small-action-btn" @click="goToCart">{{ t.mypage.viewCart }}</button>
-              </div>
-            </div>
-
-            <div class="mypage-card glass-panel">
-              <div class="card-header">
-                <h3>💬 {{ t.mypage.inquiryStatus }}</h3>
-              </div>
-              <div class="card-content">
-                <div class="stat-row">
-                  <span>{{ t.mypage.myInquiries }}</span>
-                  <span class="stat-val">{{ userInquiries.length }}</span>
-                </div>
-                <div class="user-history-list" v-if="userInquiries.length > 0">
-                  <div v-for="inq in userInquiries" :key="inq.id" class="history-item clickable" @click="viewDetail(inq)">
-                    <span class="h-date">{{ new Date(inq.created_at).toLocaleDateString() }}</span>
-                    <span class="h-title">{{ inq.subject }}</span>
-                    <span class="h-status pending">{{ inq.status === 'pending' ? '접수완료' : '답변완료' }}</span>
-                  </div>
-                </div>
-                <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
-              </div>
-            </div>
-
-            <div class="mypage-card glass-panel">
-              <div class="card-header">
-                <h3>📄 {{ t.mypage.recruitStatus }}</h3>
-              </div>
-              <div class="card-content">
-                <div class="stat-row">
-                  <span>{{ t.mypage.myApps }}</span>
-                  <span class="stat-val">{{ userRecruitments.length }}</span>
-                </div>
-                <div class="user-history-list" v-if="userRecruitments.length > 0">
-                  <div v-for="app in userRecruitments" :key="app.id" class="history-item clickable" @click="viewDetail(app)">
-                    <span class="h-date">{{ new Date(app.created_at).toLocaleDateString() }}</span>
-                    <span class="h-title">{{ app.name }} 컨설턴트 지원</span>
-                    <span class="h-status" :class="app.status">{{ app.status === 'pending' ? '심사중' : '심사완료' }}</span>
-                  </div>
-                </div>
-                <p class="empty-msg" v-else>{{ t.mypage.empty }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div style="text-align: center; margin-top: 40px;">
-            <button class="logout-btn" @click="handleLogout">{{ currentLang === 'ko' ? '로그아웃' : 'Logout' }}</button>
-          </div>
-        </div>
-      </template>
-
-      <div v-show="currentView === 'home'">
-        <section id="philosophy" class="philosophy-section">
-            <div class="full-screen-quote intro-fade-in">
-              <div class="quote-content">
-                <span class="quote-mark">“</span>
-                <h2 class="quote-text" v-html="t.hero.quote1"></h2>
-                <p class="quote-eyebrow align-right">{{ t.hero.quote2 }}</p>
-              </div>
-            </div>
-        
-            <div class="full-screen-section">
-              <div class="crop-bg slide2-crop"></div>
-              <div class="dark-overlay"></div>
-              <div class="phil-text-content animate-hidden">
-                <h3>{{ t.hero.crisisTitle }}</h3>
-                <p>{{ t.hero.crisisDesc1 }}</p>
-                <p v-html="t.hero.crisisDesc2"></p>
-              </div>
-            </div>
-        
-            <div class="full-screen-section">
-              <div class="crop-bg slide3-crop"></div>
-              <div class="dark-overlay"></div>
-              <div class="phil-text-content animate-hidden">
-                <h3>{{ t.hero.waverTitle }}</h3>
-                <h4 class="sub-heading">{{ t.hero.waverSub }}</h4>
-                <p v-html="t.hero.waverDesc"></p>
-                <div class="phil-box">
-                  <p v-html="t.hero.waverBox"></p>
-                </div>
-              </div>
-            </div>
-        
-            <div class="full-screen-section">
-              <div class="crop-bg slide4-crop"></div>
-              <div class="dark-overlay"></div>
-              <div class="phil-text-content animate-hidden">
-                <h3>{{ t.hero.signalTitle }}</h3>
-                <ul class="phil-list">
-                  <li>
-                    <span class="icon">⚠️</span>
-                    <p v-html="t.hero.signalList1"></p>
-                  </li>
-                  <li>
-                    <span class="icon">⚖️</span>
-                    <p v-html="t.hero.signalList2"></p>
-                  </li>
-                  <li>
-                    <span class="icon">🛡️</span>
-                     <p v-html="t.hero.signalList3"></p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-        
-            <div class="full-screen-section">
-              <div class="crop-bg slide5-crop"></div>
-              <div class="dark-overlay"></div>
-              <div class="phil-text-content animate-hidden">
-                <h3 class="giant-title" v-html="t.hero.systemTitle"></h3>
-                <h4 class="sub-heading">{{ t.hero.systemSub }}</h4>
-                <p>{{ t.hero.systemDesc1 }}</p>
-                <p>{{ t.hero.systemDesc2 }}</p>
-              </div>
-            </div>
-        </section>
-
-        <section id="products" class="products-section">
-          <div class="section-container animate-hidden">
-            <div id="consulting-boxes" class="grid-container">
-              <div class="tech-card" @click="sendMail">
-                <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.ai }}</h3>
-                  <button>{{ t.products.inquireBtn }}</button>
-                </div>
-              </div>
-
-              <div class="tech-card" @click="sendMail">
-                <div class="card-img-placeholder" style="background-image: url('/images/personal.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.personal }}</h3>
-                  <button>{{ t.products.inquireBtn }}</button>
-                </div>
-              </div>
-
-              <div class="tech-card" @click="sendMail">
-                <div class="card-img-placeholder" style="background-image: url('/images/kids.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.kids }}</h3>
-                  <button>{{ t.products.inquireBtn }}</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-      
-      <template v-if="currentView === 'recruit'">
-        <div class="recruit-view-container">
-           <div class="recruit-header">
-                <h2>{{ t.recruit.title }}</h2>
-                <p>{{ t.recruit.desc }}</p>
-           </div>
-           
-           <form class="recruit-form glass-panel container-narrow" @submit.prevent="handleRecruitSubmit">
-             <div class="recruit-input-group">
-               <label>{{ t.recruit.name }}</label>
-               <input type="text" v-model="recruitForm.name" required />
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.recruit.phone }}</label>
-               <div class="phone-inputs">
-                  <input type="tel" maxlength="3" v-model="recruitForm.phone1" required /> <span>-</span>
-                  <input type="tel" maxlength="4" v-model="recruitForm.phone2" required /> <span>-</span>
-                  <input type="tel" maxlength="4" v-model="recruitForm.phone3" required />
-               </div>
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.recruit.email }}</label>
-               <input type="email" v-model="recruitForm.email" required />
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ currentLang === 'ko' ? '이력서/포트폴리오 첨부 (PDF, Word, ZIP)' : 'Attach CV/Portfolio (PDF, Word, ZIP)' }}</label>
-               <input id="cvFileInput" type="file" @change="handleCvFileChange" accept=".pdf,.doc,.docx,.zip" />
-               <small style="color: #9DA1B4; margin-top:-5px;">(최대 5MB 제한)</small>
-             </div>
-             
-             <div class="recruit-input-group">
-               <label>{{ t.recruit.content }}</label>
-               <textarea rows="6" v-model="recruitForm.content" required></textarea>
-             </div>
-             
-             <button type="submit" class="recruit-submit-btn">{{ t.recruit.submit }}</button>
-           </form>
-        </div>
-      </template>
-
-      <template v-if="currentView === 'detail'">
-        <div class="detail-header">
-          <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
-          <h2>{{ selectedDetailProduct === '케익칼' ? t.products.cakeKnife : selectedDetailProduct === '딥소스' ? t.products.dipSauce : selectedDetailProduct }} {{ t.detail.detailInfo }}</h2>
-        </div>
-        
-        <div class="product-detail-container" v-if="selectedDetailProduct === '케익칼' || selectedDetailProduct === '딥소스'">
-          <div class="detail-images">
-            <template v-if="selectedDetailProduct === '케익칼'">
-              <img src="/images/eco_paper_cake_knife.jpg" alt="Eco Paper Cake Knife" />
-            </template>
-            <template v-else-if="selectedDetailProduct === '딥소스'">
-              <img src="/images/dip_sauce_detail.jpg" alt="Korean Dipping Sauce" />
-            </template>
-          </div>
-          
-          <div class="shipping-info">
-            <p v-html="t.detail.shipping"></p>
-          </div>
-          
-          <div class="detail-action-bottom" style="display:flex; gap:10px;">
-            <button class="primary-btn huge-btn" @click="goToCheckout(selectedDetailProduct)" style="flex:2;">
-              {{ selectedDetailProduct === '케익칼' ? t.detail.payCake : t.detail.payDip }}
-            </button>
-            <button class="outline-btn huge-btn" @click="addToCart(selectedDetailProduct)" style="flex:1;">
-              {{ t.cart.addBtn }}
-            </button>
-          </div>
-
-          <!-- 정책 섹션 추가 -->
-          <div class="policy-container glass-panel">
-            <div class="policy-block">
-              <h3>{{ t.policy.returnTitle }}</h3>
-              <p class="pre-line">{{ t.policy.refundInfo }}</p>
-              <div class="addr-box">
-                <h4>{{ t.policy.addrTitle }}</h4>
-                <p>{{ t.policy.addr }}</p>
-              </div>
-              <p class="notice">{{ t.policy.shippingNotice }}</p>
-            </div>
-            
-            <div class="policy-block">
-              <h3>{{ t.policy.shippingTitle }}</h3>
-              <p class="pre-line">{{ t.policy.shippingDetail }}</p>
-            </div>
-
-            <div class="policy-block">
-              <h3>{{ t.policy.cancelTitle }}</h3>
-              <p class="pre-line text-small">{{ t.policy.cancelDetail }}</p>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <template v-if="currentView === 'checkout'">
-        <div class="checkout-header">
-          <button @click="goBackFromCheckout" class="back-btn">{{ t.detail.backBtn }}</button>
-          <h2>{{ selectedProduct === '케익칼' ? t.products.cakeKnife : selectedProduct === '딥소스' ? t.products.dipSauce : selectedProduct }} {{ t.checkout.title }}</h2>
-        </div>
-        <CheckoutPage :productName="selectedProduct" :amount="checkoutAmount" />
-        
-        <!-- 결제 페이지 하단에도 동일 정책 노출 -->
-        <div class="policy-container glass-panel container-narrow" style="margin-top: 40px;">
-          <div class="policy-block">
-            <h3>{{ t.policy.returnTitle }}</h3>
-            <p class="pre-line">{{ t.policy.refundInfo }}</p>
-            <div class="addr-box">
-              <h4>{{ t.policy.addrTitle }}</h4>
-              <p>{{ t.policy.addr }}</p>
-            </div>
-            <p class="notice">{{ t.policy.shippingNotice }}</p>
-          </div>
-          
-          <div class="policy-block">
-            <h3>{{ t.policy.shippingTitle }}</h3>
-            <p class="pre-line">{{ t.policy.shippingDetail }}</p>
-          </div>
-        </div>
-      </template>
-    
-      <template v-if="currentView === 'cart'">
-        <div class="detail-header">
-          <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
-          <h2>{{ t.cart.title }}</h2>
-        </div>
-        
-        <section class="cart-section container-narrow">
-          <div v-if="cart.length === 0" class="empty-cart">
-            <p>{{ t.cart.empty }}</p>
-            <button class="primary-btn" @click="goToMall">{{ t.nav.mall }}</button>
-          </div>
-          
-          <div v-else class="cart-list glass-panel">
-            <div v-for="item in cart" :key="item.id" class="cart-item">
-              <input type="checkbox" v-model="item.selected" />
-              <div class="item-info">
-                <h3>{{ item.name === '케익칼' ? t.products.cakeKnife : item.name === '딥소스' ? t.products.dipSauce : item.name }}</h3>
-                <p>{{ (item.price * item.quantity).toLocaleString() }} 원</p>
-                <div class="qty-control">
-                  <button class="qty-btn" @click="updateQuantity(item.id, -1)">-</button>
-                  <span class="qty-val">{{ item.quantity }}</span>
-                  <button class="qty-btn" @click="updateQuantity(item.id, 1)">+</button>
-                </div>
-              </div>
-              <button class="del-btn" @click="removeFromCart(item.id)">{{ t.cart.delete }}</button>
-            </div>
-            
-            <div class="cart-summary">
-              <div class="summary-row" style="font-size: 1rem; opacity: 0.8; margin-bottom: 0.5rem;">
-                <span>상품 합계</span>
-                <span>{{ cartItemsTotal.toLocaleString() }} 원</span>
-              </div>
-              <div class="summary-row" style="font-size: 1rem; opacity: 0.8; margin-bottom: 1rem;">
-                <span>배송비</span>
-                <span>+{{ shippingFee.toLocaleString() }} 원</span>
-              </div>
-              <div class="summary-row">
-                <span>{{ t.cart.total }}</span>
-                <span class="total-price">{{ cartTotal.toLocaleString() }} 원</span>
-              </div>
-              <div class="check-actions-row">
-                 <button class="primary-btn huge-btn" @click="checkoutFromCart(false)">{{ t.cart.checkout }}</button>
-                 <button class="outline-btn huge-btn" @click="checkoutFromCart(true)" style="margin-top: 10px;">{{ t.cart.guest }}</button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </template>
-
-      <template v-if="currentView === 'auth'">
-        <AuthPage :currentLang="currentLang" :initialMode="currentAuthMode" @back="goHome" />
-      </template>
-
-      <template v-if="currentView === 'mall'">
-        <div class="detail-header mall-header">
-          <button @click="goHome" class="back-btn">{{ t.detail.backBtn }}</button>
-          <h2>{{ t.nav.mall }}</h2>
-        </div>
-        
-        <section class="products-section mall-view" style="padding-top: 40px;">
-          <div class="section-container">
-            <div class="grid-container flex-center">
-              <div class="tech-card" @click="goToDetail('케익칼')">
-                <div class="card-img-placeholder" style="background-image: url('/images/cake_knife.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.cakeKnife }}</h3>
-                  <div class="btn-group-row">
-                    <button class="small-btn" @click="goToDetail('케익칼')">{{ t.products.purchaseBtn }}</button>
-                    <button class="small-btn outline-btn" @click.stop="addToCart('케익칼')">{{ t.cart.addBtn }}</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="tech-card" @click="goToDetail('딥소스')">
-                <div class="card-img-placeholder" style="background-image: url('/images/dip_sauce.png'); background-size: cover; background-position: center;">
-                  <span class="glow"></span>
-                </div>
-                <div class="tech-card-info">
-                  <h3>{{ t.products.dipSauce }}</h3>
-                  <div class="btn-group-row">
-                    <button class="small-btn" @click="goToDetail('딥소스')">{{ t.products.purchaseBtn }}</button>
-                    <button class="small-btn outline-btn" @click.stop="addToCart('딥소스')">{{ t.cart.addBtn }}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </template>
+      <router-view />
     </main>
 
-
-    <div class="modal-overlay" v-show="showContactModal" @click="showContactModal = false">
-      <div class="modal-content" @click.stop>
-        <h3>{{ t.modal.title }}</h3>
-        <p class="modal-desc">{{ t.modal.desc }}</p>
-        <div class="email-box">
-          <strong>contact@c-braindesign.com</strong>
-        </div>
-        <div class="modal-actions">
-          <button class="outline-btn" @click="copyEmail">{{ t.modal.copy }}</button>
-          <button class="primary-btn" @click="triggerMailApp">{{ t.modal.app }}</button>
-        </div>
-        <button class="close-btn" @click="showContactModal = false">✕</button>
-      </div>
-    </div>
-
-    <!-- 상세 보기 모달 추가 -->
-    <div class="modal-overlay" v-if="showDetailModal" @click="closeDetailModal">
-      <div class="modal-content detail-modal-content" @click.stop>
-        <div class="detail-header-row">
-          <h3>📂 {{ selectedItemDetail?.subject || (selectedItemDetail?.name + ' 지원 내역') }}</h3>
-          <button class="close-btn" @click="closeDetailModal">✕</button>
-        </div>
-        
-        <div class="detail-body glass-panel">
-          <div class="detail-info-grid">
-            <div class="info-cell">
-              <label>이름</label>
-              <span>{{ selectedItemDetail?.name }}</span>
-            </div>
-            <div class="info-cell">
-              <label>이메일</label>
-              <span>{{ selectedItemDetail?.email }}</span>
-            </div>
-            <div class="info-cell" v-if="selectedItemDetail?.phone">
-              <label>연락처</label>
-              <span>{{ selectedItemDetail?.phone }}</span>
-            </div>
-            <div class="info-cell" v-if="selectedItemDetail?.category">
-              <label>카테고리</label>
-              <span>{{ selectedItemDetail?.category }}</span>
-            </div>
-            <div class="info-cell">
-              <label>작성 일시</label>
-              <span>{{ new Date(selectedItemDetail?.created_at).toLocaleString() }}</span>
-            </div>
-          </div>
-          
-          <div class="detail-desc-box">
-             <label>내용 원문</label>
-             <div class="content-text" v-html="formatContent(selectedItemDetail?.content)"></div>
-          </div>
-
-          <!-- 답변 섹션 (문의내역인 경우에만: subject 속성으로 판별) -->
-          <div v-if="selectedItemDetail?.subject" class="detail-desc-box" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-             <label>관리자 답변</label>
-             
-             <!-- 관리자 시점: 답변 작성/수정 -->
-             <div v-if="isAdmin">
-                <textarea rows="4" v-model="adminReplyText" placeholder="고객에게 보낼 답변을 작성하세요" style="width: 100%; border-radius: 6px; padding: 10px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1); margin-top: 8px;"></textarea>
-                <div style="text-align: right; margin-top: 10px;">
-                  <button class="primary-btn" style="padding: 8px 16px; font-size: 0.9rem;" @click="submitAdminReply(selectedItemDetail.id)">답변 저장 및 완료처리</button>
-                </div>
-             </div>
-             
-             <!-- 일반 사용자 시점: 답변 열람 -->
-             <div v-else>
-                <div class="content-text" v-if="selectedItemDetail?.admin_reply" style="background: rgba(89, 179, 217, 0.1); border-left: 4px solid #59B3D9; padding: 15px; border-radius: 4px; margin-top: 8px;">
-                  <span v-html="formatContent(selectedItemDetail.admin_reply)"></span>
-                </div>
-                <div v-else class="content-text" style="color: #888; font-style: italic; margin-top: 8px;">
-                  아직 답변이 등록되지 않았습니다.
-                </div>
-             </div>
-          </div>
-        </div>
-        
-        <div class="modal-actions" style="margin-top:20px;">
-           <button class="primary-btn" @click="closeDetailModal">닫기</button>
-        </div>
-      </div>
-    </div>
-
+    <!-- Footer -->
     <footer class="app-footer">
       <div class="footer-content">
         <p>{{ t.footer.company }}</p>
-        <p>{{ t.footer.bizNo }}</p>
+        <p style="white-space: pre-line;">{{ t.footer.bizNo }}</p>
         <p>{{ t.footer.contact }}</p>
         <p class="copyright">{{ t.footer.copyright }}</p>
       </div>
     </footer>
+
+    <!-- Global Modals -->
+    <div class="modal-overlay" v-if="state.showDetailModal" @click.self="closeDetailModal">
+      <div class="tech-modal glass-panel">
+        <div class="modal-header">
+          <h3>{{ state.selectedItemDetail?.subject || state.selectedItemDetail?.product_name || 'Detail' }}</h3>
+          <button @click="closeDetailModal" class="close-btn">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row">
+            <span class="label">날짜/일시:</span>
+            <span>{{ new Date(state.selectedItemDetail?.created_at).toLocaleString() }}</span>
+          </div>
+
+          <!-- Order Type Details -->
+          <div v-if="state.selectedItemDetail?.order_status" class="order-detail-container">
+            <div class="detail-section">
+              <h4 class="detail-sec-title">📦 상품 정보</h4>
+              <div class="detail-data-box">
+                <div class="data-row"><span>상품명:</span> <strong>{{ state.selectedItemDetail.product_name }}</strong></div>
+                <div class="data-row"><span>결제금액:</span> <strong>{{ state.selectedItemDetail.total_amount?.toLocaleString() }}원</strong></div>
+                <div class="data-row"><span>배송상태:</span> <span class="status-tag" :class="state.selectedItemDetail.delivery_status">{{ state.selectedItemDetail.delivery_status === 'preparing' ? '배송준비' : state.selectedItemDetail.delivery_status === 'shipping' ? '배송중' : '배송완료' }}</span></div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4 class="detail-sec-title">👤 주문자 정보</h4>
+              <div class="detail-data-box">
+                <div class="data-row"><span>이메일:</span> {{ state.selectedItemDetail.user_email }}</div>
+                <div class="data-row" v-if="state.selectedItemDetail.buyer_name"><span>이름:</span> {{ state.selectedItemDetail.buyer_name }}</div>
+                <div class="data-row" v-if="state.selectedItemDetail.buyer_phone"><span>연락처:</span> {{ state.selectedItemDetail.buyer_phone }}</div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4 class="detail-sec-title">🚚 배송지 정보</h4>
+              <div class="detail-data-box">
+                <div class="data-row"><span>수령인:</span> {{ state.selectedItemDetail.receiver_name }}</div>
+                <div class="data-row"><span>연락처:</span> {{ state.selectedItemDetail.receiver_phone }}</div>
+                <div class="data-row"><span>주소:</span> {{ state.selectedItemDetail.shipping_address }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inquiry/Recruitment Type Details -->
+          <template v-else>
+            <div class="detail-content-box" v-html="formatContent(state.selectedItemDetail?.content || state.selectedItemDetail?.product_name || '')"></div>
+            
+            <div v-if="isAdmin && state.selectedItemDetail?.category" class="admin-reply-section">
+              <textarea v-model="state.adminReplyText" placeholder="답변을 입력하세요..."></textarea>
+              <button @click="submitAdminReply(state.selectedItemDetail.id)" class="primary-btn">답변 저장</button>
+            </div>
+            <div v-else-if="state.selectedItemDetail?.admin_reply" class="user-reply-box">
+               <h4>Admin Reply:</h4>
+               <p v-html="formatContent(state.selectedItemDetail.admin_reply)"></p>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" v-if="state.showContactModal" @click.self="state.showContactModal = false">
+      <div class="tech-modal glass-panel small-modal">
+        <div class="modal-header">
+          <h3>{{ t.modal.title }}</h3>
+          <button @click="state.showContactModal = false" class="close-btn">✕</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+          <p style="margin-bottom: 25px; opacity: 0.8; line-height: 1.6;">{{ t.modal.desc }}</p>
+          <div class="contact-email">contact@c-braindesign.com</div>
+          <div class="modal-actions-grid">
+            <button class="primary-btn" @click="copyEmail">{{ t.modal.copy }}</button>
+            <button class="outline-btn" @click="triggerMailApp">{{ t.modal.app }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style>
 /* 테크 기반 프리미엄 다크 테마 변수 */
 :root {
-  --tech-bg: #1A1B26; /* 매우 깊은 네이비/보라빛 배경 */
-  --tech-nav-bg: #1A1B26; /* 배경과 완벽히 동일한 색상으로 블렌딩 */
+  --tech-bg: #02040a; /* 요청하신 이미지 톤에 맞춘 깊은 다크 네이비 블랙 */
+  --tech-nav-bg: #02040a;
   --tech-text: #FFFFFF;
   --tech-muted: #9DA1B4;
   --tech-border: rgba(255, 255, 255, 0.15);
@@ -1526,170 +354,149 @@ html, body, #app {
 html {
   scroll-behavior: smooth;
 }
-</style>
 
-<style scoped>
-.admin-header h1 {
-  font-size: 2.2rem;
-  margin-bottom: 30px;
-  background: linear-gradient(90deg, #fff, #59B3D9);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
 }
 
-.admin-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-}
-
-.admin-tabs button {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
+.primary-btn {
+  background: #59B3D9;
+  color: #111;
+  border: none;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 30px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
   transition: all 0.2s;
 }
 
-.admin-tabs button.active {
-  background: rgba(89, 179, 217, 0.1);
-  border-color: #59B3D9;
+.primary-btn:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
+.outline-btn {
+  background: transparent;
+  border: 1px solid #59B3D9;
   color: #59B3D9;
-  border-bottom: 2px solid #59B3D9;
-}
-
-.admin-del-btn {
-  background: rgba(255, 107, 107, 0.1);
-  color: #ff6b6b;
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.admin-del-btn:hover:not(:disabled) {
-  background: rgba(255, 107, 107, 0.2);
-  border-color: #ff6b6b;
-  transform: translateY(-1px);
+.outline-btn:hover {
+  background: rgba(89, 179, 217, 0.1);
+  transform: translateY(-2px);
 }
 
-.admin-del-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.table-scroll {
-  overflow-x: auto;
-}
-
-.admin-table {
+.huge-btn {
   width: 100%;
-  border-collapse: collapse;
+  padding: 18px !important;
+  font-size: 1.15rem !important;
+  border-radius: 40px !important;
 }
 
-.admin-table th, .admin-table td {
-  padding: 18px 15px;
-  text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.admin-table th {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.4);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.clickable-row {
+.back-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 30px;
+  color: #D3D5DF;
   cursor: pointer;
-}
-.clickable-row:hover {
-  background: rgba(255,255,255,0.02);
-}
-
-.tag-cat {
-  background: rgba(89, 179, 217, 0.1);
-  color: #59B3D9;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.status-tag {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  transition: all 0.3s;
+  font-size: 13.4px;
   font-weight: 600;
 }
 
-.status-tag.pending, .status-tag.payment_pending, .status-tag.preparing {
-  background: rgba(255, 193, 7, 0.1);
-  color: #FFC107;
+.back-btn:hover {
+  background: #fff;
+  color: #111;
 }
 
-.status-tag.completed, .status-tag.delivered, .status-tag.payment_finished {
-  background: rgba(40, 167, 69, 0.1);
-  color: #28A745;
-}
-
-.status-tag.shipping {
-  background: rgba(89, 179, 217, 0.1);
-  color: #59B3D9;
-}
-
-.admin-select {
-  background: #2D2E3A;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.text-truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.app-footer {
-  background: var(--tech-bg);
-  padding: 3rem 0;
-  text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: auto;
-}
-.footer-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  color: var(--tech-muted);
-  font-size: 1.02rem;
-  line-height: 1.6;
-}
-.footer-content p {
-  margin: 0.3rem 0;
-}
-.copyright {
-  margin-top: 1rem !important;
-  opacity: 0.6;
-  font-size: 0.9rem;
-}
-
-.app-container {
-  min-height: 100vh;
+.detail-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 40px;
+  padding: 140px 4rem 0;
 }
 
-/* 최상단 유틸리티 바 (매우 작고 연한 텍스트) */
+/* Navbar & Logo styles moved to main.css to prevent version conflict flickering */
+
+.icon-btn {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.44rem;
+  opacity: 0.9;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.icon-btn:hover {
+  opacity: 1;
+}
+
+.my-page-icon-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s;
+  padding: 5px;
+}
+
+.my-page-icon-wrapper:hover {
+  transform: scale(1.1);
+}
+
+.my-page-icon-wrapper .icon-emoji {
+  font-size: 1.4rem;
+  filter: brightness(1.5);
+}
+
+.my-page-icon-wrapper .my-text-label {
+  position: absolute;
+  bottom: 4px; /* 조금 더 위로 올려서 아이콘과 더 많이 겹치게 조정 */
+  right: -2px; 
+  font-size: 10px;
+  font-weight: 900;
+  color: #fff;
+  background: rgba(0,0,0,0.4); 
+  padding: 0px 2px;
+  border-radius: 3px;
+  letter-spacing: -0.2px;
+  line-height: 1;
+  z-index: 2;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: white;
+  color: #1A1B26;
+  font-size: 11px;
+  font-weight: 900;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Utility Bar */
 .top-utility-bar {
   background-color: var(--tech-nav-bg);
   width: 100%;
@@ -1712,499 +519,43 @@ html {
   color: var(--tech-text);
   text-decoration: none;
   font-size: 0.9rem;
-  font-weight: 500;
-  opacity: 0.8;
-  letter-spacing: -0.2px;
-}
-
-.utility-content a:hover {
-  text-decoration: underline;
-  opacity: 1;
-}
-
-/* Navbar */
-.navbar {
-  position: fixed;
-  top: 30px; /* 유틸리티 바 아래에 위치 */
-  left: 0;
-  right: 0;
-  height: 90px;
-  background: var(--tech-nav-bg); /* #1A1B26 */
-  backdrop-filter: blur(12px);
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
-
-.nav-content {
-  max-width: 1600px;
-  margin: 0 auto;
-  height: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 4rem;
-}
-
-.logo {
-  flex-shrink: 0;
-}
-
-.nav-logo-img {
-  height: 68px; /* 1.5배 크기로 상향 */
-  vertical-align: middle;
-  object-fit: contain;
-  /* CSS Magic: 압도적인 대비로 JPG 아티팩트를 완벽 블랙으로 눌러 투명처리 */
-  filter: grayscale(1) invert(1) contrast(1000%) brightness(150%);
-  mix-blend-mode: screen;
-}
-
-/* 중앙 메뉴 링크 */
-.nav-links {
-  display: flex;
-  gap: 1.8rem;
-  align-items: center;
-  flex-grow: 1;
-  margin-left: 3rem;
-}
-
-.nav-links a {
-  color: var(--tech-text);
-  text-decoration: none;
-  font-size: 1.14rem;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  transition: opacity 0.2s;
-}
-
-.nav-links a:hover {
-  opacity: 0.7;
-}
-
-/* 우측 액션 (검색창, 아이콘) */
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.search-bar {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 6px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 1rem;
-  border: 1px solid transparent;
-  transition: border 0.3s;
-}
-
-.search-bar:hover {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.search-icon {
-  font-size: 1.08rem;
   opacity: 0.8;
 }
 
-.search-bar input {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.02rem;
-  width: 120px;
-  outline: none;
-}
+/* Hero & Philosophy Sections are strictly managed in main.css */
 
-.search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.icon-btn {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.44rem;
-  opacity: 0.9;
-}
-
-.icon-btn:hover {
-  opacity: 1;
-}
-
-/* 스크롤 애니메이션 컴포넌트 */
-.animate-hidden {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.animate-hidden.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* -------------------------------------
-   Hero Section (Samsung 갤럭시 S26 느낌)
--------------------------------------- */
-.hero-section {
-  position: relative;
-  min-height: 100vh;
-  width: 100%; /* 전체 화면 너비 차지 */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* 좌측 정렬 */
-  padding-left: 10%;
-  overflow: hidden;
-}
-
-/* 깊고 메탈릭한 보라/파란색 그라데이션 바탕 */
-.hero-bg {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: radial-gradient(circle at 70% 50%, #2b305c 0%, #161723 60%, #0d0e15 100%);
-  z-index: -1;
-}
-
-/* 스마트폰 렌더링 같은 엣지 효과를 주기 위한 은은한 빛 */
-.hero-bg::after {
-  content: '';
-  position: absolute;
-  right: -10vw;
-  top: 20vh;
-  width: 60vw;
-  height: 80vh;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-  border-radius: 50%;
-  transform: rotate(-30deg);
-  filter: blur(60px);
-}
-
-.hero-content {
-  z-index: 10;
-  max-width: 600px;
-  margin-top: -50px;
-}
-
-.main-title {
-  font-size: clamp(4.50rem, 9vw, 6.75rem);
-  font-weight: 800;
-  margin: 0;
-  color: #fff;
-  letter-spacing: -1px;
-  line-height: 1.1;
-}
-
-.sub-title {
-  font-size: clamp(3rem, 6vw, 4.50rem);
-  font-weight: 400;
-  margin: 0.5rem 0 1.5rem 0;
-  color: #fff;
-  letter-spacing: -0.5px;
-}
-
-.hero-desc {
-  font-size: 1.56rem;
-  color: #E2E4EC;
-  margin-bottom: 2.5rem;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-}
-
-.hero-buttons {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.link-btn {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 6px;
-  font-weight: 600;
-  font-size: 1.2rem;
-  transition: opacity 0.2s;
-}
-
-.link-btn:hover {
-  opacity: 0.7;
-}
-
-.outline-btn {
-  background: transparent;
-  color: #fff;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  padding: 12px 28px;
-  border-radius: 30px;
-  font-size: 1.14rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.outline-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #fff;
-}
-
-
-/* -------------------------------------
-   Philosophy Section (Dynamic Scroll Full-bleed)
--------------------------------------- */
-.philosophy-section {
-  padding: 0 0 4rem 0;
-  background: var(--tech-bg);
-  position: relative;
-  width: 100%;
-}
-
-.full-screen-quote {
-  width: 100vw;
-  min-height: 85vh; /* 스크롤 다운을 유도하기 위해 100vh에서 85vh로 줄임 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--tech-bg); /* Current background color */
-  margin-left: calc(-50vw + 50%); /* Full bleed override */
-  position: relative;
-  overflow: hidden;
-}
-
-/* Subtle glowing background orb for extra dynamic feel */
-.full-screen-quote::before {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 50vw; height: 50vw;
-  background: radial-gradient(circle, rgba(108,130,248,0.04) 0%, transparent 60%);
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  pointer-events: none;
-}
-
-.quote-content {
-  max-width: 900px;
-  padding: 0 4rem;
-  position: relative;
-  z-index: 2;
-  text-align: left;
-  margin-top: 3rem; /* 글자 세로 한 줄 크기만큼 딱 내려서 시각적 중앙 재정렬 */
-}
-
-.quote-mark {
-  font-size: 5.76rem;
-  color: rgba(255, 255, 255, 0.08); /* Very faint watermark quote */
-  position: absolute;
-  top: -2.5rem;
-  left: -1.5rem;
-  font-family: Georgia, serif;
-  line-height: 1;
-  user-select: none;
-}
-
-.quote-text {
-  font-size: clamp(2.16rem, 4.20vw, 3rem); /* 100% -> 80% 사이즈 축소 */
-  font-weight: 300;
-  line-height: 1.7;
-  font-style: italic;
-  margin: 0 0 2rem 0;
-  color: #fff;
-  letter-spacing: -0.5px;
-}
-
-.quote-eyebrow {
-  color: var(--tech-muted);
-  font-size: 1.14rem;
-  letter-spacing: 1px;
-  font-style: italic;
-}
-
-.align-right {
-  text-align: right;
-  display: block;
-}
-
-@keyframes slowFadeUp {
-  0% { opacity: 0; transform: translateY(40px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.intro-fade-in {
-  animation: slowFadeUp 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes slowZoomCrop {
-  0% { transform: scale(1.4); }
-  100% { transform: scale(1.55); }
-}
-
-.full-screen-section {
-  position: relative;
-  width: 100vw;
-  min-height: 85vh; /* 화면 크기에 맞게 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin-left: calc(-50vw + 50%); /* 강제로 100% 가로 확장 보장 */
-}
-
-/* 이미지 내 텍스트 크롭을 위해 너비를 200%로 설정 (가로 비율 무시하고 강제 절반 크롭) */
 .crop-bg {
   position: absolute;
-  top: 0;
-  width: 200%; 
+  width: 200%;
   height: 100%;
   background-size: cover;
   z-index: 1;
-  animation: slowZoomCrop 15s infinite alternate ease-in-out; /* 25s -> 15s로 속도 개선 */
 }
 
-/* 슬라이드 2: 그림이 오른쪽. 박스의 우측 절반 활용, 백그라운드도 우측 고정, 스케일 중심축 우측 중앙(75%) */
-.slide2-crop { 
-  left: -100%; 
-  background-image: url('/philosophy/slide2.png'); 
-  background-position: right center;
-  transform-origin: 75% 50%;
-}
-/* 슬라이드 3: 그림이 왼쪽. 박스의 좌측 활용, 스케일 중심축 좌측 중앙(25%) */
-.slide3-crop { 
-  left: 0; 
-  background-image: url('/philosophy/slide3.png'); 
-  background-position: left center;
-  transform-origin: 25% 50%;
-}
-/* 슬라이드 4: 그림이 오른쪽. */
-.slide4-crop { 
-  left: -100%; 
-  background-image: url('/philosophy/slide4.png'); 
-  background-position: right center;
-  transform-origin: 75% 50%;
-}
-/* 슬라이드 5: 구조물 그림이 오른쪽. */
-.slide5-crop { 
-  left: -100%; 
-  background-image: url('/philosophy/slide5.png'); 
-  background-position: right center;
-  transform-origin: 75% 50%;
-}
+.slide2-crop { background-image: url('/philosophy/slide2.png'); left: -100%; background-position: right; }
+.slide3-crop { background-image: url('/philosophy/slide3.png'); left: 0; background-position: left; }
+.slide4-crop { background-image: url('/philosophy/slide4.png'); left: -100%; background-position: right; }
+.slide5-crop { background-image: url('/philosophy/slide5.png'); left: -100%; background-position: right; }
 
 .dark-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(22, 24, 38, 0.70); /* 가독성을 위한 오버레이 */
+  background: rgba(22, 24, 38, 0.7);
   z-index: 2;
 }
 
 .phil-text-content {
   position: relative;
   z-index: 3;
-  color: white;
-  text-align: center; /* 텍스트 영역 중앙 정렬 */
-  padding: 4rem 2rem;
-  max-width: 900px;
-  width: 100%;
-}
-
-.phil-text-content h3 {
-  font-size: clamp(2.10rem, 3vw, 2.70rem); /* 글씨 크기 크게 축소 */
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  color: #fff;
-  letter-spacing: -1px;
-}
-
-.phil-text-content h3.giant-title {
-  font-size: clamp(2.70rem, 3.75vw, 3.90rem);
-  line-height: 1.1;
-  color: #59B3D9; /* 채도를 30% 낮춘 부드러운 스카이블루 */
-}
-
-.phil-text-content p {
-  font-size: 1.14rem; /* 약 70% 폰트 사이즈 */
-  line-height: 1.8;
-  color: #D3D5DF;
-  margin-bottom: 1rem;
-  word-break: keep-all;
-}
-
-.phil-text-content p strong {
-  color: #fff;
-  font-weight: bold;
-}
-
-.sub-heading {
-  font-size: 1.32rem;
-  color: #59B3D9; /* 채도를 30% 낮춘 부드러운 스카이블루 */
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-}
-
-.phil-box {
-  background: rgba(89, 179, 217, 0.1); /* 톤다운된 하늘색 배경 */
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-top: 2rem;
-  border-left: 4px solid #59B3D9; /* 톤다운된 하늘색 보더 */
-  text-align: left;
-}
-
-.phil-box p {
-  margin: 0;
-  font-size: 1.08rem;
-}
-
-.phil-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 2rem;
-  text-align: left;
-}
-
-.phil-list li {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  background: rgba(255,255,255,0.05); /* 테크 스타일 박스 내부 처리 */
-  padding: 1.2rem;
-  border-radius: 10px;
-}
-.phil-list li p { margin: 0; font-size: 1.08rem; }
-
-.phil-list .icon {
-  font-size: 1.68rem;
-  flex-shrink: 0;
-}
-
-@media (max-width: 900px) {
-  /* No overrides needed, geometric crop math works perfectly on mobile now */
-}
-
-/* -------------------------------------
-   Products Grid Section
--------------------------------------- */
-.products-section {
-  background: #12131C; /* 히어로 아래 깊은 어둠 */
-  padding: 6rem 0;
-}
-
-.section-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 4rem;
-}
-
-.section-divider {
   text-align: center;
-  margin: 4rem 0 2rem;
-  padding-top: 4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 900px;
+  padding: 2rem;
 }
-.section-divider h2 {
-  font-size: 2.16rem;
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+
+/* Products */
+.products-section {
+  background: #12131C;
+  padding: 6rem 0;
 }
 
 .grid-container {
@@ -2213,217 +564,46 @@ html {
   gap: 2rem;
 }
 
-.grid-container.flex-center {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.grid-container.flex-center .tech-card {
-  width: calc(33.333% - 1.34rem);
-}
-
-@media (max-width: 1024px) {
-  .grid-container {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-  .grid-container.flex-center .tech-card {
-    width: calc(50% - 0.75rem);
-  }
-}
-
-@media (max-width: 768px) {
-  .grid-container {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .grid-container.flex-center .tech-card {
-    width: 100%;
-  }
-}
-
 .tech-card {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s, background 0.3s;
+  transition: transform 0.3s;
 }
 
-.tech-card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.06);
-}
+.tech-card:hover { transform: translateY(-5px); }
 
 .card-img-placeholder {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  position: relative;
+  aspect-ratio: 4/3;
   background: #1B1E2B;
-  overflow: hidden;
 }
 
-/* 카드 내부에 메탈릭/유리 빛 들어간 구슬 느낌 효과 */
-.glow {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(108,130,248,0.4) 0%, transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tech-card-info {
-  padding: 1.5rem;
+/* Footer */
+.app-footer {
+  padding: 3rem 0;
   text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.tech-card-info h3 {
-  font-size: 1.32rem;
-  font-weight: 600;
-  margin: 0 0 1rem 0;
-  color: #fff;
+.footer-content {
+  color: var(--tech-muted);
 }
 
-.tech-card-info button {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 1.02rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.tech-card-info button:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* -------------------------------------
-   Checkout View
--------------------------------------- */
-.checkout-header {
-  padding: 2rem;
-  max-width: 600px;
-  margin: 120px auto 30px;
-  text-align: center;
-}
-
-.back-btn {
-  background: transparent;
-  border: 1px solid var(--tech-border);
-  padding: 8px 20px;
-  border-radius: 30px;
-  color: var(--tech-text);
-  cursor: pointer;
-  margin-bottom: 2rem;
-  font-size: 1.08rem;
-  font-weight: bold;
-  transition: all 0.3s;
-}
-
-.back-btn:hover {
-  background: #fff;
-  color: var(--tech-bg);
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 1024px) {
-  .nav-links {
-    display: none;
-  }
-  .grid-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-section {
-    padding-left: 0;
-    justify-content: center;
-  }
-  .hero-content {
-    text-align: center;
-  }
-  .hero-buttons {
-    justify-content: center;
-  }
-  .grid-container {
-    grid-template-columns: 1fr;
-  }
-  .section-divider {
-    margin-left: -3rem;
-    margin-right: -3rem;
-  }
-  .section-divider h2 {
-    font-size: clamp(2.10rem, 9.75vw, 3.75rem);
-    white-space: nowrap;
-    letter-spacing: -1px;
-    transform: scale(1.1);
-  }
-  /* 모바일 네비게이션 최적화 */
-  .navbar {
-    height: 65px;
-    top: 0 !important;
-    background: var(--tech-bg) !important;
-  }
-  .nav-content {
-    padding: 0 0.5rem;
-  }
-  .nav-logo-img {
-    height: 40px; /* 모바일에 맞게 로고 축소 */
-  }
-  .top-utility-bar {
-    display: none; /* 공간 확보를 위해 유틸바 숨김 */
-  }
-  .quote-content {
-    padding: 0 2rem;
-  }
-  .quote-text {
-    font-size: 1.44rem;
-  }
-}
-
-/* Mobile Slide Menu Styles */
+/* Mobile Slide Menu */
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
   gap: 5px;
   background: none;
   border: none;
-  cursor: pointer;
-  z-index: 1002;
-  padding: 5px 10px;
 }
 
 .hamburger-line {
   width: 22px;
   height: 2px;
-  background-color: var(--tech-text);
-  transition: all 0.3s ease;
-}
-
-.mobile-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 2000;
-  backdrop-filter: blur(3px);
-}
-
-.mobile-overlay.is-open {
-  opacity: 1;
-  visibility: visible;
+  background: #fff;
 }
 
 .mobile-slide-menu {
@@ -2433,39 +613,11 @@ html {
   width: 260px;
   height: 100vh;
   background: var(--tech-bg);
-  box-shadow: -5px 0 30px rgba(0,0,0,0.5);
   z-index: 2001;
-  transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-  display: flex;
-  flex-direction: column;
+  transition: right 0.4s ease;
 }
 
-.mobile-slide-menu.is-open {
-  right: 0;
-}
-
-.mobile-menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem;
-  border-bottom: 1px solid var(--tech-border);
-}
-
-.mobile-menu-title {
-  font-size: 1.32rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: var(--tech-text);
-}
-
-.close-menu-btn {
-  background: none;
-  border: none;
-  color: var(--tech-text);
-  font-size: 1.8rem;
-  cursor: pointer;
-}
+.mobile-slide-menu.is-open { right: 0; }
 
 .mobile-nav-links {
   display: flex;
@@ -2474,841 +626,182 @@ html {
   gap: 1.5rem;
 }
 
-.mobile-nav-links a {
-  color: var(--tech-text);
-  text-decoration: none;
-  font-size: 1.32rem;
-  font-weight: 600;
-  transition: color 0.2s;
-}
-
-.mobile-nav-links a:hover {
-  color: var(--tech-muted);
-}
-
-@media (max-width: 1024px) {
-  .mobile-menu-btn {
+.mobile-lang-row {
     display: flex;
-  }
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.mobile-lang-row button {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.mobile-lang-row button.active {
+    border-color: #59B3D9;
+    color: #59B3D9;
+}
+
+/* Animate */
+.animate-hidden {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s ease;
+}
+
+.animate-hidden.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .nav-links { display: none; }
+  .mobile-menu-btn { display: flex; }
 }
 
 @media (max-width: 768px) {
-  .hide-mobile {
-    display: none !important;
-  }
-  .nav-actions {
-    gap: 0.8rem !important;
-  }
-  .lang-toggle {
-    margin-right: 0 !important;
-    gap: 2px !important;
-    font-size: 13.2px;
-  }
-  .lang-btn {
-    padding: 2px !important;
-  }
-  .search-bar {
-    width: auto;
-    padding: 3px 6px;
-    margin-right: 0 !important;
-  }
-  .search-bar .search-icon {
-    font-size: 0.84rem;
-  }
-  .search-bar input {
-    width: 40px;
-    font-size: 0.84rem;
-  }
-  .mobile-menu-btn {
-    margin-right: 0;
-    padding: 2px;
-  }
-  .hamburger-line {
-    width: 18px;
-  }
+  .top-utility-bar { display: none; }
+  .navbar { height: 70px; top: 0; }
+  .main-content { padding-top: 70px; }
+  .hero-section { padding-left: 0; justify-content: center; text-align: center; }
+  .grid-container { grid-template-columns: 1fr; }
+  .footer-content { font-size: 0.65rem; }
+  .nav-logo-img { height: 36px; }
 }
 
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
-.modal-content {
-  background: var(--tech-bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+
+.tech-modal {
+  background: #1A1B26;
+  border: 1px solid rgba(255,255,255,0.15);
   padding: 2.5rem;
-  border-radius: 16px;
-  max-width: 400px;
+  border-radius: 20px;
+  max-width: 600px;
   width: 90%;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-}
-.modal-content h3 {
-  margin-top: 0;
-  font-size: 1.68rem;
-  color: #fff;
-  margin-bottom: 1rem;
-}
-.modal-desc {
-  color: var(--tech-muted);
-  font-size: 1.14rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-}
-.email-box {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  font-size: 1.32rem;
-  color: #59B3D9;
-  user-select: all;
-}
-.modal-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-.modal-actions button {
-  padding: 0.8rem 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  border: none;
-  font-size: 1.08rem;
-  transition: opacity 0.2s;
-}
-.modal-actions button:hover {
-  opacity: 0.8;
-}
-.modal-actions .outline-btn {
-  background: transparent;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.3);
-}
-.modal-actions .primary-btn {
-  background: #59B3D9;
-  color: #111;
-}
-.close-btn {
-  position: absolute;
-  top: 1rem; right: 1rem;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.44rem;
-  cursor: pointer;
-}
-.main-content {
-  padding-top: 120px; /* 고정 네비게이션 공간 확보 */
-}
-.detail-header {
-  max-width: 800px;
-  margin: 20px auto 20px;
-  padding: 0 20px;
-  text-align: center;
-  position: relative;
-}
-.mall-header {
-  margin-bottom: 60px;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
-/* --------------------------------------
-   Policy UI (Shipping/Refund)
--------------------------------------- */
-.policy-container {
-  margin-top: 50px;
-  padding: 30px;
-  text-align: left;
-}
-
-.policy-block {
-  margin-bottom: 30px;
-}
-
-.policy-block h3 {
-  font-size: 1.25rem;
-  color: #59B3D9;
-  margin-bottom: 15px;
-  border-bottom: 1px solid var(--tech-border);
-  padding-bottom: 10px;
-}
-
-.policy-block h4 {
-  font-size: 1rem;
-  margin: 15px 0 5px;
-  opacity: 0.9;
-}
-
-.pre-line {
-  white-space: pre-line;
-  line-height: 1.6;
-  opacity: 0.8;
-  font-size: 0.96rem;
-}
-
-.addr-box {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 15px;
-  border-radius: 8px;
-  margin: 15px 0;
-}
-
-.notice {
-  font-size: 0.84rem;
-  color: #ff6b6b;
-  margin-top: 10px;
-}
-
-.text-small {
-  font-size: 0.84rem;
-}
-.detail-header h2 {
-  font-size: 28.8px;
-  color: #fff;
-  margin: 0;
-}
-
-/* --------------------------------------
-   Shopping Cart UI
--------------------------------------- */
-.cart-section {
-  max-width: 800px;
-  margin: 0 auto 100px;
-}
-
-.empty-cart {
-  text-align: center;
-  padding: 60px 0;
-  color: var(--tech-muted);
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--tech-border);
-}
-
-.cart-item h3 {
-  margin: 0;
-  font-size: 1.14rem;
-}
-
-.cart-item p {
-  margin: 5px 0 0;
-  color: #59B3D9;
-  font-weight: bold;
-}
-
-.qty-control {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  width: fit-content;
-  padding: 5px 12px;
-  border-radius: 6px;
-}
-
-.qty-btn {
-  background: transparent;
-  border: 1px solid var(--tech-border);
-  color: #fff;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
-
-.qty-btn:hover {
-  background: #fff;
-  color: #000;
-}
-
-.qty-val {
-  font-weight: bold;
-  font-size: 1.08rem;
-  min-width: 20px;
-  text-align: center;
-}
-
-.del-btn {
-  background: rgba(255,107,107,0.1);
-  color: #ff6b6b;
-  border: 1px solid rgba(255,107,107,0.3);
-  padding: 5px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: auto;
-}
-
-.cart-summary {
-  padding: 30px;
-  border-top: 2px solid var(--tech-border);
-}
-
-.summary-row {
+.modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
 }
 
-.total-price {
+.modal-header h3 {
+  margin: 0;
+  color: #fff;
   font-size: 1.5rem;
-  color: #59B3D9;
-  font-weight: 800;
 }
 
-.btn-group-row {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-}
-
-.small-btn {
-  flex: 1;
-  padding: 10px;
-  font-size: 0.84rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.container-narrow {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.detail-header .back-btn {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  color: #59B3D9;
+.close-btn {
+  background: none;
   border: none;
-  font-size: 19.2px;
+  color: #fff;
+  font-size: 1.5rem;
   cursor: pointer;
 }
-.product-detail-container {
-  max-width: 800px;
-  margin: 0 auto 60px;
-  padding: 20px;
-  background: var(--tech-bg);
-  border-radius: 12px;
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
-.detail-images {
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-row .label {
+  color: var(--tech-muted);
+  font-weight: 600;
+}
+
+/* Order Detail Styles */
+.order-detail-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-bottom: 40px;
 }
-.detail-images img {
-  width: 100%;
+
+.detail-section {
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  display: block;
-}
-.shipping-info {
-  background: rgba(89, 179, 217, 0.1);
-  border-left: 4px solid #59B3D9;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 40px;
-  font-size: 1.32rem;
-  color: #fff;
-  text-align: center;
-}
-.detail-action-bottom {
-  text-align: center;
-}
-.huge-btn {
-  width: 100%;
-  padding: 20px;
-  font-size: 1.56rem;
-  border-radius: 12px;
-  color: #111;
-  background: #59B3D9;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-.lang-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 16px;
-  font-size: 16.8px;
-}
-.lang-btn {
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  font-weight: 600;
-  padding: 4px;
-  transition: color 0.2s;
-}
-.lang-btn.active {
-  color: #fff;
-}
-.lang-btn:hover {
-  color: rgba(255, 255, 255, 0.8);
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
-/* Recruitment View */
-.recruit-view-container {
-  background-color: var(--tech-bg);
-  color: #fff;
-  min-height: 100vh;
-  padding: 140px 20px 80px;
-}
-
-.recruit-header {
-  max-width: 800px;
-  margin: 0 auto 40px;
-  text-align: left;
-}
-
-.recruit-header h2 {
-  font-size: 2.1rem;
-  font-weight: 800;
-  margin-bottom: 20px;
-  color: #fff;
-}
-
-.recruit-header p {
-  font-size: 1.14rem;
-  line-height: 1.6;
-  opacity: 0.8;
-  color: #fff;
-  margin: 0;
-}
-
-.recruit-form {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-}
-
-.recruit-input-group {
-  margin-bottom: 25px;
-}
-
-.recruit-input-group label {
-  display: block;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  color: #9DA1B4;
-  text-align: left;
-}
-
-.recruit-input-group input, 
-.recruit-input-group textarea {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+.detail-sec-title {
   font-size: 1rem;
-  outline: none;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.phone-inputs {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-}
-
-.phone-inputs input {
-  flex: 1;
-  text-align: center;
-}
-
-.phone-inputs span {
-  color: var(--tech-muted);
-}
-
-.phone-inputs input {
-  width: 80px;
-  text-align: center;
-}
-
-.recruit-submit-btn {
-  background: #59B3D9;
-  color: #111;
-  border: none;
-  padding: 12px 40px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-  display: block;
-  margin: 20px auto 0;
-  border-radius: 30px;
-}
-
-.recruit-submit-btn:hover {
-  opacity: 0.8;
-  transform: translateY(-2px);
-}
-
-.support-select {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  font-size: 1rem;
-  outline: none;
-  border-radius: 6px;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.support-select option {
-  background: #1a1b26;
-  color: #fff;
-}
-
-/* My Page Styles */
-.mypage-view-container {
-  padding: 140px 20px 80px;
-  min-height: 100vh;
-}
-
-.mypage-header {
-  margin-bottom: 40px;
-}
-
-.mypage-header h1 {
-  font-size: 2.16rem;
-  margin-bottom: 8px;
-}
-
-.user-welcome {
-  color: #59B3D9;
   font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.mypage-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.mypage-card {
-  padding: 24px;
-  border-radius: 16px;
-  transition: transform 0.3s;
-}
-
-.mypage-card:hover {
-  transform: translateY(-5px);
-}
-
-.card-header h3 {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 12px;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  color: rgba(255,255,255,0.7);
-}
-
-.stat-val {
   color: #59B3D9;
-  font-weight: 700;
+  margin: 0 0 12px;
+  border-bottom: 1px solid rgba(89, 179, 217, 0.2);
+  padding-bottom: 8px;
 }
 
-.empty-msg {
-  font-size: 0.84rem;
-  color: rgba(255,255,255,0.3);
-  margin-top: 12px;
-  text-align: center;
-}
-
-.small-action-btn {
-  background: rgba(89, 179, 217, 0.1);
-  border: 1px solid #59B3D9;
-  color: #59B3D9;
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 12px;
-  transition: all 0.2s;
-}
-
-.small-action-btn:hover {
-  background: #59B3D9;
-  color: #111;
-}
-
-.logout-btn {
-  background: transparent;
-  border: 1px solid #ff6b6b;
-  color: #ff6b6b;
-  padding: 8px 24px;
-  border-radius: 30px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background: #ff6b6b;
-  color: #fff;
-}
-
-/* Admin Dashboard */
-.admin-view-container {
-  padding: 140px 20px 80px;
-}
-
-.admin-top {
-  margin-bottom: 40px;
-}
-
-.admin-top h1 {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.badge {
-  background: #ff6b6b;
-  color: #fff;
-  font-size: 0.8rem;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-.admin-tabs {
-  margin-top: 24px;
-  display: flex;
-  gap: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.admin-tabs button {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  padding: 12px 24px;
-  cursor: pointer;
-  font-weight: 700;
-  position: relative;
-}
-
-.admin-tabs button.active {
-  color: #59B3D9;
-}
-
-.admin-tabs button.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #59B3D9;
-}
-
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-table th {
-  text-align: left;
-  padding: 16px;
-  background: rgba(255,255,255,0.05);
-  font-size: 0.9rem;
-  color: #9DA1B4;
-}
-
-.admin-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 0.9rem;
-}
-
-.category-tag {
-  background: rgba(89, 179, 217, 0.1);
-  color: #59B3D9;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.content-cell {
-  max-width: 300px;
-  white-space: pre-wrap;
-  color: rgba(255,255,255,0.7);
-}
-
-/* User History List in My Page */
-.user-history-list {
-  margin-top: 15px;
-  max-height: 150px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.user-history-list::-webkit-scrollbar {
-  width: 4px;
-}
-.user-history-list::-webkit-scrollbar-thumb {
-  background: rgba(89, 179, 217, 0.3);
-  border-radius: 10px;
-}
-
-.history-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 0.82rem;
-}
-
-.h-date {
-  color: rgba(255,255,255,0.4);
-  font-size: 0.75rem;
-  min-width: 70px;
-}
-
-.h-title {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.h-status {
-  font-size: 0.72rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: rgba(89, 179, 217, 0.1);
-  color: #59B3D9;
-}
-
-.h-status.preparing { background: rgba(255, 193, 7, 0.1); color: #FFC107; }
-.h-status.shipping { background: rgba(89, 179, 217, 0.1); color: #59B3D9; }
-.h-status.delivered { background: rgba(40, 167, 69, 0.1); color: #28A745; }
-
-.h-status.pending {
-  color: #59B3D9;
-}
-
-.history-item.clickable {
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.history-item.clickable:hover {
-  background: rgba(255,255,255,0.05);
-}
-
-/* Detail Modal Styles */
-.detail-modal-content {
-  max-width: 600px !important;
-  width: 90% !important;
-}
-
-.detail-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 15px;
-}
-
-.detail-header-row h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #59B3D9;
-}
-
-.detail-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.info-cell {
+.detail-data-box {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
 }
 
-.info-cell label {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
-}
-
-.info-cell span {
+.data-row {
+  display: flex;
+  justify-content: space-between;
   font-size: 0.95rem;
-  color: #fff;
+  line-height: 1.4;
 }
 
-.detail-desc-box {
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.05);
+.data-row span {
+  opacity: 0.7;
 }
 
-.detail-desc-box label {
-  display: block;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
-  margin-bottom: 10px;
-}
-
-.content-text {
-  background: rgba(0,0,0,0.2);
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 0.95rem;
+.detail-content-box {
+  background: rgba(255,255,255,0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 1rem;
   line-height: 1.6;
-  white-space: pre-wrap;
-  color: rgba(255,255,255,0.9);
-  min-height: 100px;
+  white-space: pre-line;
 }
 
-@media (max-width: 768px) {
-  .recruit-header h2 { font-size: 1.8rem; }
-  .recruit-form { padding: 20px; }
+.admin-reply-section textarea {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  height: 100px;
 }
+
+.status-tag {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.status-tag.preparing { background: rgba(255, 171, 0, 0.1); color: #ffab00; }
+.status-tag.shipping { background: rgba(54, 179, 126, 0.1); color: #36b37e; }
+.status-tag.delivered { background: rgba(0, 101, 255, 0.1); color: #0065ff; }
 </style>

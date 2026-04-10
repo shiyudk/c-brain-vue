@@ -1,0 +1,281 @@
+<script setup>
+import { onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { supabase } from './supabase.js'
+import { 
+  state, t, isAdmin, 
+  fetchAdminData, fetchUserDashboardData, 
+  logout 
+} from './store'
+
+const router = useRouter()
+const route = useRoute()
+
+const formatContent = (text) => {
+  if (!text) return ''
+  let safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  safeText = safeText.replace(/\[FILE:([^|]+)\|([^\]]+)\]/g, '<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline; font-weight: bold;">📎 $1</a>');
+  safeText = safeText.replace(/(^|[^"'])((https?):\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline;">$2</a>');
+  return safeText.replace(/\n/g, '<br/>')
+}
+
+const handleLogout = async () => {
+  await logout()
+  router.push({ name: 'home' })
+}
+
+const toggleMobileMenu = () => {
+  state.isMobileMenuOpen = !state.isMobileMenuOpen
+  document.body.style.overflow = state.isMobileMenuOpen ? 'hidden' : ''
+}
+
+const goHome = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'home' })
+}
+
+const goToMall = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'mall' })
+}
+
+const goToMyPage = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  if (!state.currentUser) {
+    router.push({ name: 'auth', query: { mode: 'login' } })
+    return
+  }
+  fetchUserDashboardData()
+  router.push({ name: 'mypage' })
+}
+
+const goToCart = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'cart' })
+}
+
+const goToSupport = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'support' })
+}
+
+const goToJobs = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'recruit' })
+}
+
+const goToAuth = (mode = 'login') => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'auth', query: { mode } })
+}
+
+const goToAdmin = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  router.push({ name: 'admin' })
+}
+
+const scrollToPhilosophy = () => {
+  if (route.name !== 'home') {
+    router.push({ name: 'home', hash: '#philosophy' })
+  } else {
+    const el = document.getElementById('philosophy')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+const scrollToConsulting = () => {
+  if (state.isMobileMenuOpen) toggleMobileMenu()
+  if (route.name !== 'home') {
+    router.push({ name: 'home', hash: '#consulting-boxes' })
+  } else {
+    const el = document.getElementById('consulting-boxes')
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }
+}
+
+const closeDetailModal = () => {
+  state.showDetailModal = false
+  state.selectedItemDetail = null
+  state.adminReplyText = ''
+}
+
+const submitAdminReply = async (id) => {
+  if (!supabase || !isAdmin.value) return
+  try {
+    const { error } = await supabase
+      .from('inquiries')
+      .update({ admin_reply: state.adminReplyText, status: 'completed' })
+      .eq('id', id)
+      
+    if (error) {
+      alert("데이터베이스 오류: " + error.message)
+      return
+    }
+    
+    alert('답변이 저장되었습니다.')
+    if (state.selectedItemDetail) {
+      state.selectedItemDetail.admin_reply = state.adminReplyText
+      state.selectedItemDetail.status = 'completed'
+    }
+    const item = state.adminInquiries.find(i => i.id === id)
+    if (item) {
+      item.admin_reply = state.adminReplyText
+      item.status = 'completed'
+    }
+  } catch (err) {
+    alert("오류 발생: " + err.message)
+  }
+}
+
+const copyEmail = () => {
+  navigator.clipboard.writeText('contact@c-braindesign.com')
+  alert(state.currentLang === 'ko' ? '이메일 주소가 복사되었습니다!' : 'Email address copied!')
+}
+
+const triggerMailApp = () => {
+  const mailToLink = document.createElement('a')
+  mailToLink.href = 'mailto:contact@c-braindesign.com'
+  mailToLink.click()
+}
+
+onMounted(() => {
+  const observer = new IntersectionObserver((entries) => {entries.forEach((entry) => {if (entry.isIntersecting) {entry.target.classList.add('show');}});}, { threshold: 0.1 });
+  const hiddenElements = document.querySelectorAll('.animate-hidden');
+  hiddenElements.forEach((el) => observer.observe(el));
+});
+
+watch(() => route.hash, (newHash) => {
+  if (newHash) {
+    setTimeout(() => {
+      const el = document.querySelector(newHash)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 500)
+  }
+})
+</script>
+
+<template>
+  <div class="app-container">
+    <div class="top-utility-bar">
+      <div class="utility-content">
+        <a href="#" @click.prevent="goToMall" style="margin-right: 1.5rem; font-weight: 700; color: #59B3D9;">{{ t.nav.mall }}</a>
+        <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
+        <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
+        <a href="#" v-if="isAdmin" @click.prevent="goToAdmin" style="color: #ff6b6b; font-weight: 700; margin-left: 1rem;">ADMIN</a>
+        <template v-if="state.currentUser">
+           <a href="#" @click.prevent="goToMyPage" style="margin-right: 1rem;">마이페이지</a>
+           <a href="#" @click.prevent="handleLogout">로그아웃</a>
+        </template>
+        <template v-else>
+          <a href="#" @click.prevent="goToAuth('signup')">{{ t.nav.signup }}</a>
+        </template>
+      </div>
+    </div>
+
+    <header class="navbar">
+      <div class="nav-content">
+        <a href="#" class="logo" @click.prevent="goHome">
+          <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
+        </a>
+        <nav class="nav-links">
+          <a href="#" @click.prevent="scrollToPhilosophy">{{ t.nav.company }}</a>
+          <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.personal }}</a>
+          <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.ai }}</a>
+          <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.kids }}</a>
+        </nav>
+
+        <div class="nav-actions">
+          <div class="lang-toggle">
+            <button @click="state.currentLang = 'ko'" :class="{ active: state.currentLang === 'ko' }" class="lang-btn">KR</button>
+            <span style="color:rgba(255,255,255,0.2)">|</span>
+            <button @click="state.currentLang = 'en'" :class="{ active: state.currentLang === 'en' }" class="lang-btn">EN</button>
+          </div>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToCart">🛒 <span v-if="state.cart.length > 0" class="cart-count">{{ state.cart.length }}</span></a>
+          <a href="#" class="icon-btn hide-mobile" @click.prevent="goToMyPage">👤</a>
+          <button class="mobile-menu-btn" @click="toggleMobileMenu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mobile-overlay" :class="{ 'is-open': state.isMobileMenuOpen }" @click="toggleMobileMenu"></div>
+    <div class="mobile-slide-menu" :class="{ 'is-open': state.isMobileMenuOpen }">
+      <div class="mobile-menu-header">
+        <span class="mobile-menu-title">MENU</span>
+        <button class="close-menu-btn" @click="toggleMobileMenu">✕</button>
+      </div>
+      <nav class="mobile-nav-links">
+        <a href="#" @click.prevent="scrollToPhilosophy(); if(state.isMobileMenuOpen) toggleMobileMenu()">{{ t.nav.company }}</a>
+        <a href="#" @click.prevent="goToMall()">{{ t.nav.mall }}</a>
+        <a href="#" @click.prevent="goToJobs()">{{ t.nav.jobs }}</a>
+        <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.personal }}</a>
+        <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.ai }}</a>
+        <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.kids }}</a>
+        <a href="#" @click.prevent="goToCart()">장바구니 ({{ state.cart.length }})</a>
+        <a href="#" @click.prevent="goToMyPage()">마이페이지</a>
+        <a href="#" v-if="isAdmin" @click.prevent="goToAdmin()" style="color: #ff6b6b; font-weight: 700;">ADMIN DASHBOARD</a>
+        <div class="mobile-lang-row">
+            <button @click="state.currentLang = 'ko'" :class="{ active: state.currentLang === 'ko' }">KOR</button>
+            <button @click="state.currentLang = 'en'" :class="{ active: state.currentLang === 'en' }">ENG</button>
+        </div>
+      </nav>
+    </div>
+
+    <main class="main-content">
+      <router-view />
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>{{ t.footer.company }}</p>
+        <p style="white-space: pre-line;">{{ t.footer.bizNo }}</p>
+        <p>{{ t.footer.contact }}</p>
+        <p class="copyright">{{ t.footer.copyright }}</p>
+      </div>
+    </footer>
+
+    <div class="modal-overlay" v-if="state.showDetailModal" @click.self="closeDetailModal">
+      <div class="tech-modal glass-panel">
+        <div class="modal-header">
+          <h3>{{ state.selectedItemDetail?.subject || state.selectedItemDetail?.product_name || 'Detail' }}</h3>
+          <button @click="closeDetailModal" class="close-btn">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row">
+            <span class="label">Date:</span>
+            <span>{{ new Date(state.selectedItemDetail?.created_at).toLocaleString() }}</span>
+          </div>
+          <div class="detail-content-box" v-html="formatContent(state.selectedItemDetail?.content || state.selectedItemDetail?.product_name)"></div>
+          <div v-if="isAdmin && state.selectedItemDetail?.category" class="admin-reply-section">
+            <textarea v-model="state.adminReplyText" placeholder="답변을 입력하세요..."></textarea>
+            <button @click="submitAdminReply(state.selectedItemDetail.id)" class="primary-btn">답변 저장</button>
+          </div>
+          <div v-else-if="state.selectedItemDetail?.admin_reply" class="user-reply-box">
+             <h4>Admin Reply:</h4>
+             <p v-html="formatContent(state.selectedItemDetail.admin_reply)"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" v-if="state.showContactModal" @click.self="state.showContactModal = false">
+      <div class="tech-modal glass-panel small-modal">
+        <div class="modal-header">
+          <h3>{{ t.modal.title }}</h3>
+          <button @click="state.showContactModal = false" class="close-btn">✕</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+          <p style="margin-bottom: 25px; opacity: 0.8; line-height: 1.6;">{{ t.modal.desc }}</p>
+          <div class="contact-email">contact@c-braindesign.com</div>
+          <div class="modal-actions-grid">
+            <button class="primary-btn" @click="copyEmail">{{ t.modal.copy }}</button>
+            <button class="outline-btn" @click="triggerMailApp">{{ t.modal.app }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -18,6 +18,9 @@ const emit = defineEmits(['back'])
 const isLogin = ref(props.initialMode === 'login')
 const signupComplete = ref(false)
 const registeredUserName = ref('')
+const isLoading = ref(false)
+const authMessage = ref('')
+const isErrorMessage = ref(true)
 
 watch(() => props.initialMode, (newVal) => {
   isLogin.value = newVal === 'login'
@@ -57,7 +60,10 @@ const t = computed(() => {
       errKey: 'API 키가 설정되지 않았습니다. 가이드를 참고해 환경변수를 등록해주세요.',
       loginSuccess: '로그인 성공!',
       signupSuccess: '회원가입 성공! 등록한 이메일을 확인하여 인증해주세요.',
-      pwMismatch: '비밀번호가 서로 일치하지 않습니다.'
+      pwMismatch: '비밀번호가 서로 일치하지 않습니다.',
+      forgotSent: '비밀번호 재설정 이메일이 발송되었습니다.',
+      enterEmail: '이메일을 먼저 입력해주세요.',
+      invalidLogin: '이메일 주소 또는 비밀번호가 올바르지 않습니다.'
     },
     en: {
       loginTitle: 'Welcome Back',
@@ -78,7 +84,10 @@ const t = computed(() => {
       errKey: 'API keys are missing. Please setup environment variables.',
       loginSuccess: 'Login Successful!',
       signupSuccess: 'Signup Successful! Please check your email to verify your account.',
-      pwMismatch: 'Passwords do not match.'
+      pwMismatch: 'Passwords do not match.',
+      forgotSent: 'Password reset link sent to your email.',
+      enterEmail: 'Please enter your email address.',
+      invalidLogin: 'Invalid email or password.'
     }
   }
   return dict[props.currentLang] || dict.ko
@@ -86,31 +95,77 @@ const t = computed(() => {
 
 const handleSubmit = async () => {
   if (!supabase) {
-    alert(t.value.errKey); return;
+    authMessage.value = t.value.errKey;
+    isErrorMessage.value = true;
+    return;
   }
-  if (isLogin.value) {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
-    })
-    if (error) alert(error.message)
-    else { alert(t.value.loginSuccess); emit('back'); }
-  } else {
-    if (password.value !== passwordConfirm.value) {
-      alert(t.value.pwMismatch)
-      return
-    }
-    const { error } = await supabase.auth.signUp({
-      email: email.value,
-      password: password.value,
-      options: { data: { full_name: name.value } }
-    })
-    if (error) alert(error.message)
-    else { 
+  
+  authMessage.value = '';
+  isLoading.value = true;
+  try {
+    if (isLogin.value) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.value,
+        password: password.value,
+      })
+      if (error) throw error;
+      
+      authMessage.value = t.value.loginSuccess;
+      isErrorMessage.value = false;
+      
+      // 약간의 지연 후 이동 (메시지를 볼 시간 확보)
+      setTimeout(() => {
+        emit('back');
+      }, 800);
+    } else {
+      if (password.value !== passwordConfirm.value) {
+        authMessage.value = t.value.pwMismatch;
+        isErrorMessage.value = true;
+        return
+      }
+      const { error } = await supabase.auth.signUp({
+        email: email.value,
+        password: password.value,
+        options: { data: { full_name: name.value } }
+      })
+      if (error) throw error;
       registeredUserName.value = name.value || email.value.split('@')[0]
       signupComplete.value = true 
     }
+  } catch (error) {
+    console.error('Auth Error:', error);
+    let msg = error.message || error;
+    if (msg === 'Invalid login credentials') {
+      msg = t.value.invalidLogin;
+    }
+    authMessage.value = msg;
+    isErrorMessage.value = true;
+  } finally {
+    isLoading.value = false;
   }
+}
+
+const handleForgotPassword = async () => {
+    if (!email.value) {
+        authMessage.value = t.value.enterEmail;
+        isErrorMessage.value = true;
+        return;
+    }
+    authMessage.value = '';
+    isLoading.value = true;
+    try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
+            redirectTo: window.location.origin + '/auth?mode=reset'
+        });
+        if (error) throw error;
+        authMessage.value = t.value.forgotSent;
+        isErrorMessage.value = false;
+    } catch (err) {
+        authMessage.value = err.message;
+        isErrorMessage.value = true;
+    } finally {
+        isLoading.value = false;
+    }
 }
 
 const loginWithProvider = async (providerName) => {
@@ -144,12 +199,12 @@ const loginWithProvider = async (providerName) => {
 
     <div class="auth-container animate-fade" v-if="signupComplete">
       <div class="auth-box glass-panel" style="text-align: center;">
-        <h2 style="font-size: 25.6px; margin-bottom:1rem;">🎉</h2>
+        <h2 style="font-size: 30.7px; margin-bottom:1rem;">🎉</h2>
         <h2 style="margin-bottom:1rem;">{{ currentLang === 'ko' ? '회원가입되셨습니다!' : 'Signup Successful!' }}</h2>
         <p style="color:rgba(255,255,255,0.7); margin-bottom:1rem;">
           {{ currentLang === 'ko' ? `${registeredUserName}님, 환영합니다.` : `Welcome, ${registeredUserName}.` }}
         </p>
-        <p style="color:#ff6b6b; font-size: 11.2px; margin-bottom:2rem; background:rgba(255,107,107,0.1); padding:12px; border-radius:8px; line-height:1.5;">
+        <p style="color:#ff6b6b; font-size: 13.4px; margin-bottom:2rem; background:rgba(255,107,107,0.1); padding:12px; border-radius:8px; line-height:1.5;">
           {{ currentLang === 'ko' ? '메일함(또는 스팸함)으로 발송된 인증 링크(Confirm)를 클릭하셔야 로그인이 가능합니다.' : 'Please click the confirmation link sent to your email (or spam folder) to log in.' }}
         </p>
         <button class="submit-btn neon-border-btn" style="width:100%" @click="$emit('back')">
@@ -186,12 +241,16 @@ const loginWithProvider = async (providerName) => {
           </div>
 
           <div class="form-actions" v-if="isLogin">
-            <a href="#" class="forgot-link text-small" @click.prevent>{{ t.forgotBtn }}</a>
+            <a href="#" class="forgot-link text-small" @click.prevent="handleForgotPassword">{{ t.forgotBtn }}</a>
           </div>
 
-          <button type="submit" class="submit-btn neon-border-btn">
-            {{ isLogin ? t.loginBtn : t.signupBtn }}
+          <button type="submit" class="submit-btn neon-border-btn" :disabled="isLoading">
+            {{ isLoading ? (currentLang === 'ko' ? '처리중...' : 'Processing...') : (isLogin ? t.loginBtn : t.signupBtn) }}
           </button>
+
+          <div v-if="authMessage" class="auth-status-message animate-fade" :class="{ 'is-error': isErrorMessage }">
+            {{ isErrorMessage ? '⚠️' : '✅' }} {{ authMessage }}
+          </div>
         </form>
 
         <div class="social-login">
@@ -227,7 +286,35 @@ const loginWithProvider = async (providerName) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 2.5rem 2rem 2rem; /* 상단 여백 축소 */
+}
+
+@media (max-width: 768px) {
+  .auth-wrapper {
+    padding-top: 100px; /* 헤더 공간 충분히 확보 */
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .auth-header h2 {
+    font-size: 1.12rem !important; /* 70% of 1.6rem */
+  }
+  .input-group input {
+    font-size: 16px !important; /* 자동 확대 방지용 16px 유지 */
+  }
+  .checkout-header {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .submit-btn {
+    font-size: 0.8rem;
+    padding: 12px;
+  }
+  .back-btn {
+    font-size: 0.65rem;
+  }
+  .text-small {
+    font-size: 0.65rem;
+  }
 }
 
 .checkout-header {
@@ -235,25 +322,8 @@ const loginWithProvider = async (providerName) => {
   max-width: 480px;
   text-align: left;
   margin-bottom: 2rem;
-  margin-top: 4rem;
 }
 
-.back-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 8px 20px;
-  border-radius: 30px;
-  color: #D3D5DF;
-  cursor: pointer;
-  font-size: 11.2px;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.back-btn:hover {
-  background: #fff;
-  color: #111;
-}
 
 .auth-container {
   width: 100%;
@@ -276,7 +346,7 @@ const loginWithProvider = async (providerName) => {
 }
 
 .auth-header h2 {
-  font-size: 22.4px;
+  font-size: 26.9px;
   color: #fff;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -297,7 +367,7 @@ const loginWithProvider = async (providerName) => {
 }
 
 .input-group label {
-  font-size: 11px;
+  font-size: 13.2px;
   color: rgba(255,255,255,0.7);
   font-weight: 600;
   margin-left: 4px;
@@ -309,7 +379,7 @@ const loginWithProvider = async (providerName) => {
   border-radius: 12px;
   padding: 14px 16px;
   color: #fff;
-  font-size: 12px;
+  font-size: 14.4px;
   transition: all 0.2s ease;
   outline: none;
 }
@@ -326,12 +396,12 @@ const loginWithProvider = async (providerName) => {
 }
 
 .text-small {
-  font-size: 11px;
+  font-size: 13.2px;
   color: rgba(255,255,255,0.6);
 }
 
 .text-tiny {
-  font-size: 11px;
+  font-size: 13.2px;
   color: rgba(255,255,255,0.4);
   margin-top: 1rem;
   line-height: 1.5;
@@ -353,7 +423,7 @@ const loginWithProvider = async (providerName) => {
   margin-top: 1rem;
   padding: 16px;
   border-radius: 14px;
-  font-size: 12.8px;
+  font-size: 15.4px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -381,7 +451,7 @@ const loginWithProvider = async (providerName) => {
   text-align: center;
   margin: 2rem 0;
   color: rgba(255,255,255,0.3);
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 600;
 }
 
@@ -404,11 +474,11 @@ const loginWithProvider = async (providerName) => {
 
 .social-btn {
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
   padding: 14px;
   border-radius: 12px;
-  font-size: 11.2px;
+  font-size: 13.4px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -448,7 +518,7 @@ const loginWithProvider = async (providerName) => {
   background: none;
   border: none;
   color: #59B3D9;
-  font-size: 11.2px;
+  font-size: 13.4px;
   font-weight: 700;
   cursor: pointer;
   padding: 0;
@@ -463,6 +533,24 @@ const loginWithProvider = async (providerName) => {
 
 .animate-fade {
   animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.auth-status-message {
+  margin-top: 1.5rem;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  background: rgba(89, 179, 217, 0.1);
+  color: #59B3D9;
+  border: 1px solid rgba(89, 179, 217, 0.2);
+}
+
+.auth-status-message.is-error {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.2);
 }
 
 @keyframes fadeUp {
