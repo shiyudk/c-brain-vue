@@ -198,7 +198,7 @@ const translations = {
     detail: { backBtn: '??Back', detailInfo: 'Details', shipping: '?슊 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
     checkout: { title: 'Checkout / Booking' },
     modal: { title: 'Quote & Inquiry', desc: 'Please leave inquiries via email below for a rapid response.', copy: 'Copy Address', app: 'Open Mail App' },
-    footer: { company: 'Company: Continuum Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: ??026-?쒖슱?숇?臾?0710??| Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '짤 2026 Continuum Brain Design. All rights reserved.' },
+    footer: { company: 'Company: Continuum Brain Design (CBD) | LEADER: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: ??026-?쒖슱?숇?臾?0710??| Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '짤 2026 Continuum Brain Design. All rights reserved.' },
     cart: { title: 'Shopping Cart', empty: 'Your cart is empty.', addBtn: 'Add to Cart', checkout: 'Checkout Selected', checkoutAll: 'Checkout All', delete: 'Delete', total: 'Total Amount', guest: 'Guest Checkout' },
     policy: {
       returnTitle: 'Exchange & Return Info',

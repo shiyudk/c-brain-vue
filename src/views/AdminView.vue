@@ -156,7 +156,7 @@ onMounted(() => {
   fetchAdminData()
   
   // 초기 탭 설정
-  if (!state.leadershipTeamTab) state.leadershipTeamTab = 'CEO'
+  if (!state.leadershipTeamTab) state.leadershipTeamTab = 'LEADER'
 })
 
 // Leadership Tasks Logic
@@ -262,14 +262,39 @@ const getCurrentTeamTasks = () => {
   return state.leadershipTasks[team]
 }
 
+let saveTimeout = null
 const saveTasks = async () => {
   // 로컬 스토리지 백업
   localStorage.setItem('leadership_tasks', JSON.stringify(state.leadershipTasks))
   
-  // Supabase 연동 (테이블이 있는 경우)
-  if (supabase && isAdmin.value) {
-     // 실시간 저장은 추후 테이블 구조 확정 후 고도화 가능
-  }
+  // Supabase 연동 (디바운스 처리)
+  if (saveTimeout) clearTimeout(saveTimeout)
+  saveTimeout = setTimeout(async () => {
+    if (supabase && isAdmin.value) {
+      try {
+        const team = state.leadershipTeamTab
+        const tasks = state.leadershipTasks[team]
+        if (!team) return
+
+        // 해당 팀의 데이터를 upsert (team_name 이 PK 또는 Unique 제약조건이 있어야 함)
+        const { error } = await supabase
+          .from('leadership_tasks')
+          .upsert({ 
+            team_name: team, 
+            tasks: tasks, 
+            updated_at: new Date().toISOString() 
+          }, { onConflict: 'team_name' })
+        
+        if (error) {
+          console.error('Supabase sync error:', error.message)
+        } else {
+          console.log(`Sync success: ${team}`)
+        }
+      } catch (err) {
+        console.error('Critical sync error:', err)
+      }
+    }
+  }, 1000) // 1초 디바운스
 }
 </script>
 
@@ -288,7 +313,7 @@ const saveTasks = async () => {
     <!-- Leadership Dashboard -->
     <div v-if="state.adminActiveTab === 'leadership'" class="leadership-dashboard">
       <div class="leadership-teams-bar">
-        <button v-for="team in ['CEO', 'PRODUCT & OPERATION', 'FINANCIAL', 'LEGAL RISK', 'BRAND & MARKETING']" 
+        <button v-for="team in ['LEADER', 'PRODUCT & OPERATION', 'FINANCIAL', 'LEGAL RISK', 'BRAND & MARKETING']" 
                 :key="team" 
                 @click="state.leadershipTeamTab = team"
                 :class="{ active: state.leadershipTeamTab === team }"
@@ -299,9 +324,9 @@ const saveTasks = async () => {
 
       <div class="leadership-content glass-panel" v-if="state.leadershipTeamTab">
         <div class="role-grid">
-           <!-- CEO Team -->
-           <div v-if="state.leadershipTeamTab === 'CEO'" class="role-card highlight">
-              <div class="role-header"><h3>CEO</h3><p>방향결정 및 최종 책임자</p></div>
+           <!-- LEADER Team -->
+           <div v-if="state.leadershipTeamTab === 'LEADER'" class="role-card highlight">
+              <div class="role-header"><h3>LEADER</h3><p>방향결정 및 최종 책임자</p></div>
               <ul class="role-list">
                 <li>비전 및 전사 전략 결정</li>
                 <li>C-level 성과 평가</li>
@@ -407,7 +432,7 @@ const saveTasks = async () => {
                   <!-- Project Header Row: Title and Dates ONLY -->
                   <tr class="project-header-row" style="border: none !important;">
                     <td class="align-top" style="min-width: 220px !important; max-width: 220px !important; width: 220px !important; padding: 12px 10px; box-sizing: border-box; display: table-cell !important;">
-                      <input type="text" v-model="project.title" placeholder="업무명" class="todo-input" @blur="saveTasks" style="width: 100%; font-weight: bold; color: #59B3D9;" />
+                      <input type="text" v-model="project.title" placeholder="업무명" class="todo-input" @input="saveTasks" style="width: 100%; font-weight: bold; color: #59B3D9;" />
                     </td>
                     <td class="date-cell align-top" style="min-width: 325px !important; max-width: 325px !important; width: 325px !important; padding: 12px 2px !important; box-sizing: border-box; overflow: hidden; display: table-cell !important;">
                       <div class="date-inputs-group" style="display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; gap: 4px; width: 100%;">
@@ -437,11 +462,11 @@ const saveTasks = async () => {
                             <span class="checkmark" v-if="project.subTasks[0].completed">✅</span>
                             <span class="checkmark-empty" v-else>⬜</span>
                           </label>
-                          <textarea v-model="project.subTasks[0].detail" placeholder="상세 내용" class="todo-textarea auto-grow" :class="{ 'strike': project.subTasks[0].completed }" @input="autoResize" @blur="saveTasks"></textarea>
+                          <textarea v-model="project.subTasks[0].detail" placeholder="상세 내용" class="todo-textarea auto-grow" :class="{ 'strike': project.subTasks[0].completed }" @input="e => { autoResize(e); saveTasks(); }"></textarea>
                         </div>
                       </td>
                       <td class="align-top" style="min-width: 350px !important; max-width: 350px !important; width: 350px !important; padding: 12px 10px; box-sizing: border-box; display: table-cell !important;">
-                        <textarea v-model="project.subTasks[0].reference" placeholder="참고 사항" class="todo-textarea auto-grow" @input="autoResize" @blur="saveTasks"></textarea>
+                        <textarea v-model="project.subTasks[0].reference" placeholder="참고 사항" class="todo-textarea auto-grow" @input="e => { autoResize(e); saveTasks(); }"></textarea>
                       </td>
                       <td class="align-top" style="min-width: 180px !important; max-width: 180px !important; width: 180px !important; padding: 12px 10px; box-sizing: border-box; display: table-cell !important;">
                         <div class="progress-container" style="margin: 0 auto; width: 120px;">
@@ -475,11 +500,11 @@ const saveTasks = async () => {
                           <span class="checkmark" v-if="sub.completed">✅</span>
                           <span class="checkmark-empty" v-else>⬜</span>
                         </label>
-                        <textarea v-model="sub.detail" placeholder="상세 내용" class="todo-textarea auto-grow" :class="{ 'strike': sub.completed }" @input="autoResize" @blur="saveTasks"></textarea>
+                        <textarea v-model="sub.detail" placeholder="상세 내용" class="todo-textarea auto-grow" :class="{ 'strike': sub.completed }" @input="e => { autoResize(e); saveTasks(); }"></textarea>
                       </div>
                     </td>
                     <td class="align-top" style="min-width: 350px !important; max-width: 350px !important; width: 350px !important; padding: 12px 10px; box-sizing: border-box;">
-                      <textarea v-model="sub.reference" placeholder="참고 사항" class="todo-textarea auto-grow" @input="autoResize" @blur="saveTasks"></textarea>
+                      <textarea v-model="sub.reference" placeholder="참고 사항" class="todo-textarea auto-grow" @input="e => { autoResize(e); saveTasks(); }"></textarea>
                     </td>
                     <td class="align-top" style="min-width: 180px !important; max-width: 180px !important; width: 180px !important; text-align: center; padding: 12px 0 !important; box-sizing: border-box;">
                       <div class="progress-container" style="margin: 0 auto; width: 120px;">

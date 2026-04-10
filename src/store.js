@@ -25,9 +25,17 @@ const state = reactive({
   adminReplyText: '',
   checkoutDraft: JSON.parse(localStorage.getItem('cbd_checkout_draft') || 'null'),
   // Leadership Dashboard State
-  leadershipActiveTab: 'CEO',
-  leadershipTeamTab: 'CEO',
-  leadershipTasks: JSON.parse(localStorage.getItem('leadership_tasks') || '{}')
+  leadershipActiveTab: 'LEADER',
+  leadershipTeamTab: 'LEADER',
+  leadershipTasks: (() => {
+    const tasks = JSON.parse(localStorage.getItem('leadership_tasks') || '{}')
+    // Migrate CEO to LEADER if exists
+    if (tasks['CEO'] && !tasks['LEADER']) {
+      tasks['LEADER'] = tasks['CEO']
+      delete tasks['CEO']
+    }
+    return tasks
+  })()
 })
 
 // Initialize session
@@ -48,6 +56,11 @@ watch(() => state.cart, (newVal) => {
 // Persist checkout draft
 watch(() => state.checkoutDraft, (newVal) => {
   localStorage.setItem('cbd_checkout_draft', JSON.stringify(newVal))
+}, { deep: true })
+
+// Persist leadership tasks
+watch(() => state.leadershipTasks, (newVal) => {
+  localStorage.setItem('leadership_tasks', JSON.stringify(newVal))
 }, { deep: true })
 
 const isAdmin = computed(() => state.currentUser?.email === 'contact@c-braindesign.com')
@@ -74,6 +87,30 @@ const fetchAdminData = async () => {
   state.adminInquiries = inq || []
   state.adminRecruitments = rec || []
   state.adminOrders = ord || []
+
+  // Leadership tasks sync
+  await fetchLeadershipTasks()
+}
+
+const fetchLeadershipTasks = async () => {
+  if (!supabase || !isAdmin.value) return
+  try {
+    const { data, error } = await supabase.from('leadership_tasks').select('*')
+    if (error) {
+       console.warn('Leadership tasks fetch failed (maybe table missing):', error.message)
+       return
+    }
+    if (data && data.length > 0) {
+      // Map back to leadershipTasks object { team_name: tasks_array }
+      const newTasks = {}
+      data.forEach(row => {
+        newTasks[row.team_name] = row.tasks
+      })
+      state.leadershipTasks = { ...state.leadershipTasks, ...newTasks }
+    }
+  } catch (e) {
+    console.error('Leadership tasks fetch error:', e)
+  }
 }
 
 const fetchUserDashboardData = async () => {
@@ -215,7 +252,7 @@ const translations = {
     detail: { backBtn: '← Back', detailInfo: 'Details', shipping: '🚚 <strong>Shipping Info:</strong> Safe delivery within <strong>3 days</strong> of payment.', payCake: 'Checkout (2,000 KRW)', payDip: 'Checkout (8,000 KRW)' },
     checkout: { title: 'Checkout / Booking' },
     modal: { title: 'Quote & Inquiry', desc: 'Please leave inquiries via email below for a rapid response.', copy: 'Copy Address', app: 'Open Mail App' },
-    footer: { company: 'Company: Continuum by Brain Design (CBD) | CEO: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: 제2026-서울동대문-0710호 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum by Brain Design. All rights reserved.' },
+    footer: { company: 'Company: Continuum by Brain Design (CBD) | LEADER: Shinhee Yun', bizNo: 'Business Reg: 746-36-01588 | E-Commerce Reg: 제2026-서울동대문-0710호 | Address: 85-6, Hancheon-ro 46-gil, Dongdaemun-gu, Seoul', contact: 'Email: contact@c-braindesign.com | Phone: 010-7567-7189', copyright: '© 2026 Continuum by Brain Design. All rights reserved.' },
     cart: { title: 'Shopping Cart', empty: 'Your cart is empty.', addBtn: 'Add to Cart', checkout: 'Checkout Selected', checkoutAll: 'Checkout All', delete: 'Delete', total: 'Total Amount', guest: 'Guest Checkout' },
     policy: {
       returnTitle: 'Exchange & Return Info',
