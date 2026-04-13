@@ -438,15 +438,15 @@ const saveTasks = async () => {
                       <div class="date-inputs-group" style="display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; gap: 4px; width: 100%;">
                         <div class="custom-date-container" style="cursor: pointer; flex-shrink: 0; width: auto !important;" @click="triggerDatePicker">
                           <input type="date" v-model="project.startDate" class="hidden-date-input" @change="saveTasks" />
-                          <div class="date-display-box" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; font-size: 0.85rem; min-width: 156px; box-sizing: border-box; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                          <div class="date-display-box" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; font-size: 1.02rem; min-width: 156px; box-sizing: border-box; background: rgba(0,0,0,0.2); border-radius: 4px;">
                             {{ project.startDate.slice(2) }} ({{ getDayOfWeek(project.startDate).slice(1,2) }})
                             <span class="date-arrow-icon" style="font-size: 6px; margin-left: 5px;">▼</span>
                           </div>
                         </div>
-                        <span class="date-sep" style="font-size: 0.8rem; color: rgba(255,255,255,0.4); flex-shrink: 0;">~</span>
+                        <span class="date-sep" style="font-size: 0.96rem; color: rgba(255,255,255,0.4); flex-shrink: 0;">~</span>
                         <div class="custom-date-container" style="cursor: pointer; flex-shrink: 0; width: auto !important;" @click="triggerDatePicker">
                           <input type="date" v-model="project.endDate" class="hidden-date-input" @change="saveTasks" />
-                          <div class="date-display-box" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; font-size: 0.85rem; min-width: 156px; box-sizing: border-box; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                          <div class="date-display-box" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; font-size: 1.02rem; min-width: 156px; box-sizing: border-box; background: rgba(0,0,0,0.2); border-radius: 4px;">
                             {{ project.endDate.slice(2) }} ({{ getDayOfWeek(project.endDate).slice(1,2) }})
                             <span class="date-arrow-icon" style="font-size: 6px; margin-left: 5px;">▼</span>
                           </div>
@@ -473,7 +473,7 @@ const saveTasks = async () => {
                            <input type="range" v-model="project.subTasks[0].progress" min="0" max="100" step="10" class="progress-slider" 
                                   :style="{ '--progress-color': getProgressColor(project.subTasks[0].progress), '--p-val': project.subTasks[0].progress + '%' }" 
                                   @input="saveTasks" />
-                           <div class="progress-label" :style="{ color: getProgressColor(project.subTasks[0].progress), fontSize: '0.8rem' }">{{ project.subTasks[0].progress }}%</div>
+                           <div class="progress-label" :style="{ color: getProgressColor(project.subTasks[0].progress), fontSize: '0.96rem' }">{{ project.subTasks[0].progress }}%</div>
                         </div>
                       </td>
                       <td class="align-top" style="min-width: 100px !important; max-width: 100px !important; width: 100px !important; padding: 12px 10px; box-sizing: border-box; display: table-cell !important; text-align: center;">
@@ -511,7 +511,7 @@ const saveTasks = async () => {
                          <input type="range" v-model="sub.progress" min="0" max="100" step="10" class="progress-slider" 
                                 :style="{ '--progress-color': getProgressColor(sub.progress), '--p-val': sub.progress + '%' }" 
                                 @input="saveTasks" />
-                         <div class="progress-label" :style="{ color: getProgressColor(sub.progress), fontSize: '0.8rem' }">{{ sub.progress }}%</div>
+                         <div class="progress-label" :style="{ color: getProgressColor(sub.progress), fontSize: '0.96rem' }">{{ sub.progress }}%</div>
                       </div>
                     </td>
                     <td class="align-top" style="min-width: 100px !important; max-width: 100px !important; width: 100px !important; text-align: center; padding: 12px 0 !important; vertical-align: middle; box-sizing: border-box;">
@@ -690,7 +690,7 @@ const saveTasks = async () => {
   border-radius: 30px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 1.02rem;
   transition: all 0.3s;
 }
 .team-pill.active {
@@ -735,7 +735,7 @@ const saveTasks = async () => {
   margin: 0;
 }
 .role-header p {
-  font-size: 0.9rem;
+  font-size: 1.08rem;
   opacity: 0.6;
   margin: 5px 0 0;
 }
@@ -748,7 +748,7 @@ const saveTasks = async () => {
   gap: 10px;
 }
 .role-list li {
-  font-size: 0.9rem;
+  font-size: 1.08rem;
   color: rgba(255,255,255,0.8);
   display: flex;
   align-items: center;
@@ -783,6 +783,7 @@ const saveTasks = async () => {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 700;
+  font-size: 1.2rem;
   transition: all 0.2s;
 }
 .add-todo-btn:hover {
@@ -810,6 +811,7 @@ const saveTasks = async () => {
   color: #fff;
   border-radius: 4px;
   height: 38px !important;
+  font-size: 1.2rem;
   box-sizing: border-box;
 }
 .todo-textarea {
@@ -821,6 +823,7 @@ const saveTasks = async () => {
   border-radius: 4px;
   height: 38px !important;
   min-height: 38px !important;
+  font-size: 1.2rem;
   resize: vertical;
   box-sizing: border-box;
   line-height: 1.4;
@@ -834,7 +837,7 @@ const saveTasks = async () => {
   border: none;
   color: #ff6b6b;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.96rem;
   opacity: 0.7;
 }
 .todo-del-btn:hover {
@@ -885,14 +888,14 @@ const saveTasks = async () => {
   justify-content: center;
   padding: 0 8px;
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 1.02rem;
   letter-spacing: -0.5px;
   white-space: nowrap;
   gap: 4px;
 }
 .date-arrow-icon {
   color: #59B3D9;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   margin-left: 2px;
   opacity: 0.6;
 }
@@ -909,7 +912,7 @@ const saveTasks = async () => {
 }
 .date-sep {
   opacity: 0.5;
-  font-size: 0.9rem;
+  font-size: 1.08rem;
   font-weight: 700;
 }
 
@@ -951,7 +954,7 @@ const saveTasks = async () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.2rem;
   transition: all 0.2s;
 }
 .sub-row-del-btn:hover {
@@ -967,7 +970,7 @@ const saveTasks = async () => {
   cursor: pointer;
   color: #59B3D9;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.96rem;
 }
 .add-sub-btn:hover {
   background: rgba(89, 179, 217, 0.1);
@@ -1003,7 +1006,7 @@ const saveTasks = async () => {
 .date-input {
   border: none !important;
   background: transparent !important;
-  font-size: 0.8rem !important;
+  font-size: 0.96rem !important;
   padding: 5px !important;
   color: #fff;
   width: 105px;
@@ -1013,7 +1016,7 @@ const saveTasks = async () => {
   border: none;
   border-left: 1px solid rgba(255,255,255,0.1);
   color: #59B3D9;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   padding: 0 6px;
   cursor: pointer;
   height: 100%;
@@ -1087,7 +1090,7 @@ const saveTasks = async () => {
   margin-top: -1px; /* Center align with track */
 }
 .progress-label {
-  font-size: 0.85rem;
+  font-size: 1.02rem;
   font-weight: 900;
   text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }

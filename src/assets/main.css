@@ -44,6 +44,7 @@ html {
   padding: 12px 24px;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 1.01rem;
   font-weight: 600;
   transition: all 0.2s;
 }
@@ -61,7 +62,7 @@ html {
   border: 1px solid rgba(255, 107, 107, 0.3);
   padding: 8px 16px;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 1.08rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -92,10 +93,11 @@ html {
   text-align: left;
   border-bottom: 1px solid rgba(255,255,255,0.05);
   white-space: nowrap;
+  font-size: 1.2rem;
 }
 
 .admin-table th {
-  font-size: 0.85rem;
+  font-size: 1.02rem;
   color: rgba(255,255,255,0.4);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -113,13 +115,13 @@ html {
   color: #59B3D9;
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 0.96rem;
 }
 
 .status-tag {
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
@@ -144,7 +146,7 @@ html {
   border: 1px solid rgba(255,255,255,0.1);
   padding: 6px 12px;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 1.02rem;
   cursor: pointer;
 }
 
