@@ -783,7 +783,7 @@ const saveTasks = async () => {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 0.96rem;
   transition: all 0.2s;
 }
 .add-todo-btn:hover {
