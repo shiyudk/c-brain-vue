@@ -190,9 +190,9 @@ watch(() => route.hash, (newHash) => {
     <!-- Navbar -->
     <header class="navbar">
       <div class="nav-content">
-        <router-link to="/" class="logo" @click="goHome" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
-          <img src="/logo_new.png?v=10" alt="Brain Design" class="nav-logo-img" loading="eager" />
-        </router-link>
+        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
+          <img src="/logo_new.png?v=11" alt="Brain Design" class="nav-logo-img" loading="eager" />
+        </a>
         <nav class="nav-links">
           <a href="#" @click.prevent="scrollToPhilosophy">{{ t.nav.company }}</a>
           <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.personal }}</a>
@@ -459,12 +459,6 @@ html {
 
 .logo:hover {
   opacity: 0.8;
-}
-
-.nav-logo-img {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
 }
 
 /* Navbar & Logo styles moved to main.css to prevent version conflict flickering */
