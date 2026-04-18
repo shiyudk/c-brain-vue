@@ -1,23 +1,33 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { state, t } from '../store'
 import { useRouter } from 'vue-router'
 import h2Image from '../assets/h2.png'
+const companyImage = "/company3'.png"
+
+const companyBgStyle = computed(() => ({
+  backgroundImage: `url("${companyImage}")`,
+  backgroundSize: '92%',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  backgroundColor: 'var(--tech-bg)'
+}))
 
 const router = useRouter()
 
-const scrollToPhilosophy = () => {
-  const el = document.getElementById('quote-target')
+const scrollToIndex = (id) => {
+  const el = document.getElementById(id)
   if (el) {
     el.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }
 }
 
+const scrollToPhilosophy = () => {
+  scrollToIndex('philosophy-company-section')
+}
+
 const scrollToConsulting = () => {
-  const el = document.getElementById('consulting-boxes')
-  if (el) {
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }
+  scrollToIndex('consulting-boxes')
 }
 
 const sendMail = () => {
@@ -34,6 +44,8 @@ onMounted(() => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add('show')
+      } else {
+        entry.target.classList.remove('show')
       }
     })
   }, { threshold: 0.1 })
@@ -54,16 +66,16 @@ onMounted(() => {
       }">
       <div class="hero-container">
         <div class="hero-content">
-          <h1 class="main-title hero-fade-in">CONTINUUM</h1>
-          <h2 class="sub-title hero-fade-in delay-1">by BRAIN DESIGN</h2>
-          <p class="hero-desc hero-fade-in delay-2" v-html="t.hero.crisisDesc1"></p>
-          <div class="hero-buttons hero-fade-in delay-3">
+          <h1 class="main-title animate-hidden stagger-up">CONTINUUM</h1>
+          <h2 class="sub-title animate-hidden stagger-up delay-1">by BRAIN DESIGN</h2>
+          <p class="hero-desc animate-hidden stagger-up delay-2" v-html="t.hero.crisisDesc1"></p>
+          <div class="hero-buttons animate-hidden stagger-up delay-3">
             <button class="outline-btn" @click="scrollToPhilosophy">{{ t.nav.company }}</button>
-            <a href="#" class="link-btn" @click.prevent="scrollToPhilosophy">{{ state.currentLang === 'ko' ? '시스템 철학 →' : 'System Philosophy →' }}</a>
+            <a href="#" class="link-btn" @click.prevent="scrollToIndex('quote-target')">{{ state.currentLang === 'ko' ? '시스템 철학 →' : 'System Philosophy →' }}</a>
           </div>
         </div>
-      </div>
-    </section>
+    </div>
+  </section>
 
     <!-- Philosophy Sections -->
     <section id="philosophy" class="philosophy-section">
@@ -78,59 +90,14 @@ onMounted(() => {
           </div>
         </div>
     
-        <div class="full-screen-section">
-          <div class="crop-bg slide2-crop"></div>
-          <div class="dark-overlay"></div>
-          <div class="phil-text-content">
-            <h3 class="animate-hidden delay-1">{{ t.hero.crisisTitle }}</h3>
-            <p class="animate-hidden delay-2">{{ t.hero.crisisDesc1 }}</p>
-            <p class="animate-hidden delay-3" v-html="t.hero.crisisDesc2"></p>
-          </div>
-        </div>
-    
-        <div class="full-screen-section">
-          <div class="crop-bg slide3-crop"></div>
-          <div class="dark-overlay"></div>
-          <div class="phil-text-content">
-            <h3 class="animate-hidden delay-1">{{ t.hero.waverTitle }}</h3>
-            <h4 class="sub-heading animate-hidden delay-2">{{ t.hero.waverSub }}</h4>
-            <p class="animate-hidden delay-3" v-html="t.hero.waverDesc"></p>
-            <div class="phil-box animate-hidden delay-4">
-              <p v-html="t.hero.waverBox"></p>
+        <div id="philosophy-company-section" class="full-screen-section" :style="companyBgStyle">
+          <div class="phil-overlay-text quote-content">
+            <div class="quote-text animate-hidden stagger-up">
+              <strong class="brand-white-bold">Brain Design</strong><strong class="quote-subtext-match">은 즉시 복귀할 수 있는 강력한 구조적 프레임을 제공하여</strong>
             </div>
-          </div>
-        </div>
-    
-        <div class="full-screen-section">
-          <div class="crop-bg slide4-crop"></div>
-          <div class="dark-overlay"></div>
-          <div class="phil-text-content animate-hidden">
-            <h3>{{ t.hero.signalTitle }}</h3>
-            <ul class="phil-list">
-              <li>
-                <span class="icon">⚠️</span>
-                <p v-html="t.hero.signalList1"></p>
-              </li>
-              <li>
-                <span class="icon">⚖️</span>
-                <p v-html="t.hero.signalList2"></p>
-              </li>
-              <li>
-                <span class="icon">🛡️</span>
-                <p v-html="t.hero.signalList3"></p>
-              </li>
-            </ul>
-          </div>
-        </div>
-    
-        <div class="full-screen-section">
-          <div class="crop-bg slide5-crop"></div>
-          <div class="dark-overlay"></div>
-          <div class="phil-text-content animate-hidden">
-            <h3 class="giant-title" v-html="t.hero.systemTitle"></h3>
-            <h4 class="sub-heading">{{ t.hero.systemSub }}</h4>
-            <p>{{ t.hero.systemDesc1 }}</p>
-            <p>{{ t.hero.systemDesc2 }}</p>
+            <div class="quote-text animate-hidden stagger-up delay-s1">
+              <strong class="quote-subtext-match">지속 가능한 삶의 방식을 완성합니다</strong>
+            </div>
           </div>
         </div>
     </section>

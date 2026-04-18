@@ -765,8 +765,8 @@ onMounted(() => {
 
     <header class="navbar">
       <div class="nav-content">
-        <a href="#" class="logo" @click.prevent="goHome">
-          <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
+        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 9999; cursor: pointer;">
+          <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" />
         </a>
         <nav class="nav-links">
           <a href="#" @click.prevent="currentView === 'home' ? scrollToPhilosophy() : (goHome(), setTimeout(scrollToPhilosophy, 0))">{{ t.nav.company }}</a>

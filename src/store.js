@@ -97,16 +97,22 @@ const fetchLeadershipTasks = async () => {
   try {
     const { data, error } = await supabase.from('leadership_tasks').select('*')
     if (error) {
-       console.warn('Leadership tasks fetch failed (maybe table missing):', error.message)
+       console.warn('Leadership tasks fetch failed:', error.message)
        return
     }
     if (data && data.length > 0) {
-      // Map back to leadershipTasks object { team_name: tasks_array }
-      const newTasks = {}
       data.forEach(row => {
-        newTasks[row.team_name] = row.tasks
+        const team = row.team_name
+        const remoteTasks = row.tasks || []
+        
+        // 만약 로컬에 이미 데이터가 있고, 로컬 데이터가 더 비대하거나 비어있지 않다면 우선 유지할지 판단
+        // 여기서는 서버 데이터를 공통 데이터로 보고 로컬에 없는 팀 데이터만 채우거나, 서버 데이터를 우선시하되 비어있는 경우 무시
+        if (remoteTasks.length > 0) {
+          state.leadershipTasks[team] = remoteTasks
+        }
       })
-      state.leadershipTasks = { ...state.leadershipTasks, ...newTasks }
+      // 변경사항 반영을 위해 강제 트리거 (필요시)
+      console.log('Leadership tasks synced from Supabase')
     }
   } catch (e) {
     console.error('Leadership tasks fetch error:', e)

@@ -172,8 +172,8 @@ onMounted(() => {
     <!-- Mobile Header -->
     <header class="navbar mobile-navbar">
       <div class="nav-content">
-        <a href="#" class="logo" @click.prevent="goHome">
-          <img src="/logo.jpg" alt="Brain Design" class="nav-logo-img" />
+        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 9999; cursor: pointer;">
+          <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" />
         </a>
         <div class="nav-actions">
            <div class="lang-toggle">

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { state, isAdmin, fetchAdminData } from '../store'
 import { supabase } from '../supabase.js'
 import { useRouter } from 'vue-router'
@@ -148,15 +148,35 @@ const updateStatus = async (table, id, newStatus, field = 'status') => {
   }
 }
 
-onMounted(() => {
-  if (!isAdmin.value) {
-    router.push({ name: 'home' })
-    return
-  }
-  fetchAdminData()
+const isCheckingAuth = ref(true)
+
+onMounted(async () => {
+  // 세션 확인을 위해 잠시 대기 (store.js에서 비동기로 처리됨)
+  let attempts = 0
+  const checkAuth = setInterval(() => {
+    attempts++
+    // currentUser가 null이 아니거나 (로그인됨) 1초(10회)가 지나면 로딩 중단
+    if (state.currentUser !== undefined || attempts > 10) {
+      clearInterval(checkAuth)
+      isCheckingAuth.value = false
+      
+      if (!isAdmin.value) {
+        router.push({ name: 'home' })
+      } else {
+        fetchAdminData()
+      }
+    }
+  }, 100)
   
   // 초기 탭 설정
   if (!state.leadershipTeamTab) state.leadershipTeamTab = 'LEADER'
+})
+
+// 관리자 권한 변경 감지 (새로고침 없이 로그인 시)
+watch(isAdmin, (newVal) => {
+  if (newVal) {
+    fetchAdminData()
+  }
 })
 
 // Leadership Tasks Logic
@@ -300,8 +320,15 @@ const saveTasks = async () => {
 
 <template>
   <div class="admin-view-container container">
-    <div class="admin-header">
-       <h1>Admin Control Panel</h1>
+    <!-- Auth Loading State -->
+    <div v-if="isCheckingAuth" class="auth-loading glass-panel">
+      <div class="loader"></div>
+      <p>관리자 권한 확인 중...</p>
+    </div>
+
+    <template v-else-if="isAdmin">
+      <div class="admin-header">
+         <h1>Admin Control Panel</h1>
         <div class="admin-tabs">
           <button @click="state.adminActiveTab = 'inquiries'" :class="{ active: state.adminActiveTab === 'inquiries' }">고객 문의 ({{ state.adminInquiries.length }})</button>
           <button @click="state.adminActiveTab = 'recruitments'" :class="{ active: state.adminActiveTab === 'recruitments' }">채용 지원 ({{ state.adminRecruitments.length }})</button>
@@ -339,7 +366,7 @@ const saveTasks = async () => {
            <!-- Product & Operation Team -->
            <div v-if="state.leadershipTeamTab === 'PRODUCT & OPERATION'" class="role-group">
              <div class="role-card">
-                <div class="role-header"><h3>CPO</h3><p>"만들기"</p></div>
+                <div class="role-header"><h3>PRODUCT</h3><p>"만들기"</p></div>
                 <ul class="role-list">
                   <li>제품 기획: 정의 및 로직 설계</li>
                   <li>구조 설계: 기능/패키징 설계</li>
@@ -349,7 +376,7 @@ const saveTasks = async () => {
                 </ul>
              </div>
              <div class="role-card">
-                <div class="role-header"><h3>COO</h3><p>"굴리기"</p></div>
+                <div class="role-header"><h3>OPERATION</h3><p>"굴리기"</p></div>
                 <ul class="role-list">
                   <li>프로세스 설계: 주문~CS 구축</li>
                   <li>공급망 관리: 제조/물류 관리</li>
@@ -362,7 +389,7 @@ const saveTasks = async () => {
 
            <!-- Financial Team -->
            <div v-if="state.leadershipTeamTab === 'FINANCIAL'" class="role-card">
-              <div class="role-header"><h3>CFO</h3><p>"돈 안 새게"</p></div>
+              <div class="role-header"><h3>FINANCIAL</h3><p>"돈 안 새게"</p></div>
               <ul class="role-list">
                 <li>재무 현금 통제: 수입/지출 관리</li>
                 <li>수익성 분석: 정량적 이익 분석</li>
@@ -374,7 +401,7 @@ const saveTasks = async () => {
 
            <!-- Legal Team -->
            <div v-if="state.leadershipTeamTab === 'LEGAL RISK'" class="role-card">
-              <div class="role-header"><h3>CLO</h3><p>"안전 장치"</p></div>
+              <div class="role-header"><h3>LEGAL RISK</h3><p>"안전 장치"</p></div>
               <ul class="role-list">
                 <li>법적 리스크: 사전 검토/대응</li>
                 <li>계약 관리: 구조 설계 및 검토</li>
@@ -387,7 +414,7 @@ const saveTasks = async () => {
            <!-- Marketing Team -->
            <div v-if="state.leadershipTeamTab === 'BRAND & MARKETING'" class="role-group">
              <div class="role-card">
-                <div class="role-header"><h3>CBO</h3><p>"신뢰구축"</p></div>
+                <div class="role-header"><h3>BRAND</h3><p>"신뢰구축"</p></div>
                 <ul class="role-list">
                   <li>정체성 정의: 회사 규정 수립</li>
                   <li>메시지: 톤앤매너 통일</li>
@@ -397,7 +424,7 @@ const saveTasks = async () => {
                 </ul>
              </div>
              <div class="role-card">
-                <div class="role-header"><h3>CMO</h3><p>"홍보"</p></div>
+                <div class="role-header"><h3>MARKETING</h3><p>"홍보"</p></div>
                 <ul class="role-list">
                   <li>고객 획득: 유입 경로 전략</li>
                   <li>채널 운영: SNS/홈페이지</li>
@@ -668,6 +695,13 @@ const saveTasks = async () => {
           </tbody>
         </table>
       </div>
+      </div>
+    </template>
+
+    <div v-else class="admin-denied glass-panel">
+       <h2>대시보드 접근 권한이 없습니다.</h2>
+       <p>관리자 계정으로 로그인해주세요.</p>
+       <button @click="router.push({ name: 'home' })" class="outline-btn">홈으로 가기</button>
     </div>
   </div>
 </template>
@@ -1109,3 +1143,27 @@ const saveTasks = async () => {
   }
 }
 </style>
+
+<style scoped>
+.auth-loading, .admin-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  gap: 20px;
+}
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(89, 179, 217, 0.2);
+  border-top: 4px solid #59B3D9;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+

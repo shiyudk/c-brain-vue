@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, watch } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { supabase } from './supabase.js'
 import { 
@@ -10,6 +10,7 @@ import {
 
 const router = useRouter()
 const route = useRoute()
+
 
 const formatContent = (text) => {
   if (!text) return ''
@@ -30,8 +31,13 @@ const toggleMobileMenu = () => {
 }
 
 const goHome = () => {
+  console.log('Logo clicked - navigating home');
   if (state.isMobileMenuOpen) toggleMobileMenu()
-  router.push({ name: 'home' })
+  if (route.path === '/') {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } else {
+    router.push('/')
+  }
 }
 
 const goToMall = () => {
@@ -76,10 +82,10 @@ const goToAdmin = () => {
 
 const scrollToPhilosophy = () => {
   if (route.name !== 'home') {
-    router.push({ name: 'home', hash: '#philosophy' })
+    router.push({ name: 'home', hash: '#philosophy-company-section' })
   } else {
-    const el = document.getElementById('philosophy')
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    const el = document.getElementById('philosophy-company-section')
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }
 }
 
@@ -139,6 +145,7 @@ const triggerMailApp = () => {
 }
 
 onMounted(() => {
+  
   // 강제 상단 고정 (다중 시도)
   window.scrollTo(0, 0);
   setTimeout(() => window.scrollTo(0, 0), 50);
@@ -148,6 +155,9 @@ onMounted(() => {
   const hiddenElements = document.querySelectorAll('.animate-hidden');
   hiddenElements.forEach((el) => observer.observe(el));
 });
+
+onUnmounted(() => {
+})
 
 watch(() => route.hash, (newHash) => {
   if (newHash) {
@@ -180,9 +190,9 @@ watch(() => route.hash, (newHash) => {
     <!-- Navbar -->
     <header class="navbar">
       <div class="nav-content">
-        <a href="#" class="logo" @click.prevent="goHome">
-          <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" loading="eager" />
-        </a>
+        <router-link to="/" class="logo" @click="goHome" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
+          <img src="/logo_new.png?v=10" alt="Brain Design" class="nav-logo-img" loading="eager" />
+        </router-link>
         <nav class="nav-links">
           <a href="#" @click.prevent="scrollToPhilosophy">{{ t.nav.company }}</a>
           <a href="#" @click.prevent="scrollToConsulting">{{ t.nav.personal }}</a>
@@ -327,7 +337,7 @@ watch(() => route.hash, (newHash) => {
         </div>
       </div>
     </div>
-  </div>
+    </div> <!-- /app-container -->
 </template>
 
 <style>
@@ -344,11 +354,18 @@ html, body, #app {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
-  max-width: 100% !important;
+  height: 100% !important;
   background-color: var(--tech-bg) !important;
   color: var(--tech-text);
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.app-container {
+  width: 100%;
+  position: relative;
+  overflow: visible;
 }
 
 html {
@@ -427,6 +444,27 @@ html {
   gap: 20px;
   margin-bottom: 40px;
   padding: 140px 4rem 0;
+}
+
+/* Navbar & Logo styles */
+.logo {
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  transition: opacity 0.2s ease !important;
+  position: relative !important;
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+}
+
+.logo:hover {
+  opacity: 0.8;
+}
+
+.nav-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* Navbar & Logo styles moved to main.css to prevent version conflict flickering */
