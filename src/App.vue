@@ -190,7 +190,7 @@ watch(() => route.hash, (newHash) => {
     <!-- Navbar -->
     <header class="navbar">
       <div class="nav-content">
-        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
+        <a href="/" class="logo" @click.prevent="goHome(); setTimeout(() => window.scrollTo(0, 0), 50);" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
           <img src="/logo_new.png?v=11" alt="Brain Design" class="nav-logo-img" loading="eager" />
         </a>
         <nav class="nav-links">

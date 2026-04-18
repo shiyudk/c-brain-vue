@@ -172,7 +172,7 @@ onMounted(() => {
     <!-- Mobile Header -->
     <header class="navbar mobile-navbar">
       <div class="nav-content">
-        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 9999; cursor: pointer;">
+        <a href="/" class="logo" @click.prevent="goHome(); setTimeout(() => window.scrollTo(0, 0), 50);" style="position: relative; z-index: 9999; cursor: pointer;">
           <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" />
         </a>
         <div class="nav-actions">
