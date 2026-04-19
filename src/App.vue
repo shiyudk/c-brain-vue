@@ -360,16 +360,19 @@ watch(() => route.hash, (newHash) => {
   --tech-border: rgba(255, 255, 255, 0.15);
 }
 
-html, body, #app {
+html, body {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
-  height: 100% !important;
+  min-height: 100vh !important;
   background-color: var(--tech-bg) !important;
   color: var(--tech-text);
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
-  overflow-y: auto;
+}
+
+#app {
+  min-height: 100vh;
 }
 
 .app-container {
