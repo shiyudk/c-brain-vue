@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { onMounted, onUnmounted, computed, ref, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { supabase } from './supabase.js'
@@ -15,7 +15,7 @@ const route = useRoute()
 const formatContent = (text) => {
   if (!text) return ''
   let safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  safeText = safeText.replace(/\[FILE:([^|]+)\|([^\]]+)\]/g, '<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline; font-weight: bold;">?�� $1</a>');
+  safeText = safeText.replace(/\[FILE:([^|]+)\|([^\]]+)\]/g, '<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline; font-weight: bold;">📎 $1</a>');
   safeText = safeText.replace(/(^|[^"'])((https?):\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" style="color: #59B3D9; text-decoration: underline;">$2</a>');
   return safeText.replace(/\n/g, '<br/>')
 }
@@ -132,11 +132,11 @@ const submitAdminReply = async (id) => {
       .eq('id', id)
       
     if (error) {
-      alert("?�이?�베?�스 ?�류: " + error.message)
+      alert("데이터베이스 오류: " + error.message)
       return
     }
     
-    alert('?��????�?�되?�습?�다.')
+    alert('답변이 저장되었습니다.')
     if (state.selectedItemDetail) {
       state.selectedItemDetail.admin_reply = state.adminReplyText
       state.selectedItemDetail.status = 'completed'
@@ -147,13 +147,13 @@ const submitAdminReply = async (id) => {
       item.status = 'completed'
     }
   } catch (err) {
-    alert("?�류 발생: " + err.message)
+    alert("오류 발생: " + err.message)
   }
 }
 
 const copyEmail = () => {
   navigator.clipboard.writeText('contact@c-braindesign.com')
-  alert(state.currentLang === 'ko' ? '?�메??주소가 복사?�었?�니??' : 'Email address copied!')
+  alert(state.currentLang === 'ko' ? '이메일 주소가 복사되었습니다!' : 'Email address copied!')
 }
 
 const triggerMailApp = () => {
@@ -164,7 +164,7 @@ const triggerMailApp = () => {
 
 onMounted(() => {
   
-  // 강제 ?�단 고정 (?�중 ?�도)
+  // 강제 상단 고정 (다중 시도)
   window.scrollTo(0, 0);
   setTimeout(() => window.scrollTo(0, 0), 50);
   setTimeout(() => window.scrollTo(0, 0), 300);
@@ -201,7 +201,7 @@ watch(() => route.hash, (newHash) => {
         <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
         <a href="#" v-if="isAdmin" @click.prevent="goToAdmin" style="color: #ff6b6b; font-weight: 700; margin-left: 1rem;">ADMIN</a>
         <template v-if="state.currentUser">
-           <a href="#" @click.prevent="handleLogout">로그?�웃</a>
+           <a href="#" @click.prevent="handleLogout">로그아웃</a>
         </template>
         <template v-else>
           <a href="#" @click.prevent="goToAuth('signup')">{{ t.nav.signup }}</a>
@@ -229,10 +229,10 @@ watch(() => route.hash, (newHash) => {
             <button @click="state.currentLang = 'en'" :class="{ active: state.currentLang === 'en' }" class="lang-btn">EN</button>
           </div>
           <a href="#" class="icon-btn hide-mobile" @click.prevent="goToCart">
-            ?�� <span v-if="state.cart.length > 0" class="cart-badge">{{ state.cart.length }}</span>
+            🛒 <span v-if="state.cart.length > 0" class="cart-badge">{{ state.cart.length }}</span>
           </a>
           <a href="#" class="icon-btn hide-mobile my-page-icon-wrapper" @click.prevent="goToMyPage">
-            <span class="icon-emoji">?��</span>
+            <span class="icon-emoji">👤</span>
             <span class="my-text-label">MY</span>
           </a>
           <button class="mobile-menu-btn" @click="toggleMobileMenu">
@@ -249,7 +249,7 @@ watch(() => route.hash, (newHash) => {
     <div class="mobile-slide-menu" :class="{ 'is-open': state.isMobileMenuOpen }">
       <div class="mobile-menu-header">
         <span class="mobile-menu-title">MENU</span>
-        <button class="close-menu-btn" @click="toggleMobileMenu">??/button>
+        <button class="close-menu-btn" @click="toggleMobileMenu">✕</button>
       </div>
       <nav class="mobile-nav-links">
         <a href="#" @click.prevent="scrollToPhilosophy()">{{ t.nav.company }}</a>
@@ -258,8 +258,8 @@ watch(() => route.hash, (newHash) => {
         <a href="#" @click.prevent="scrollToConsulting()">{{ t.nav.kids }}</a>
         <a href="#" @click.prevent="goToMall()">{{ t.nav.mall }}</a>
         <a href="#" @click.prevent="goToJobs()">{{ t.nav.jobs }}</a>
-        <a href="#" @click.prevent="goToCart()">?�바구니 ({{ state.cart.length }})</a>
-        <a href="#" @click.prevent="goToMyPage()">마이?�이지</a>
+        <a href="#" @click.prevent="goToCart()">장바구니 ({{ state.cart.length }})</a>
+        <a href="#" @click.prevent="goToMyPage()">마이페이지</a>
         <a href="#" v-if="isAdmin" @click.prevent="goToAdmin()" style="color: #ff6b6b; font-weight: 700;">ADMIN DASHBOARD</a>
         <div class="mobile-lang-row">
             <button @click="state.currentLang = 'ko'" :class="{ active: state.currentLang === 'ko' }">KOR</button>
@@ -288,39 +288,39 @@ watch(() => route.hash, (newHash) => {
       <div class="tech-modal glass-panel">
         <div class="modal-header">
           <h3>{{ state.selectedItemDetail?.subject || state.selectedItemDetail?.product_name || 'Detail' }}</h3>
-          <button @click="closeDetailModal" class="close-btn">??/button>
+          <button @click="closeDetailModal" class="close-btn">✕</button>
         </div>
         <div class="modal-body">
           <div class="detail-row">
-            <span class="label">?�짜/?�시:</span>
+            <span class="label">날짜/일시:</span>
             <span>{{ new Date(state.selectedItemDetail?.created_at).toLocaleString() }}</span>
           </div>
 
           <!-- Order Type Details -->
           <div v-if="state.selectedItemDetail?.order_status" class="order-detail-container">
             <div class="detail-section">
-              <h4 class="detail-sec-title">?�� ?�품 ?�보</h4>
+              <h4 class="detail-sec-title">📦 상품 정보</h4>
               <div class="detail-data-box">
-                <div class="data-row"><span>?�품�?</span> <strong>{{ state.selectedItemDetail.product_name }}</strong></div>
-                <div class="data-row"><span>결제금액:</span> <strong>{{ state.selectedItemDetail.total_amount?.toLocaleString() }}??/strong></div>
-                <div class="data-row"><span>배송?�태:</span> <span class="status-tag" :class="state.selectedItemDetail.delivery_status">{{ state.selectedItemDetail.delivery_status === 'preparing' ? '배송준�? : state.selectedItemDetail.delivery_status === 'shipping' ? '배송�? : '배송?�료' }}</span></div>
+                <div class="data-row"><span>상품명:</span> <strong>{{ state.selectedItemDetail.product_name }}</strong></div>
+                <div class="data-row"><span>결제금액:</span> <strong>{{ state.selectedItemDetail.total_amount?.toLocaleString() }}원</strong></div>
+                <div class="data-row"><span>배송상태:</span> <span class="status-tag" :class="state.selectedItemDetail.delivery_status">{{ state.selectedItemDetail.delivery_status === 'preparing' ? '배송준비' : state.selectedItemDetail.delivery_status === 'shipping' ? '배송중' : '배송완료' }}</span></div>
               </div>
             </div>
 
             <div class="detail-section">
-              <h4 class="detail-sec-title">?�� 주문???�보</h4>
+              <h4 class="detail-sec-title">👤 주문자 정보</h4>
               <div class="detail-data-box">
-                <div class="data-row"><span>?�메??</span> {{ state.selectedItemDetail.user_email }}</div>
-                <div class="data-row" v-if="state.selectedItemDetail.buyer_name"><span>?�름:</span> {{ state.selectedItemDetail.buyer_name }}</div>
-                <div class="data-row" v-if="state.selectedItemDetail.buyer_phone"><span>?�락�?</span> {{ state.selectedItemDetail.buyer_phone }}</div>
+                <div class="data-row"><span>이메일:</span> {{ state.selectedItemDetail.user_email }}</div>
+                <div class="data-row" v-if="state.selectedItemDetail.buyer_name"><span>이름:</span> {{ state.selectedItemDetail.buyer_name }}</div>
+                <div class="data-row" v-if="state.selectedItemDetail.buyer_phone"><span>연락처:</span> {{ state.selectedItemDetail.buyer_phone }}</div>
               </div>
             </div>
 
             <div class="detail-section">
-              <h4 class="detail-sec-title">?�� 배송지 ?�보</h4>
+              <h4 class="detail-sec-title">🚚 배송지 정보</h4>
               <div class="detail-data-box">
-                <div class="data-row"><span>?�령??</span> {{ state.selectedItemDetail.receiver_name }}</div>
-                <div class="data-row"><span>?�락�?</span> {{ state.selectedItemDetail.receiver_phone }}</div>
+                <div class="data-row"><span>수령인:</span> {{ state.selectedItemDetail.receiver_name }}</div>
+                <div class="data-row"><span>연락처:</span> {{ state.selectedItemDetail.receiver_phone }}</div>
                 <div class="data-row"><span>주소:</span> {{ state.selectedItemDetail.shipping_address }}</div>
               </div>
             </div>
@@ -331,8 +331,8 @@ watch(() => route.hash, (newHash) => {
             <div class="detail-content-box" v-html="formatContent(state.selectedItemDetail?.content || state.selectedItemDetail?.product_name || '')"></div>
             
             <div v-if="isAdmin && state.selectedItemDetail?.category" class="admin-reply-section">
-              <textarea v-model="state.adminReplyText" placeholder="?��????�력?�세??.."></textarea>
-              <button @click="submitAdminReply(state.selectedItemDetail.id)" class="primary-btn">?��? ?�??/button>
+              <textarea v-model="state.adminReplyText" placeholder="답변을 입력하세요..."></textarea>
+              <button @click="submitAdminReply(state.selectedItemDetail.id)" class="primary-btn">답변 저장</button>
             </div>
             <div v-else-if="state.selectedItemDetail?.admin_reply" class="user-reply-box">
                <h4>Admin Reply:</h4>
@@ -347,7 +347,7 @@ watch(() => route.hash, (newHash) => {
       <div class="tech-modal glass-panel small-modal">
         <div class="modal-header">
           <h3>{{ t.modal.title }}</h3>
-          <button @click="state.showContactModal = false" class="close-btn">??/button>
+          <button @click="state.showContactModal = false" class="close-btn">✕</button>
         </div>
         <div class="modal-body" style="text-align: center;">
           <p style="margin-bottom: 25px; opacity: 0.8; line-height: 1.6;">{{ t.modal.desc }}</p>
@@ -363,9 +363,9 @@ watch(() => route.hash, (newHash) => {
 </template>
 
 <style>
-/* ?�크 기반 ?�리미엄 ?�크 ?�마 변??*/
+/* 테크 기반 프리미엄 다크 테마 변수 */
 :root {
-  --tech-bg: #02040a; /* ?�청?�신 ?��?지 ?�에 맞춘 깊�? ?�크 ?�이�?블랙 */
+  --tech-bg: #02040a; /* 요청하신 이미지 톤에 맞춘 깊은 다크 네이비 블랙 */
   --tech-nav-bg: #02040a;
   --tech-text: #FFFFFF;
   --tech-muted: #9DA1B4;
@@ -523,7 +523,7 @@ html {
 
 .my-page-icon-wrapper .my-text-label {
   position: absolute;
-  bottom: 4px; /* 조금 ???�로 ?�려???�이콘과 ??많이 겹치�?조정 */
+  bottom: 4px; /* 조금 더 위로 올려서 아이콘과 더 많이 겹치게 조정 */
   right: -2px; 
   font-size: 10px;
   font-weight: 900;

@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { state, t, isAdmin, logout, fetchAdminData, fetchUserDashboardData } from '../store.js'
 
@@ -217,7 +217,7 @@ onMounted(() => {
           <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
           <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
           <template v-if="state.currentUser">
-            <a href="#" @click.prevent="goToMyPage">{{ state.currentLang === 'ko' ? '마이?�이지' : 'My Page' }}</a>
+            <a href="#" @click.prevent="goToMyPage">{{ state.currentLang === 'ko' ? '마이?�이지' : 'My Page' }}</a>
           </template>
           <template v-else>
             <a href="#" @click.prevent="goToAuth('signup')">{{ t.nav.signup }}</a>
@@ -226,7 +226,7 @@ onMounted(() => {
           <a href="#" @click.prevent="goToCart" class="accent-link">{{ t.cart.title }}</a>
           <a href="#" @click.prevent="goToMall" class="accent-link">{{ t.nav.mall }}</a>
           <a href="#" v-if="isAdmin" @click.prevent="goToAdmin" style="color: #ff6b6b;">ADMIN</a>
-          <a href="#" v-if="state.currentUser" @click.prevent="logout" style="color: #ff6b6b; opacity: 0.8; margin-top: 10px;">{{ state.currentLang === 'ko' ? '로그?�웃' : 'Logout' }}</a>
+          <a href="#" v-if="state.currentUser" @click.prevent="logout" style="color: #ff6b6b; opacity: 0.8; margin-top: 10px;">{{ state.currentLang === 'ko' ? '로그?�웃' : 'Logout' }}</a>
         </div>
       </nav>
     </div>
@@ -256,6 +256,4 @@ onMounted(() => {
   background: var(--tech-bg) !important;
 }
 </style>
-
-
 

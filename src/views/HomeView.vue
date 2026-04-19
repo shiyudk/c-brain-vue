@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { onMounted, computed } from 'vue'
 import { state, t } from '../store'
 import { useRouter } from 'vue-router'
@@ -73,7 +73,7 @@ onMounted(() => {
           <p class="hero-desc animate-hidden stagger-up delay-2" v-html="t.hero.crisisDesc1"></p>
           <div class="hero-buttons animate-hidden stagger-up delay-3">
             <button class="outline-btn" @click="scrollToPhilosophy">{{ t.nav.company }}</button>
-            <a href="#" class="link-btn" @click.prevent="scrollToIndex('quote-target-box')">{{ state.currentLang === 'ko' ? '?�스??철학 ?? : 'System Philosophy ?? }}</a>
+            <a href="#" class="link-btn" @click.prevent="scrollToIndex('quote-target-box')">{{ state.currentLang === 'ko' ? '시스템 철학 →' : 'System Philosophy →' }}</a>
           </div>
         </div>
     </div>
@@ -84,9 +84,9 @@ onMounted(() => {
         <div class="full-screen-quote">
           <div id="quote-target-box" class="quote-content animate-hidden">
             <div class="quote-text-wrapper">
-              <span class="quote-mark">??/span>
+              <span class="quote-mark">“</span>
               <h2 id="quote-target" class="quote-text" v-html="t.hero.quote1"></h2>
-              <span class="quote-mark closing-quote">??/span>
+              <span class="quote-mark closing-quote">”</span>
             </div>
             <p class="quote-eyebrow align-right delay-2">{{ t.hero.quote2 }}</p>
           </div>
@@ -95,10 +95,10 @@ onMounted(() => {
         <div id="philosophy-company-section" class="full-screen-section" :style="companyBgStyle">
           <div class="phil-overlay-text quote-content">
             <div class="quote-text animate-hidden stagger-up">
-              <strong class="brand-white-bold">Brain Design</strong><strong class="quote-subtext-match">?� 즉시 복�??????�는 강력??구조???�레?�을 ?�공?�여</strong>
+              <strong class="brand-white-bold">Brain Design</strong><strong class="quote-subtext-match">은 즉시 복귀할 수 있는 강력한 구조적 프레임을 제공하여</strong>
             </div>
             <div class="quote-text animate-hidden stagger-up delay-s1">
-              <strong class="quote-subtext-match">지??가?�한 ?�의 방식???�성?�니??/strong>
+              <strong class="quote-subtext-match">지속 가능한 삶의 방식을 완성합니다</strong>
             </div>
           </div>
         </div>
@@ -135,5 +135,3 @@ onMounted(() => {
     </section>
   </div>
 </template>
-
-
