@@ -5,7 +5,7 @@ import { state, t } from '../store'
 const router = useRouter()
 
 // Use h2 (Company background) for the main Hero
-const h2Image = '/images/h2.png'
+const h2Image = '/h2.png'
 const companyBg = '/company3.png'
 
 const companyBgStyle = computed(() => ({
