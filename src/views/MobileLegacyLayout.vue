@@ -622,13 +622,13 @@ const scrollToConsulting = (isMobile = false) => {
     goHome()
     setTimeout(() => {
       const el = document.getElementById('consulting-boxes')
-      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 45, behavior: 'smooth' })
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 50, behavior: 'smooth' })
     }, 100)
     return
   }
   const el = document.getElementById('consulting-boxes')
   if (el) {
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 45, behavior: 'smooth' })
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 50, behavior: 'smooth' })
   }
 }
 

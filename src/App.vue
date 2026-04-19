@@ -97,7 +97,7 @@ const scrollToPhilosophy = () => {
     const el = document.getElementById('quote-target')
     if (el) {
       const rect = el.getBoundingClientRect();
-      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 45;
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 50;
       window.scrollTo({ top: offsetTop, behavior: 'smooth' });
     }
   }
@@ -111,7 +111,7 @@ const scrollToConsulting = () => {
     const el = document.getElementById('consulting-boxes')
     if (el) {
       const rect = el.getBoundingClientRect();
-      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 45;
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 50;
       window.scrollTo({ top: offsetTop, behavior: 'smooth' });
     }
   }
@@ -183,7 +183,7 @@ watch(() => route.hash, (newHash) => {
       const el = document.querySelector(newHash)
       if (el) {
         const rect = el.getBoundingClientRect();
-        const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 45;
+        const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 50;
         window.scrollTo({ top: offsetTop, behavior: 'smooth' });
       }
     }, 500)

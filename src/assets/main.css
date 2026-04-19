@@ -2141,6 +2141,7 @@ body {
 
 
 
-.quote-content { margin-top: -10vh !important; } /* 2번째 페이지 상단 여백 축소 */
+.quote-content { margin-top: -25vh !important; } /* 2번째 페이지 상단 여백 1/3로 축소 */ /* 2번째 페이지 상단 여백 축소 */
+
 
 
