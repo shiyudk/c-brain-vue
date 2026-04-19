@@ -406,7 +406,7 @@ html {
   position: relative;
   z-index: 10;
   max-width: 1000px; /* 문장????기지 ??도??가????비 ??장 */
-  margin-top: -15vh; transform: translateY(-30px);
+  margin-top: -30px;
 }
 
 .main-title {
@@ -2133,6 +2133,7 @@ body {
   .hide-mobile { display: flex !important; }
   .grid-container { grid-template-columns: repeat(3, 1fr) !important; }
 }
+
 
 
 
