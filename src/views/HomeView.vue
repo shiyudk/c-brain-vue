@@ -19,7 +19,7 @@ const scrollToIndex = (id) => {
   const el = document.getElementById(id)
   if (el) {
     const rect = el.getBoundingClientRect()
-    const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 45
+    const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 40
     window.scrollTo({ top: offsetTop, behavior: 'smooth' })
   }
 }

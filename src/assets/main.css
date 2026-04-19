@@ -358,7 +358,7 @@ html {
 -------------------------------------- */
 .hero-section {
   position: relative;
-  height: 80vh !important; /* 1페이지 여백 20% 축소 */
+  height: 70vh !important; /* 1페이지 여백 20% 축소 */
   width: 100%;
   display: flex;
   align-items: center;
@@ -406,7 +406,7 @@ html {
   position: relative;
   z-index: 10;
   max-width: 1000px; /* ����????���� ??��??��????�� ??�� */
-  margin-top: -15vh;
+  margin-top: -20vh !important; /* 위에 여백 대폭 축소 */
 }
 
 .main-title {
@@ -2133,6 +2133,7 @@ body {
   .hide-mobile { display: flex !important; }
   .grid-container { grid-template-columns: repeat(3, 1fr) !important; }
 }
+
 
 
 
