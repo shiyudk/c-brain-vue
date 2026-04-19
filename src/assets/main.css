@@ -1972,7 +1972,7 @@ html {
 
 
 .full-screen-quote {
-  min-height: 100vh !important; /* Restore 2nd page to full screen */   70%    (  70%      ) */
+  min-height: 100vh !important; /* Restore 2nd page to full screen */
 }
 
 .full-screen-section {
@@ -2142,4 +2142,5 @@ body {
 
 
 .quote-content { margin-top: -10vh !important; } /* 2번째 페이지 상단 여백 축소 */
+
 
