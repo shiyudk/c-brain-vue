@@ -492,8 +492,13 @@ html {
   width: 100%;
 }
 
-.full-screen-quote { display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; 
-  width: 100vw;
+.full-screen-quote {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+
+width: 100vw;
   height: 80vh !important; /* ??û??�� ??????�� ??��??��????��??100vh??���� */
   display: flex;
   align-items: center;
@@ -1898,8 +1903,13 @@ html {
 }
 
 
-.full-screen-quote { display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; 
-  min-height: 100vh !important;
+.full-screen-quote {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+
+min-height: 75vh !important; /* 2번째 페이지 여백 70% 축소 및 대칭 */
 }
 
 .phil-overlay-text p {
@@ -1951,8 +1961,13 @@ html {
 }
 
 
-.full-screen-quote { display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; 
+.full-screen-quote {
+  display: flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+
+align-items: center !important;
   padding-bottom: 0 !important; /* ?  20%   ?  ?X  ? */
 }
 
@@ -1971,8 +1986,13 @@ html {
 }
 
 
-.full-screen-quote { display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; 
-  min-height: 100vh !important; /* Restore 2nd page to full screen */
+.full-screen-quote {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+
+min-height: 75vh !important; /* 2번째 페이지 여백 70% 축소 및 대칭 */ /* Restore 2nd page to full screen */
 }
 
 .full-screen-section {
@@ -1980,13 +2000,18 @@ html {
 }
 
 
-.full-screen-quote { display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; 
-  padding-bottom: 0 !important;
+.full-screen-quote {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+
+padding-bottom: 0 !important;
 }
 
 
 .full-screen-section {
-  min-height: 100vh !important;
+  min-height: 75vh !important; /* 2번째 페이지 여백 70% 축소 및 대칭 */
 }
 
 .phil-overlay-text.animate-hidden.show {
@@ -2133,6 +2158,7 @@ body {
   .hide-mobile { display: flex !important; }
   .grid-container { grid-template-columns: repeat(3, 1fr) !important; }
 }
+
 
 
 
