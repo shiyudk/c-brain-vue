@@ -25,7 +25,7 @@ const scrollToIndex = (id) => {
 }
 
 const scrollToPhilosophy = () => {
-  scrollToIndex('philosophy-company-section')
+  scrollToIndex('quote-target')
 }
 
 const scrollToConsulting = () => {

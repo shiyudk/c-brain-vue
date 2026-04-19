@@ -92,9 +92,9 @@ const goToAdmin = () => {
 
 const scrollToPhilosophy = () => {
   if (route.name !== 'home') {
-    router.push({ name: 'home', hash: '#philosophy-company-section' })
+    router.push({ name: 'home', hash: '#quote-target' })
   } else {
-    const el = document.getElementById('philosophy-company-section')
+    const el = document.getElementById('quote-target')
     if (el) {
       const rect = el.getBoundingClientRect();
       const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 35;
