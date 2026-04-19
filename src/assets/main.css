@@ -1,6 +1,6 @@
-/* ??ũ ��� ??���̾� ??ũ ??�� ��??*/
+/* ??ũ ���???���̾� ??ũ ??�� ��??*/
 :root {
-  --tech-bg: #02040a; /* ??û??�� ????�� ??�� ���� ��?? ??ũ ??��??��� */
+  --tech-bg: #02040a; /* ??û??�� ????�� ??�� ���� ��?? ??ũ ??��??���?*/
   --tech-nav-bg: #02040a;
   --tech-text: #FFFFFF;
   --tech-muted: #9DA1B4;
@@ -180,7 +180,7 @@ html {
 }
 
 .app-container {
-  height: 80vh !important;
+  height: 100vh !important;
   display: flex;
   flex-direction: column;
 }
@@ -251,13 +251,13 @@ html {
   width: auto;
   vertical-align: middle;
   object-fit: contain;
-  /* �ʰ�??��??���????�� ���� ??�� */
+  /* �ʰ�??��??���????�� ���� ??�� */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   mix-blend-mode: screen; 
   filter: contrast(1.1) brightness(1.05); 
   transform: translateY(-5px); 
-  clip-path: inset(0 1% 1% 0);
+  clip-path: inset(0 1% 1% 0); opacity: 1 !important; visibility: visible !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
@@ -360,7 +360,7 @@ html {
 -------------------------------------- */
 .hero-section {
   position: relative;
-  min-height: 100vh; /* 1페이지 여백 20% 축소 */
+  min-height: 100vh; /* 1?�이지 ?�백 20% 축소 */
   width: 100%;
   display: flex;
   align-items: center;
@@ -379,7 +379,7 @@ html {
   z-index: 10;
 }
 
-/* ��� ��Ż???? ����/??????�׶�??��??���� */
+/* ���?��Ż???? ����/??????�׶�??��??���� */
 .hero-bg-new {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -408,16 +408,16 @@ html {
   position: relative;
   z-index: 10;
   max-width: 1000px; /* ����????���� ??��??��????�� ??�� */
-  margin-top: -30px; /* 로고 축소에 맞춰 위로 재조정 */
+  margin-top: -30px; /* 로고 축소??맞춰 ?�로 ?�조??*/
 }
 
 .main-title {
-  font-size: clamp(3.64rem, 7.29vw, 5.46rem); /* ??�� 10% ��� */
+  font-size: clamp(3.64rem, 7.29vw, 5.46rem); /* ??�� 10% ���?*/
   font-weight: 800;
   margin: 0;
   letter-spacing: -1px;
   line-height: 1.1;
-  /* ��� �׶�??��????�� */
+  /* ���?�׶�??��????�� */
   background: linear-gradient(135deg, #F2E1B4 0%, #D4B483 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -426,11 +426,11 @@ html {
 }
 
 .sub-title {
-  font-size: clamp(2.43rem, 4.86vw, 3.64rem); /* ??�� 10% ��� */
+  font-size: clamp(2.43rem, 4.86vw, 3.64rem); /* ??�� 10% ���?*/
   font-weight: 500; /* ���� ????��??�� ����??500??�� ��??*/
   margin: 0.5rem 0 1.5rem 0;
   letter-spacing: -0.5px;
-  /* ��� �׶�??��????�� */
+  /* ���?�׶�??��????�� */
   background: linear-gradient(135deg, #F2E1B4 0%, #D4B483 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -439,7 +439,7 @@ html {
 }
 
 .hero-desc {
-  font-size: 1.68rem; /* 10% ��� (1.87 -> 1.68) */
+  font-size: 1.68rem; /* 10% ���?(1.87 -> 1.68) */
   color: #E2E4EC;
   margin-bottom: 2.5rem;
   font-weight: 400;
@@ -501,7 +501,7 @@ html {
   padding: 0 !important;
 
 width: 100vw;
-  height: 80vh !important; /* ??û??�� ??????�� ??��??��????��??100vh??���� */
+  height: 100vh !important; /* ??û??�� ??????�� ??��??��????��??100vh??���� */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -537,7 +537,7 @@ width: 100vw;
 }
 
 .quote-mark {
-  font-size: 2.5rem; /* ??��??????��� (????�� ��??) */
+  font-size: 2.5rem; /* ??��??????���?(????�� ��??) */
   color: rgba(255, 255, 255, 0.15); /* ??��??���� */
   position: absolute;
   top: -1rem;
@@ -555,7 +555,7 @@ width: 100vw;
 }
 
 .quote-text {
-  font-size: clamp(1.8rem, 3.2vw, 2.4rem); /* ????�� ����??���� ??¦ ��� */
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem); /* ????�� ����??���� ??¦ ���?*/
   font-weight: 300;
   line-height: 1.6;
   font-style: italic; /* ??��???? ??�� */
@@ -595,7 +595,7 @@ width: 100vw;
 .full-screen-section {
   position: relative;
   width: 100vw;
-  min-height: 85vh; /* ??�� ??��??�°� */
+  min-height: 100vh; /* ??�� ??��??�°� */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -614,7 +614,7 @@ width: 100vw;
   animation: slowZoomCrop 15s infinite alternate ease-in-out; /* 25s -> 15s????�� ���� */
 }
 
-/* ??��??�� 2: �׸�????��?? �ڽ�????�� ??�� ??��, ���??��??�� ??�� ����, ??????�߽�????�� �߾�(75%) */
+/* ??��??�� 2: �׸�????��?? �ڽ�????�� ??�� ??��, ���??��??�� ??�� ����, ??????�߽�????�� �߾�(75%) */
 .slide2-crop { 
   left: -100%; 
   background-image: url('/philosophy/slide2.png'); 
@@ -661,7 +661,7 @@ width: 100vw;
 }
 
 .phil-text-content h3 {
-  font-size: clamp(2.10rem, 3vw, 2.70rem); /* ��????�� ??�� ��� */
+  font-size: clamp(2.10rem, 3vw, 2.70rem); /* ��????�� ??�� ���?*/
   font-weight: 800;
   margin-bottom: 1.5rem;
   color: #fff;
@@ -695,7 +695,7 @@ width: 100vw;
 }
 
 .phil-box {
-  background: rgba(89, 179, 217, 0.1); /* ??��??�� ??��??��� */
+  background: rgba(89, 179, 217, 0.1); /* ??��??�� ??��??���?*/
   padding: 1.5rem;
   border-radius: 12px;
   margin-top: 2rem;
@@ -1327,7 +1327,7 @@ width: 100vw;
 .recruit-view-container {
   background-color: var(--tech-bg);
   color: #fff;
-  height: 80vh !important;
+  height: 100vh !important;
   padding: 140px 20px 80px;
 }
 
@@ -1443,7 +1443,7 @@ width: 100vw;
 /* My Page Styles */
 .mypage-view-container {
   padding: 140px 20px 80px;
-  height: 80vh !important;
+  height: 100vh !important;
 }
 
 .mypage-header {
@@ -1911,7 +1911,7 @@ width: 100vw;
   justify-content: center !important;
   padding: 0 !important;
 
-min-height: 75vh !important; /* 2번째 페이지 여백 70% 축소 및 대칭 */
+min-height: 75vh !important; /* 2번째 ?�이지 ?�백 70% 축소 �??��?*/
 }
 
 .phil-overlay-text p {
@@ -1994,7 +1994,7 @@ align-items: center !important;
   justify-content: center !important;
   padding: 0 !important;
 
-min-height: 75vh !important; /* 2번째 페이지 여백 70% 축소 및 대칭 */ /* Restore 2nd page to full screen */
+min-height: 75vh !important; /* 2번째 ?�이지 ?�백 70% 축소 �??��?*/ /* Restore 2nd page to full screen */
 }
 
 .full-screen-section {
@@ -2013,7 +2013,7 @@ padding-bottom: 0 !important;
 
 
 .full-screen-section {
-  min-height: 75vh !important; /* 2번째 페이지 여백 70% 축소 및 대칭 */
+  min-height: 75vh !important; /* 2번째 ?�이지 ?�백 70% 축소 �??��?*/
 }
 
 .phil-overlay-text.animate-hidden.show {
