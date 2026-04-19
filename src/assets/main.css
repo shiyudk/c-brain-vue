@@ -1,6 +1,6 @@
-/* ??Å© ±â¹Ý ??¸®¹Ì¾ö ??Å© ??¸¶ º¯??*/
+ï»¿/* ??Å© ï¿½ï¿½ï¿½ ??ï¿½ï¿½ï¿½Ì¾ï¿½ ??Å© ??ï¿½ï¿½ ï¿½ï¿½??*/
 :root {
-  --tech-bg: #02040a; /* ??Ã»??½Å ????Áö ??¿¡ ¸ÂÃá ±í?? ??Å© ??ÀÌ??ºí·¢ */
+  --tech-bg: #02040a; /* ??Ã»??ï¿½ï¿½ ????ï¿½ï¿½ ??ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½?? ??Å© ??ï¿½ï¿½??ï¿½ï¿½ï¿½ */
   --tech-nav-bg: #02040a;
   --tech-text: #FFFFFF;
   --tech-muted: #9DA1B4;
@@ -185,7 +185,7 @@ html {
   flex-direction: column;
 }
 
-/* ÃÖ»ó????Æ¿¸®Æ¼ ??(¸Å¿ì ??°í ??ÇÑ ??½º?? */
+/* ï¿½Ö»ï¿½????Æ¿ï¿½ï¿½Æ¼ ??(ï¿½Å¿ï¿½ ??ï¿½ï¿½ ??ï¿½ï¿½ ??ï¿½ï¿½?? */
 .top-utility-bar {
   background-color: var(--tech-nav-bg);
   width: 100%;
@@ -221,10 +221,10 @@ html {
 /* Navbar */
 .navbar {
   position: fixed;
-  top: 30px; /* ??Æ¿¸®Æ¼ ????·¡????Ä¡ */
+  top: 30px; /* ??Æ¿ï¿½ï¿½Æ¼ ????ï¿½ï¿½????Ä¡ */
   left: 0;
   right: 0;
-  height: 118px; /* ??±â 90%??¹Ì¼¼ Á¶Á¤ */
+  height: 118px; /* ??ï¿½ï¿½ 90%??ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ */
   background: var(--tech-nav-bg); /* #1A1B26 */
   backdrop-filter: blur(12px);
   z-index: 1000;
@@ -251,7 +251,7 @@ html {
   width: auto;
   vertical-align: middle;
   object-fit: contain;
-  /* ÃÊ°í??»ó??Ãâ·Â????ÇÑ ÃÖÀû ??Á¤ */
+  /* ï¿½Ê°ï¿½??ï¿½ï¿½??ï¿½ï¿½ï¿½????ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ??ï¿½ï¿½ */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   mix-blend-mode: screen; 
@@ -260,7 +260,7 @@ html {
   clip-path: inset(0 1% 1% 0); 
 }
 
-/* Áß¾Ó ¸Þ´º ¸µÅ© */
+/* ï¿½ß¾ï¿½ ï¿½Þ´ï¿½ ï¿½ï¿½Å© */
 .nav-links {
   display: flex;
   gap: 1.8rem;
@@ -282,7 +282,7 @@ html {
   opacity: 0.7;
 }
 
-/* ??Ãø ??¼Ç (°Ë??Ã¢, ??ÀÌ?? */
+/* ??ï¿½ï¿½ ??ï¿½ï¿½ (ï¿½ï¿½??Ã¢, ??ï¿½ï¿½?? */
 .nav-actions {
   display: flex;
   align-items: center;
@@ -341,7 +341,7 @@ html {
   display: inline-flex;
 }
 
-/* ??Å©????´Ï¸ÞÀÌ??ÄÄÆ÷??Æ® */
+/* ??Å©????ï¿½Ï¸ï¿½ï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½??Æ® */
 .animate-hidden {
   opacity: 0;
   transform: translateY(30px);
@@ -354,7 +354,7 @@ html {
 }
 
 /* -------------------------------------
-   Hero Section (Samsung °¶·°??S26 ??³¦)
+   Hero Section (Samsung ï¿½ï¿½ï¿½ï¿½??S26 ??ï¿½ï¿½)
 -------------------------------------- */
 .hero-section {
   position: relative;
@@ -370,14 +370,14 @@ html {
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 4rem; /* ·Î°í?? ??ÀÏ??4rem ??µù ??¿ë */
+  padding: 0 4rem; /* ï¿½Î°ï¿½?? ??ï¿½ï¿½??4rem ??ï¿½ï¿½ ??ï¿½ï¿½ */
   display: flex;
   align-items: center;
   justify-content: flex-start;
   z-index: 10;
 }
 
-/* ±í°í ¸ÞÅ»???? º¸¶ó/??????±×¶ó??ÀÌ??¹ÙÅÁ */
+/* ï¿½ï¿½ï¿½ ï¿½ï¿½Å»???? ï¿½ï¿½ï¿½ï¿½/??????ï¿½×¶ï¿½??ï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½ */
 .hero-bg-new {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -388,7 +388,7 @@ html {
   z-index: -1;
 }
 
-/* ??¸¶??Æù ??´õ??°°?? ???? ??°ú??ÁÖ±â ??ÇÑ ????????*/
+/* ??ï¿½ï¿½??ï¿½ï¿½ ??ï¿½ï¿½??ï¿½ï¿½?? ???? ??ï¿½ï¿½??ï¿½Ö±ï¿½ ??ï¿½ï¿½ ????????*/
 .hero-bg::after {
   content: '';
   position: absolute;
@@ -405,44 +405,44 @@ html {
 .hero-content {
   position: relative;
   z-index: 10;
-  max-width: 1000px; /* ¹®Àå????±âÁö ??µµ??°¡????ºñ ??Àå */
-  margin-top: -30px;
+  max-width: 1000px; /* ï¿½ï¿½ï¿½ï¿½????ï¿½ï¿½ï¿½ï¿½ ??ï¿½ï¿½??ï¿½ï¿½????ï¿½ï¿½ ??ï¿½ï¿½ */
+  margin-top: -15vh;
 }
 
 .main-title {
-  font-size: clamp(3.64rem, 7.29vw, 5.46rem); /* ??½Ã 10% Ãà¼Ò */
+  font-size: clamp(3.64rem, 7.29vw, 5.46rem); /* ??ï¿½ï¿½ 10% ï¿½ï¿½ï¿½ */
   font-weight: 800;
   margin: 0;
   letter-spacing: -1px;
   line-height: 1.1;
-  /* °ñµå ±×¶ó??ÀÌ????¿ë */
+  /* ï¿½ï¿½ï¿½ ï¿½×¶ï¿½??ï¿½ï¿½????ï¿½ï¿½ */
   background: linear-gradient(135deg, #F2E1B4 0%, #D4B483 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
-  text-shadow: 0 4px 15px rgba(0,0,0,0.3); /* ±×¶ó??ÀÌ??°ú Á¶È­???? Á¶Á¤ */
+  text-shadow: 0 4px 15px rgba(0,0,0,0.3); /* ï¿½×¶ï¿½??ï¿½ï¿½??ï¿½ï¿½ ï¿½ï¿½È­???? ï¿½ï¿½ï¿½ï¿½ */
 }
 
 .sub-title {
-  font-size: clamp(2.43rem, 4.86vw, 3.64rem); /* ??½Ã 10% Ãà¼Ò */
-  font-weight: 500; /* Á¶±Ý ????¸í??°Ô º¸ÀÌ??500??·Î º¯??*/
+  font-size: clamp(2.43rem, 4.86vw, 3.64rem); /* ??ï¿½ï¿½ 10% ï¿½ï¿½ï¿½ */
+  font-weight: 500; /* ï¿½ï¿½ï¿½ï¿½ ????ï¿½ï¿½??ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½??500??ï¿½ï¿½ ï¿½ï¿½??*/
   margin: 0.5rem 0 1.5rem 0;
   letter-spacing: -0.5px;
-  /* °ñµå ±×¶ó??ÀÌ????¿ë */
+  /* ï¿½ï¿½ï¿½ ï¿½×¶ï¿½??ï¿½ï¿½????ï¿½ï¿½ */
   background: linear-gradient(135deg, #F2E1B4 0%, #D4B483 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.3); /* ±×¶ó??ÀÌ??°ú Ãæµ¹???? ??µµ????Â¦ Á¶Á¤ */
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3); /* ï¿½×¶ï¿½??ï¿½ï¿½??ï¿½ï¿½ ï¿½æµ¹???? ??ï¿½ï¿½????Â¦ ï¿½ï¿½ï¿½ï¿½ */
 }
 
 .hero-desc {
-  font-size: 1.68rem; /* 10% Ãà¼Ò (1.87 -> 1.68) */
+  font-size: 1.68rem; /* 10% ï¿½ï¿½ï¿½ (1.87 -> 1.68) */
   color: #E2E4EC;
   margin-bottom: 2.5rem;
   font-weight: 400;
   letter-spacing: -0.5px;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.5); /* ±×¸²??Ãß?? */
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5); /* ï¿½×¸ï¿½??ï¿½ï¿½?? */
 }
 
 .hero-buttons {
@@ -494,7 +494,7 @@ html {
 
 .full-screen-quote {
   width: 100vw;
-  min-height: 100vh; /* ??Ã»??½Å ??????¸é ??°¡??µ¥????µµ??100vh??Á¶Á¤ */
+  min-height: 100vh; /* ??Ã»??ï¿½ï¿½ ??????ï¿½ï¿½ ??ï¿½ï¿½??ï¿½ï¿½????ï¿½ï¿½??100vh??ï¿½ï¿½ï¿½ï¿½ */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -521,17 +521,17 @@ html {
   padding: 0 4rem;
   position: relative;
   z-index: 2;
-  text-align: center; /* ????Áö?? ??ÀÏ??°Ô ??Ã¼ Áß¾Ó ??·Ä */
+  text-align: center; /* ????ï¿½ï¿½?? ??ï¿½ï¿½??ï¿½ï¿½ ??Ã¼ ï¿½ß¾ï¿½ ??ï¿½ï¿½ */
 }
 
 .quote-text-wrapper {
   position: relative;
-  display: inline-block; /* ??½º????ºñ????¸Â°Ô ÄÁÅ×??³Ê Á¶Àý */
+  display: inline-block; /* ??ï¿½ï¿½????ï¿½ï¿½????ï¿½Â°ï¿½ ï¿½ï¿½ï¿½ï¿½??ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ */
 }
 
 .quote-mark {
-  font-size: 2.5rem; /* ??ÀÌ??????Ãà¼Ò (????Áö ±â??) */
-  color: rgba(255, 255, 255, 0.15); /* ??¸í??Á¶Á¤ */
+  font-size: 2.5rem; /* ??ï¿½ï¿½??????ï¿½ï¿½ï¿½ (????ï¿½ï¿½ ï¿½ï¿½??) */
+  color: rgba(255, 255, 255, 0.15); /* ??ï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½ */
   position: absolute;
   top: -1rem;
   left: -3rem;
@@ -548,19 +548,19 @@ html {
 }
 
 .quote-text {
-  font-size: clamp(1.8rem, 3.2vw, 2.4rem); /* ????Áö ºñÀ²??¸ÂÃç ??Â¦ Ãà¼Ò */
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem); /* ????ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½ ??Â¦ ï¿½ï¿½ï¿½ */
   font-weight: 300;
   line-height: 1.6;
-  font-style: italic; /* ??ÅÅ???? ??¿ë */
+  font-style: italic; /* ??ï¿½ï¿½???? ??ï¿½ï¿½ */
   margin: 0 0 1.5rem 0;
   color: rgba(255, 255, 255, 0.9);
   letter-spacing: -0.5px;
-  text-align: center; /* ??½º????·Ä Áß¾Ó */
+  text-align: center; /* ??ï¿½ï¿½????ï¿½ï¿½ ï¿½ß¾ï¿½ */
 }
 
 .quote-eyebrow {
   color: rgba(255, 255, 255, 0.4);
-  font-size: 1.2rem; /* .link-btn????ÀÏ??1.2rem??·Î ??Á¤ */
+  font-size: 1.2rem; /* .link-btn????ï¿½ï¿½??1.2rem??ï¿½ï¿½ ??ï¿½ï¿½ */
   letter-spacing: 0.5px;
   font-style: italic;
   font-weight: 300;
@@ -588,15 +588,15 @@ html {
 .full-screen-section {
   position: relative;
   width: 100vw;
-  min-height: 85vh; /* ??¸é ??±â??¸Â°Ô */
+  min-height: 85vh; /* ??ï¿½ï¿½ ??ï¿½ï¿½??ï¿½Â°ï¿½ */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-left: calc(-50vw + 50%); /* °­Á¦??100% °¡????Àå º¸Àå */
+  margin-left: calc(-50vw + 50%); /* ï¿½ï¿½ï¿½ï¿½??100% ï¿½ï¿½????ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ */
 }
 
-/* ????Áö ????½º????·Ó????ÇØ ??ºñ??200%????Á¤ (°¡??ºñÀ² ¹«½Ã??°í °­Á¦ ??¹Ý ??·Ó) */
+/* ????ï¿½ï¿½ ????ï¿½ï¿½????ï¿½ï¿½????ï¿½ï¿½ ??ï¿½ï¿½??200%????ï¿½ï¿½ (ï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½??ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ??ï¿½ï¿½ ??ï¿½ï¿½) */
 .crop-bg {
   position: absolute;
   top: 0;
@@ -604,31 +604,31 @@ html {
   height: 100%;
   background-size: cover;
   z-index: 1;
-  animation: slowZoomCrop 15s infinite alternate ease-in-out; /* 25s -> 15s????µµ °³¼± */
+  animation: slowZoomCrop 15s infinite alternate ease-in-out; /* 25s -> 15s????ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ */
 }
 
-/* ??¶ó??µå 2: ±×¸²????¸¥?? ¹Ú½º????Ãø ??¹Ý ??¿ë, ¹é±×??¿î??µµ ??Ãø °íÁ¤, ??????Áß½É????Ãø Áß¾Ó(75%) */
+/* ??ï¿½ï¿½??ï¿½ï¿½ 2: ï¿½×¸ï¿½????ï¿½ï¿½?? ï¿½Ú½ï¿½????ï¿½ï¿½ ??ï¿½ï¿½ ??ï¿½ï¿½, ï¿½ï¿½ï¿½??ï¿½ï¿½??ï¿½ï¿½ ??ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ??????ï¿½ß½ï¿½????ï¿½ï¿½ ï¿½ß¾ï¿½(75%) */
 .slide2-crop { 
   left: -100%; 
   background-image: url('/philosophy/slide2.png'); 
   background-position: right center;
   transform-origin: 75% 50%;
 }
-/* ??¶ó??µå 3: ±×¸²????ÂÊ. ¹Ú½º??ÁÂÃø ??¿ë, ??????Áß½É??ÁÂÃø Áß¾Ó(25%) */
+/* ??ï¿½ï¿½??ï¿½ï¿½ 3: ï¿½×¸ï¿½????ï¿½ï¿½. ï¿½Ú½ï¿½??ï¿½ï¿½ï¿½ï¿½ ??ï¿½ï¿½, ??????ï¿½ß½ï¿½??ï¿½ï¿½ï¿½ï¿½ ï¿½ß¾ï¿½(25%) */
 .slide3-crop { 
   left: 0; 
   background-image: url('/philosophy/slide3.png'); 
   background-position: left center;
   transform-origin: 25% 50%;
 }
-/* ??¶ó??µå 4: ±×¸²????¸¥?? */
+/* ??ï¿½ï¿½??ï¿½ï¿½ 4: ï¿½×¸ï¿½????ï¿½ï¿½?? */
 .slide4-crop { 
   left: -100%; 
   background-image: url('/philosophy/slide4.png'); 
   background-position: right center;
   transform-origin: 75% 50%;
 }
-/* ??¶ó??µå 5: ±¸Á¶??±×¸²????¸¥?? */
+/* ??ï¿½ï¿½??ï¿½ï¿½ 5: ï¿½ï¿½ï¿½ï¿½??ï¿½×¸ï¿½????ï¿½ï¿½?? */
 .slide5-crop { 
   left: -100%; 
   background-image: url('/philosophy/slide5.png'); 
@@ -639,7 +639,7 @@ html {
 .dark-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(22, 24, 38, 0.70); /* °¡??¼º????ÇÑ ??¹ö??ÀÌ */
+  background: rgba(22, 24, 38, 0.70); /* ï¿½ï¿½??ï¿½ï¿½????ï¿½ï¿½ ??ï¿½ï¿½??ï¿½ï¿½ */
   z-index: 2;
 }
 
@@ -647,14 +647,14 @@ html {
   position: relative;
   z-index: 3;
   color: white;
-  text-align: center; /* ??½º????¿ª Áß¾Ó ??·Ä */
+  text-align: center; /* ??ï¿½ï¿½????ï¿½ï¿½ ï¿½ß¾ï¿½ ??ï¿½ï¿½ */
   padding: 4rem 2rem;
   max-width: 900px;
   width: 100%;
 }
 
 .phil-text-content h3 {
-  font-size: clamp(2.10rem, 3vw, 2.70rem); /* ±Û????±â ??°Ô Ãà¼Ò */
+  font-size: clamp(2.10rem, 3vw, 2.70rem); /* ï¿½ï¿½????ï¿½ï¿½ ??ï¿½ï¿½ ï¿½ï¿½ï¿½ */
   font-weight: 800;
   margin-bottom: 1.5rem;
   color: #fff;
@@ -664,11 +664,11 @@ html {
 .phil-text-content h3.giant-title {
   font-size: clamp(2.70rem, 3.75vw, 3.90rem);
   line-height: 1.1;
-  color: #59B3D9; /* Ã¤µµ??30% ???? ºÎ??·¯????Ä«??ºí??*/
+  color: #59B3D9; /* Ã¤ï¿½ï¿½??30% ???? ï¿½ï¿½??ï¿½ï¿½????Ä«??ï¿½ï¿½??*/
 }
 
 .phil-text-content p {
-  font-size: 1.14rem; /* ??70% ??Æ® ??ÀÌ??*/
+  font-size: 1.14rem; /* ??70% ??Æ® ??ï¿½ï¿½??*/
   line-height: 1.8;
   color: #D3D5DF;
   margin-bottom: 1rem;
@@ -682,17 +682,17 @@ html {
 
 .sub-heading {
   font-size: 1.32rem;
-  color: #59B3D9; /* Ã¤µµ??30% ???? ºÎ??·¯????Ä«??ºí??*/
+  color: #59B3D9; /* Ã¤ï¿½ï¿½??30% ???? ï¿½ï¿½??ï¿½ï¿½????Ä«??ï¿½ï¿½??*/
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
 
 .phil-box {
-  background: rgba(89, 179, 217, 0.1); /* ??´Ù??µÈ ??´Ã??¹è°æ */
+  background: rgba(89, 179, 217, 0.1); /* ??ï¿½ï¿½??ï¿½ï¿½ ??ï¿½ï¿½??ï¿½ï¿½ï¿½ */
   padding: 1.5rem;
   border-radius: 12px;
   margin-top: 2rem;
-  border-left: 4px solid #59B3D9; /* ??´Ù??µÈ ??´Ã??º¸´õ */
+  border-left: 4px solid #59B3D9; /* ??ï¿½ï¿½??ï¿½ï¿½ ??ï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½ */
   text-align: left;
 }
 
@@ -712,7 +712,7 @@ html {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  background: rgba(255,255,255,0.05); /* ??Å© ??????¹Ú½º ???? Ã³¸® */
+  background: rgba(255,255,255,0.05); /* ??Å© ??????ï¿½Ú½ï¿½ ???? Ã³ï¿½ï¿½ */
   padding: 1.2rem;
   border-radius: 10px;
 }
@@ -727,7 +727,7 @@ html {
    Products Grid Section
 -------------------------------------- */
 .products-section {
-  background: #12131C; /* ??¾î????·¡ ±í?? ??µÒ */
+  background: #12131C; /* ??ï¿½ï¿½????ï¿½ï¿½ ï¿½ï¿½?? ??ï¿½ï¿½ */
   padding: 6rem 0;
 }
 
@@ -1753,7 +1753,7 @@ html {
    Dynamic Scroll Animations
 -------------------------------------- */
 
-/* ±âº» ???? ??ÅÂ */
+/* ï¿½âº» ???? ??ï¿½ï¿½ */
 .animate-hidden {
   opacity: 0;
   transform: translateY(30px);
@@ -1761,13 +1761,13 @@ html {
   will-change: transform, opacity;
 }
 
-/* ??????????ÅÂ */
+/* ??????????ï¿½ï¿½ */
 .animate-hidden.show {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* ??¾î????¼Ç ??¿ë ??¼­????????±â */
+/* ??ï¿½ï¿½????ï¿½ï¿½ ??ï¿½ï¿½ ??ï¿½ï¿½????????ï¿½ï¿½ */
 .hero-fade-in {
   animation: heroFadeInUp 1.2s ease-out forwards;
 }
@@ -1783,13 +1783,13 @@ html {
   }
 }
 
-/* ??ÅÂ????·¹??(??Â÷????Àå) */
+/* ??ï¿½ï¿½????ï¿½ï¿½??(??ï¿½ï¿½????ï¿½ï¿½) */
 .delay-1 { transition-delay: 0.1s; }
 .delay-2 { transition-delay: 0.2s; }
 .delay-3 { transition-delay: 0.3s; }
 .delay-4 { transition-delay: 0.4s; }
 
-/* ??½º????ÀÌ??ÀÌ????´Ï¸ÞÀÌ??*/
+/* ??ï¿½ï¿½????ï¿½ï¿½??ï¿½ï¿½????ï¿½Ï¸ï¿½ï¿½ï¿½??*/
 .text-reveal {
   position: relative;
   overflow: hidden;

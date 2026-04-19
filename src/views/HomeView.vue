@@ -73,7 +73,7 @@ onMounted(() => {
           <p class="hero-desc animate-hidden stagger-up delay-2" v-html="t.hero.crisisDesc1"></p>
           <div class="hero-buttons animate-hidden stagger-up delay-3">
             <button class="outline-btn" @click="scrollToPhilosophy">{{ t.nav.company }}</button>
-            <a href="#" class="link-btn" @click.prevent="scrollToIndex('quote-target-box')">{{ state.currentLang === 'ko' ? '시스템 철학 →' : 'System Philosophy →' }}</a>
+            <a href="#" class="link-btn" @click.prevent="scrollToIndex('quote-target')">{{ state.currentLang === 'ko' ? '시스템 철학 →' : 'System Philosophy →' }}</a>
           </div>
         </div>
     </div>
