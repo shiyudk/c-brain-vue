@@ -180,7 +180,7 @@ html {
 }
 
 .app-container {
-  min-height: 100vh;
+  height: 80vh !important;
   display: flex;
   flex-direction: column;
 }
@@ -358,7 +358,7 @@ html {
 -------------------------------------- */
 .hero-section {
   position: relative;
-  min-height: 80vh; /* 1페이지 여백 20% 축소 */
+  height: 80vh !important; /* 1페이지 여백 20% 축소 */
   width: 100%;
   display: flex;
   align-items: center;
@@ -494,7 +494,7 @@ html {
 
 .full-screen-quote {
   width: 100vw;
-  min-height: 100vh; /* ??û??�� ??????�� ??��??��????��??100vh??���� */
+  height: 80vh !important; /* ??û??�� ??????�� ??��??��????��??100vh??���� */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1320,7 +1320,7 @@ html {
 .recruit-view-container {
   background-color: var(--tech-bg);
   color: #fff;
-  min-height: 100vh;
+  height: 80vh !important;
   padding: 140px 20px 80px;
 }
 
@@ -1436,7 +1436,7 @@ html {
 /* My Page Styles */
 .mypage-view-container {
   padding: 140px 20px 80px;
-  min-height: 100vh;
+  height: 80vh !important;
 }
 
 .mypage-header {
