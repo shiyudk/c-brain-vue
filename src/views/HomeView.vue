@@ -65,7 +65,7 @@ onMounted(() => {
 
 <template>
   <div class="home-wrapper">
-    <!-- Hero Section with CBD Background -->
+    <!-- Hero Section -->
     <section id="hero" class="hero-section" :style="{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url(${h2Image})`,
         backgroundSize: 'cover',
@@ -83,63 +83,62 @@ onMounted(() => {
             <a href="#" class="link-btn" @click.prevent="scrollToPhilosophy">시스템 철학 →</a>
           </div>
         </div>
-    </div>
-  </section>
-
-    <!-- Philosophy Sections -->
-    <section id="philosophy" class="philosophy-section">
-        <div class="full-screen-quote">
-          <div id="philosophy-company-section-box" class="quote-content animate-hidden">
-            <div class="quote-text-wrapper">
-              <span class="quote-mark">“</span>
-              <h2 id="quote-target" class="quote-text" v-html="t.hero.quote1"></h2>
-              <span class="quote-mark closing-quote">”</span>
-            </div>
-            <p class="quote-eyebrow align-right delay-2">{{ t.hero.quote2 }}</p>
-          </div>
-        </div>
-    
-        <div id="philosophy-company-section" class="full-screen-section" :style="companyBgStyle">
-          <div class="phil-overlay-text quote-content">
-            <div class="quote-text animate-hidden stagger-up" style="font-weight: 700;">
-              <strong class="brand-white-bold">Brain Design</strong>은 즉시 복귀할 수 있는 강력한 구조적 프레임을 제공하여
-            </div>
-            <div class="quote-text animate-hidden stagger-up delay-s1" style="font-weight: 700;">
-              지속 가능한 삶의 방식을 완성합니다
-            </div>
-            <div class="phil-line animate-hidden stagger-up delay-s2"></div>
-            <p class="phil-subtext animate-hidden stagger-up delay-s3" v-html="t.hero.crisisDesc2"></p>
-          </div>
-        </div>
+      </div>
     </section>
 
-    <!-- Consulting Services (3 cards) -->
+    <!-- Page 2: Philosophy Quote -->
+    <section id="philosophy-quote-section" class="full-screen-quote">
+      <div id="philosophy-company-section-box" class="quote-content animate-hidden">
+        <div class="quote-text-wrapper">
+          <span class="quote-mark">“</span>
+          <h2 id="quote-target" class="quote-text" v-html="t.hero.quote1"></h2>
+          <span class="quote-mark closing-quote">”</span>
+        </div>
+        <p class="quote-eyebrow align-right delay-2" style="text-align: right; display: block;">{{ t.hero.quote2 }}</p>
+      </div>
+    </section>
+
+    <!-- Page 3: Company Intro (Diagram) -->
+    <section id="philosophy-company-section" class="full-screen-section" :style="companyBgStyle">
+      <div class="phil-overlay-text quote-content">
+        <div class="quote-text animate-hidden stagger-up" style="font-weight: 700;">
+          <strong class="brand-white-bold">Brain Design</strong>은 즉시 복귀할 수 있는 강력한 구조적 프레임을 제공하여
+        </div>
+        <div class="quote-text animate-hidden stagger-up delay-s1" style="font-weight: 700;">
+          지속 가능한 삶의 방식을 완성합니다
+        </div>
+        <div class="phil-line animate-hidden stagger-up delay-s2"></div>
+        <p class="phil-subtext animate-hidden stagger-up delay-s3" v-html="t.hero.crisisDesc2"></p>
+      </div>
+    </section>
+
+    <!-- Page 4: Consulting Cards -->
     <section id="products" class="products-section">
-        <div class="section-container animate-hidden">
-          <div id="consulting-boxes" class="grid-container">
-            <div class="tech-card" @click="sendMail">
-               <div class="card-img-placeholder" style="background-image: url('/images/personal.png'); background-size: cover; background-position: center;"><div class="glow"></div></div>
-               <div class="tech-card-info">
-                 <h3>{{ t.products.personal }}</h3>
-                 <button>{{ t.products.inquireBtn }}</button>
-               </div>
+      <div class="section-container animate-hidden">
+        <div id="consulting-boxes" class="grid-container">
+          <div class="tech-card" @click="sendMail">
+             <div class="card-img-placeholder" style="background-image: url('/images/personal.png'); background-size: cover; background-position: center;"><div class="glow"></div></div>
+             <div class="tech-card-info">
+               <h3>{{ t.products.personal }}</h3>
+               <button>{{ t.products.inquireBtn }}</button>
+             </div>
+          </div>
+          <div class="tech-card" @click="sendMail">
+            <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;"><div class="glow"></div></div>
+            <div class="tech-card-info">
+              <h3>{{ t.products.ai }}</h3>
+              <button>{{ t.products.inquireBtn }}</button>
             </div>
-            <div class="tech-card" @click="sendMail">
-              <div class="card-img-placeholder" style="background-image: url('/images/ai.png'); background-size: cover; background-position: center;"><div class="glow"></div></div>
-              <div class="tech-card-info">
-                <h3>{{ t.products.ai }}</h3>
-                <button>{{ t.products.inquireBtn }}</button>
-              </div>
-            </div>
-            <div class="tech-card" @click="sendMail">
-              <div class="card-img-placeholder" style="background-image: url('/images/kids.png'); background-size: cover; background-position: center;"><div class="glow"></div></div>
-              <div class="tech-card-info">
-                <h3>{{ t.products.kids }}</h3>
-                <button>{{ t.products.inquireBtn }}</button>
-              </div>
+          </div>
+          <div class="tech-card" @click="sendMail">
+            <div class="card-img-placeholder" style="background-image: url('/images/kids.png'); background-size: cover; background-position: center;"><div class="glow"></div></div>
+            <div class="tech-card-info">
+              <h3>{{ t.products.kids }}</h3>
+              <button>{{ t.products.inquireBtn }}</button>
             </div>
           </div>
         </div>
+      </div>
     </section>
 
   </div>

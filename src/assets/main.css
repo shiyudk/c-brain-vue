@@ -2177,7 +2177,12 @@ body {
 
 /* CLEAN OVERRIDE BLOCK */
 .hero-section { position: relative; width: 100%; min-height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; overflow: hidden !important; }
-.philosophy-section { padding: 0 !important; margin: 0 !important; width: 100% !important; background: #02040a !important; display: block !important; }
-.full-screen-quote { width: 100% !important; height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; background: #02040a !important; }
-.full-screen-section { width: 100% !important; min-height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; background: #02040a !important; }
+.philosophy-section { padding: 0 !important; margin: 0 !important; width: 100% !important; background-color: #02040a !important; display: block !important; }
+.full-screen-quote { width: 100% !important; height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; background-color: #02040a !important; background-size: cover !important; background-position: center !important; }
+.full-screen-section { width: 100% !important; min-height: 100vh !important; display: flex !important; align-items: center !important; justify-content: center !important; background-color: #02040a !important; background-size: cover !important; background-position: center !important; }
 .nav-logo-img { height: 108px !important; opacity: 1 !important; visibility: visible !important; }
+
+/* FINAL FIX BLOCK */
+.hero-section { min-height: 100vh !important; height: 100vh !important; background-color: #02040a !important; }
+.full-screen-quote { height: 100vh !important; background-color: #02040a !important; }
+.full-screen-section { min-height: 100vh !important; height: 100vh !important; background-color: #02040a !important; background-size: cover !important; }
