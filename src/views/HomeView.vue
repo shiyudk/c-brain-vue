@@ -102,13 +102,9 @@ onMounted(() => {
     <section id="philosophy-company-section" class="full-screen-section" :style="companyBgStyle">
       <div class="phil-overlay-text quote-content">
         <div class="quote-text animate-hidden stagger-up" style="font-weight: 700;">
-          <strong class="brand-white-bold">Brain Design</strong>은 즉시 복귀할 수 있는 강력한 구조적 프레임을 제공하여
-        </div>
-        <div class="quote-text animate-hidden stagger-up delay-s1" style="font-weight: 700;">
-          지속 가능한 삶의 방식을 완성합니다
+          <strong class="brand-white-bold">Brain Design</strong>은 삶을 변화시키는 핵심 원리와 구조를 설계하고 구현합니다
         </div>
         <div class="phil-line animate-hidden stagger-up delay-s2"></div>
-        <p class="phil-subtext animate-hidden stagger-up delay-s3" v-html="t.hero.crisisDesc2"></p>
       </div>
     </section>
 
