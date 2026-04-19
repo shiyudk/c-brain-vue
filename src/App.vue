@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { onMounted, onUnmounted, computed, ref, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { supabase } from './supabase.js'
@@ -92,12 +92,12 @@ const goToAdmin = () => {
 
 const scrollToPhilosophy = () => {
   if (route.name !== 'home') {
-    router.push({ name: 'home', hash: '#quote-target' })
+    router.push({ name: 'home', hash: '#philosophy-company-section' })
   } else {
-    const el = document.getElementById('quote-target')
+    const el = document.getElementById('philosophy-company-section')
     if (el) {
       const rect = el.getBoundingClientRect();
-      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 50;
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 74;
       window.scrollTo({ top: offsetTop, behavior: 'smooth' });
     }
   }
@@ -183,7 +183,12 @@ watch(() => route.hash, (newHash) => {
       const el = document.querySelector(newHash)
       if (el) {
         const rect = el.getBoundingClientRect();
-        const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 50;
+        let offsetTop;
+        if (newHash === '#quote-target' || newHash === '#philosophy-company-section') {
+          offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2) - 74;
+        } else {
+          offsetTop = rect.top + window.scrollY - 148;
+        }
         window.scrollTo({ top: offsetTop, behavior: 'smooth' });
       }
     }, 500)
