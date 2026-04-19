@@ -257,7 +257,9 @@ html {
   mix-blend-mode: screen; 
   filter: contrast(1.1) brightness(1.05); 
   transform: translateY(-5px); 
-  clip-path: inset(0 1% 1% 0); 
+  clip-path: inset(0 1% 1% 0);
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* �߾� �޴� ��ũ */
@@ -488,214 +490,25 @@ html {
 .philosophy-section {
   padding: 0 0 4rem 0;
   background: var(--tech-bg);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 1rem;
-  border: 1px solid transparent;
-  transition: border 0.3s;
-}
-
-.search-bar:hover {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.search-icon {
-  font-size: 1.08rem;
-  opacity: 0.8;
-}
-
-.search-bar input {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.02rem;
-  width: 120px;
-  outline: none;
-}
-
-.search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.icon-btn {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.44rem;
-  opacity: 0.9;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-btn:hover {
-  opacity: 1;
-}
-
-.hide-mobile {
-  display: inline-flex;
-}
-
-/* ??ũ????ϸ????Ʈ */
-.animate-hidden {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.animate-hidden.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* -------------------------------------
-   Hero Section (Samsung ??S26 ??)
--------------------------------------- */
-.hero-section {
-  position: relative;
-  min-height: 100vh; /* 1페이지 여백 20% 축소 */
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.hero-container {
-  max-width: 1600px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 4rem; /* ΰ?? ????4rem ?? ?? */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  z-index: 10;
-}
-
-/*  Ż???? /??????׶???? */
-.hero-bg-new {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./h2.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  z-index: -1;
-}
-
-/* ???? ?????? ???? ????ֱ ?? ????????*/
-.hero-bg::after {
-  content: '';
-  position: absolute;
-  right: -10vw;
-  top: 20vh;
-  width: 60vw;
-  height: 80vh;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-  border-radius: 50%;
-  transform: rotate(-30deg);
-  filter: blur(60px);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 10;
-  max-width: 1000px; /* ???? ???????? ?? */
-  margin-top: -30px; /* 로고 축소에 맞춰 위로 재조정 */
-}
-
-.main-title {
-  font-size: clamp(3.64rem, 7.29vw, 5.46rem); /* ?? 10%  */
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -1px;
-  line-height: 1.1;
-  /*  ׶?????? */
-  background: linear-gradient(135deg, #F2E1B4 0%, #D4B483 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  text-shadow: 0 4px 15px rgba(0,0,0,0.3); /* ׶???? ȭ????  */
-}
-
-.sub-title {
-  font-size: clamp(2.43rem, 4.86vw, 3.64rem); /* ?? 10%  */
-  font-weight: 500; /*  ?????? ??500?? ??*/
-  margin: 0.5rem 0 1.5rem 0;
-  letter-spacing: -0.5px;
-  /*  ׶?????? */
-  background: linear-gradient(135deg, #F2E1B4 0%, #D4B483 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.3); /* ׶???? 浹???? ??????¦  */
-}
-
-.hero-desc {
-  font-size: 1.68rem; /* 10%  (1.87 -> 1.68) */
-  color: #E2E4EC;
-  margin-bottom: 2.5rem;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.5); /* ׸???? */
-}
-
-.hero-buttons {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.link-btn {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 6px;
-  font-weight: 600;
-  font-size: 1.2rem;
-  transition: opacity 0.2s;
-}
-
-.link-btn:hover {
-  opacity: 0.7;
-}
-
-.outline-btn {
-  background: transparent;
-  color: #fff;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  padding: 12px 28px;
-  border-radius: 30px;
-  font-size: 1.14rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.outline-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #fff;
-}
-
-
-/* -------------------------------------
-   Philosophy Section (Dynamic Scroll Full-bleed)
--------------------------------------- */
-.philosophy-section {
-  padding: 0 0 4rem 0;
-  background: var(--tech-bg);
   position: relative;
   width: 100%;
 }
 
 .full-screen-quote {
-  width: 100%;
-  height: 100vh;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+
+width: 100vw;
+  height: 80vh !important; /* ??û??�� ??????�� ??��??��????��??100vh??���� */
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--tech-bg); /* Current background color */
+  margin-left: calc(-50vw + 50%); /* Full bleed override */
   position: relative;
   overflow: hidden;
-  background-color: #02040a;
 }
 
 /* Subtle glowing background orb for extra dynamic feel */
