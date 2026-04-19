@@ -124,13 +124,13 @@ const scrollToConsulting = () => {
     goHome()
     setTimeout(() => {
       const el = document.getElementById('consulting-boxes')
-      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 40, behavior: 'smooth' })
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 45, behavior: 'smooth' })
     }, 100)
     return
   }
   const el = document.getElementById('consulting-boxes')
   if (el) {
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 40, behavior: 'smooth' })
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2) - 45, behavior: 'smooth' })
   }
 }
 
