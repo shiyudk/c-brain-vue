@@ -358,7 +358,7 @@ html {
 -------------------------------------- */
 .hero-section {
   position: relative;
-  height: 70vh !important; /* 1페이지 여백 20% 축소 */
+  min-height: 100vh; /* 1페이지 여백 20% 축소 */
   width: 100%;
   display: flex;
   align-items: center;
@@ -406,7 +406,7 @@ html {
   position: relative;
   z-index: 10;
   max-width: 1000px; /* ����????���� ??��??��????�� ??�� */
-  margin-top: -20vh !important; /* 위에 여백 대폭 축소 */
+  margin-top: -30px; /* 로고 축소에 맞춰 위로 재조정 */
 }
 
 .main-title {
@@ -1899,7 +1899,7 @@ html {
 
 
 .full-screen-quote {
-  min-height: 70vh !important;
+  min-height: 100vh !important;
 }
 
 .phil-overlay-text p {
@@ -2133,6 +2133,8 @@ body {
   .hide-mobile { display: flex !important; }
   .grid-container { grid-template-columns: repeat(3, 1fr) !important; }
 }
+
+
 
 
 
