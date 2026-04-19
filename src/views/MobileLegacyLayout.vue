@@ -571,10 +571,21 @@ const goBackFromCheckout = () => {
   }
 }
 
-const goHome = () => {
+const goHome = (resetScroll = true) => {
   currentView.value = 'home'
   previousView.value = 'home'
-  setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
+  
+  const scrollToTop = () => {
+    window.scrollTo({ top: resetScroll ? 0 : savedScrollY.value, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: resetScroll ? 0 : savedScrollY.value, behavior: 'smooth' });
+    document.body.scrollTo({ top: resetScroll ? 0 : savedScrollY.value, behavior: 'smooth' });
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.scrollTo({ top: resetScroll ? 0 : savedScrollY.value, behavior: 'smooth' });
+    const cont = document.querySelector('.app-container');
+    if (cont && typeof cont.scrollTo === 'function') cont.scrollTo({ top: resetScroll ? 0 : savedScrollY.value, behavior: 'smooth' });
+  };
+  scrollToTop();
+  setTimeout(scrollToTop, 50);
 }
 
 const goToMall = () => {
@@ -765,7 +776,7 @@ onMounted(() => {
 
     <header class="navbar">
       <div class="nav-content">
-        <a href="/" class="logo" @click.prevent="goHome(); setTimeout(() => window.scrollTo(0, 0), 50);" style="position: relative; z-index: 9999; cursor: pointer;">
+        <a href="/" class="logo" @click.prevent="goHome(true)" style="position: relative; z-index: 9999; cursor: pointer;">
           <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" />
         </a>
         <nav class="nav-links">

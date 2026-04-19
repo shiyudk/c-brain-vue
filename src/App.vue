@@ -34,7 +34,17 @@ const goHome = () => {
   console.log('Logo clicked - navigating home');
   if (state.isMobileMenuOpen) toggleMobileMenu()
   if (route.path === '/') {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
+      const appEl = document.getElementById('app');
+      if (appEl) appEl.scrollTo({ top: 0, behavior: 'smooth' });
+      const cont = document.querySelector('.app-container');
+      if (cont && typeof cont.scrollTo === 'function') cont.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    scrollToTop();
+    setTimeout(scrollToTop, 50);
   } else {
     router.push('/')
   }
@@ -190,7 +200,7 @@ watch(() => route.hash, (newHash) => {
     <!-- Navbar -->
     <header class="navbar">
       <div class="nav-content">
-        <a href="/" class="logo" @click.prevent="goHome(); setTimeout(() => window.scrollTo(0, 0), 50);" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
+        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 10000; cursor: pointer; display: flex !important;">
           <img src="/logo_new.png?v=11" alt="Brain Design" class="nav-logo-img" loading="eager" />
         </a>
         <nav class="nav-links">

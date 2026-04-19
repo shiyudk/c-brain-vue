@@ -15,7 +15,18 @@ const currentAuthMode = ref('login')
 const goHome = () => {
   currentView.value = 'home'
   previousView.value = 'home'
-  setTimeout(() => window.scrollTo(0, savedScrollY.value), 0)
+  
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.scrollTo({ top: 0, behavior: 'smooth' });
+    const cont = document.querySelector('.mobile-spa-container');
+    if (cont && typeof cont.scrollTo === 'function') cont.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  scrollToTop();
+  setTimeout(scrollToTop, 50);
 }
 
 const goToDetail = (productName) => {
@@ -172,7 +183,7 @@ onMounted(() => {
     <!-- Mobile Header -->
     <header class="navbar mobile-navbar">
       <div class="nav-content">
-        <a href="/" class="logo" @click.prevent="goHome(); setTimeout(() => window.scrollTo(0, 0), 50);" style="position: relative; z-index: 9999; cursor: pointer;">
+        <a href="/" class="logo" @click.prevent="goHome" style="position: relative; z-index: 9999; cursor: pointer;">
           <img src="/logo_new.png?v=9" alt="Brain Design" class="nav-logo-img" />
         </a>
         <div class="nav-actions">
