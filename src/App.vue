@@ -95,7 +95,11 @@ const scrollToPhilosophy = () => {
     router.push({ name: 'home', hash: '#philosophy-company-section' })
   } else {
     const el = document.getElementById('philosophy-company-section')
-    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2);
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    }
   }
 }
 
@@ -105,7 +109,11 @@ const scrollToConsulting = () => {
     router.push({ name: 'home', hash: '#consulting-boxes' })
   } else {
     const el = document.getElementById('consulting-boxes')
-    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2);
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    }
   }
 }
 
@@ -173,7 +181,11 @@ watch(() => route.hash, (newHash) => {
   if (newHash) {
     setTimeout(() => {
       const el = document.querySelector(newHash)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2) + (rect.height / 2);
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      }
     }, 500)
   }
 })

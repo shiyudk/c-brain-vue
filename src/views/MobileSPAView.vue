@@ -124,13 +124,13 @@ const scrollToConsulting = () => {
     goHome()
     setTimeout(() => {
       const el = document.getElementById('consulting-boxes')
-      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2), behavior: 'smooth' })
     }, 100)
     return
   }
   const el = document.getElementById('consulting-boxes')
   if (el) {
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (el.getBoundingClientRect().height / 2), behavior: 'smooth' })
   }
 }
 
@@ -143,13 +143,13 @@ const scrollToPhilosophy = () => {
     goHome()
     setTimeout(() => {
       const el = document.getElementById('philosophy')
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: 'smooth' })
     }, 100)
     return
   }
   const el = document.getElementById('philosophy')
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth' })
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: 'smooth' })
   }
 }
 
@@ -205,7 +205,7 @@ onMounted(() => {
     <div class="mobile-slide-menu" :class="{ 'is-open': state.isMobileMenuOpen }">
       <div class="mobile-menu-header">
         <span class="mobile-menu-title">MENU</span>
-        <button class="close-menu-btn" @click="state.isMobileMenuOpen = false">✕</button>
+        <button class="close-menu-btn" @click="state.isMobileMenuOpen = false">??/button>
       </div>
       <nav class="mobile-nav-links">
         <a href="#" @click.prevent="scrollToPhilosophy">{{ t.nav.company }}</a>
@@ -217,16 +217,16 @@ onMounted(() => {
           <a href="#" @click.prevent="goToSupport">{{ t.nav.support }}</a>
           <a href="#" @click.prevent="goToJobs">{{ t.nav.jobs }}</a>
           <template v-if="state.currentUser">
-            <a href="#" @click.prevent="goToMyPage">{{ state.currentLang === 'ko' ? '마이페이지' : 'My Page' }}</a>
+            <a href="#" @click.prevent="goToMyPage">{{ state.currentLang === 'ko' ? '마이?�이지' : 'My Page' }}</a>
           </template>
           <template v-else>
             <a href="#" @click.prevent="goToAuth('signup')">{{ t.nav.signup }}</a>
-            <a href="#" @click.prevent="goToAuth('login')">{{ state.currentLang === 'ko' ? '로그인' : 'Login' }}</a>
+            <a href="#" @click.prevent="goToAuth('login')">{{ state.currentLang === 'ko' ? '로그?? : 'Login' }}</a>
           </template>
           <a href="#" @click.prevent="goToCart" class="accent-link">{{ t.cart.title }}</a>
           <a href="#" @click.prevent="goToMall" class="accent-link">{{ t.nav.mall }}</a>
           <a href="#" v-if="isAdmin" @click.prevent="goToAdmin" style="color: #ff6b6b;">ADMIN</a>
-          <a href="#" v-if="state.currentUser" @click.prevent="logout" style="color: #ff6b6b; opacity: 0.8; margin-top: 10px;">{{ state.currentLang === 'ko' ? '로그아웃' : 'Logout' }}</a>
+          <a href="#" v-if="state.currentUser" @click.prevent="logout" style="color: #ff6b6b; opacity: 0.8; margin-top: 10px;">{{ state.currentLang === 'ko' ? '로그?�웃' : 'Logout' }}</a>
         </div>
       </nav>
     </div>
@@ -256,3 +256,4 @@ onMounted(() => {
   background: var(--tech-bg) !important;
 }
 </style>
+
